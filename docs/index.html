@@ -1,8 +1,15 @@
-<title>Pipkin Avatars</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pipkin · deterministic animal avatars that breed and fuse</title>
+<meta name="description" content="Any name, email or id gets a small animal of its own. Zero dependencies, about 2 KB of SVG per avatar. Breed two names into a child, or fuse a team into one avatar.">
+<meta name="theme-color" content="#F3F5FB">
+<link rel="icon" id="favicon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=swap">
 <style>/* pipkin motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
 .pipkin .pipkin-bob,.pipkin .pipkin-breathe,.pipkin .pipkin-ear,.pipkin .pipkin-eye{transform-box:view-box;transform-origin:0 0}
 .pipkin .pipkin-bob{animation:pipkin-bob var(--pipkin-bob,4.4s) ease-in-out var(--pipkin-delay,0s) infinite}
@@ -19,329 +26,506 @@
 @media (prefers-reduced-motion:reduce){.pipkin *{animation:none!important}}
 </style>
 <style>
-/* Layout: the pipkin field notebook, now as product docs. A hero crowd, then working benches
-   (playground, breed, fuse, motion), then the reference. One column on phones. */
+/* The Crowd: a landing page that is also the demo. Every avatar is drawn by the library in the
+   browser; nothing here is an image file. */
 :root {
-  --paper: #f3f5f0;
-  --grid: rgba(38, 72, 56, 0.05);
+  --bg: #f3f5fb;
+  --ink: #141a33;
+  --muted: #545b73;
   --card: #ffffff;
-  --tile: #eef1ec;
-  --ink: #1c2320;
-  --muted: #5b665f;
-  --line: #d8ded5;
-  --pen: #2a4bc4;
-  --pen-soft: rgba(42, 75, 196, 0.08);
-  --code: #f7f8f5;
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --radius: 14px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #131715; --grid: rgba(200, 232, 215, 0.04); --card: #1b201d; --tile: #262c29; --ink: #e5ebe6; --muted: #9aa69f;
-    --line: #2d3531; --pen: #93a8ff; --pen-soft: rgba(147, 168, 255, 0.12); --code: #171b19; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #131715; --grid: rgba(200, 232, 215, 0.04); --card: #1b201d; --tile: #262c29; --ink: #e5ebe6; --muted: #9aa69f;
-  --line: #2d3531; --pen: #93a8ff; --pen-soft: rgba(147, 168, 255, 0.12); --code: #171b19; color-scheme: dark;
+  --line: #dde2ee;
+  --line-soft: #e8ebf3;
+  --soft: #f6f7fb;
+  --tile: #eef1fa;
+  --navy-2: #1f2747;
+  --navy-3: #2e3866;
+  --pale: #c3c9dd;
+  --focus: #5b7cfa;
+  --font: "Gabarito", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --pad: 32px;
+  --ring: 0 0 0 1px rgba(20, 26, 51, 0.06);
 }
 * { box-sizing: border-box; }
-body {
-  background-color: var(--paper);
-  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 24px 24px;
-  color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); }
+a:hover { color: #3b4466; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+code, pre { font-family: var(--mono); }
+h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--pad); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.av { display: inline-block; width: var(--s, 40px); height: var(--s, 40px); flex: none; }
+.av svg, .pk svg, .tile svg { display: block; width: 100%; height: 100%; }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.small { font-size: 13px; color: var(--muted); }
+.chip { align-self: flex-start; max-width: 100%; padding: 8px 12px; border-radius: 10px; background: var(--bg); font-size: 13px; color: var(--ink); overflow-wrap: anywhere; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background-color 0.15s ease; }
+.btn-dark { background: var(--ink); color: #fff; }
+.btn-dark:hover { background: #2a3358; color: #fff; }
+.btn-soft { background: var(--soft); border-color: var(--line); color: var(--ink); }
+.btn-soft:hover { background: #e9ecf6; color: var(--ink); }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 20px; padding-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 28px; font-size: 15px; font-weight: 500; }
+.nav a { text-decoration: none; }
+
+/* Hero: the crowd flows around the card */
+.crowd { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding-top: 8px; }
+.hero-card { grid-column: 4 / 10; grid-row: 2 / 6; position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 15vw, 220px); align-items: center; gap: 28px; padding: 36px; border-radius: 32px; background: var(--card); box-shadow: 0 30px 60px -28px rgba(20, 26, 51, 0.35), var(--ring); }
+.hero-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.hero h1 { font-size: clamp(36px, 3.6vw, 54px); line-height: 0.98; }
+.lede { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field input { height: 52px; padding: 0 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); font: inherit; font-size: 17px; color: var(--ink); }
+.field input:focus { outline: none; border-color: var(--focus); background: #fff; box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.25); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.result { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; }
+.tile { width: 100%; max-width: 220px; aspect-ratio: 1 / 1; }
+.result figcaption { display: flex; flex-direction: column; align-items: center; gap: 2px; max-width: 100%; text-align: center; }
+.call { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+.desc { font-size: 14px; color: var(--muted); }
+
+.pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; }
+.pk:hover { background: #fff; transform: translateY(-2px); }
+.pk[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 2px var(--ink); }
+.pk .f { display: block; width: 76%; height: 76%; }
+.tag { position: absolute; left: 50%; bottom: -6px; z-index: 2; transform: translate(-50%, 4px); padding: 3px 8px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; line-height: 1.3; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; }
+.pk:hover .tag, .pk:focus-visible .tag { opacity: 1; transform: translate(-50%, 0); }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-7px) rotate(var(--tilt, 0deg)); } }
+.f0 { animation: float 4.6s ease-in-out infinite; --tilt: -3deg; }
+.f1 { animation: float 5.2s ease-in-out -1.4s infinite; --tilt: 2deg; }
+.f2 { animation: float 4.1s ease-in-out -2.2s infinite; --tilt: -2deg; }
+.f3 { animation: float 5.6s ease-in-out -0.7s infinite; --tilt: 3deg; }
+.f4 { animation: float 4.9s ease-in-out -3.1s infinite; --tilt: -1deg; }
+.f5 { animation: float 4.3s ease-in-out -1.9s infinite; --tilt: 1.5deg; }
+.is-off * { animation-play-state: paused !important; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 12px; padding-top: 56px; }
+.stat { display: flex; flex-direction: column; gap: 6px; padding: 24px 26px; border-radius: 24px; background: var(--card); box-shadow: var(--ring); }
+.stat span { font-size: 15px; color: var(--muted); }
+.stat strong { font-size: 44px; font-weight: 600; line-height: 1.05; letter-spacing: -0.03em; }
+
+/* Sections */
+.section { display: flex; flex-direction: column; gap: 40px; padding-top: 112px; }
+.section-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; }
+.section-head h2 { max-width: 11em; font-size: clamp(36px, 4vw, 56px); line-height: 1; }
+.section-head p { margin: 0; max-width: 30em; font-size: 17px; line-height: 1.55; color: var(--muted); }
+
+/* Chat mock */
+.app { display: flex; flex-wrap: wrap; border-radius: 28px; overflow: hidden; background: var(--card); box-shadow: 0 40px 80px -40px rgba(20, 26, 51, 0.35), 0 0 0 1px rgba(20, 26, 51, 0.07); }
+.app-side { flex: 1 1 260px; display: flex; flex-direction: column; gap: 20px; padding: 24px; background: #f7f8fc; border-right: 1px solid var(--line-soft); }
+.team-head { display: flex; align-items: center; gap: 12px; }
+.team-head strong { display: block; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.members { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.members li { display: flex; align-items: center; gap: 12px; }
+.members b, .who b { display: block; font-size: 15px; font-weight: 600; }
+.hint-box { margin: auto 0 0; padding: 12px 14px; border-radius: 14px; background: #fff; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.hint-box code { color: var(--ink); }
+.app-main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; }
+.app-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 28px; border-bottom: 1px solid var(--line-soft); }
+.app-bar .channel { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; }
+.stack { display: flex; align-items: center; }
+.stack .av { margin-left: -8px; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
+.stack .av:first-child { margin-left: 0; }
+.messages { flex: 1 1 auto; list-style: none; margin: 0; padding: 28px; display: flex; flex-direction: column; gap: 22px; }
+.messages li { display: flex; gap: 14px; }
+.who { display: flex; align-items: baseline; gap: 8px; }
+.messages p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+.composer, .reply { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: #f7f8fc; }
+.composer { margin: 0 28px 28px; padding: 6px 6px 6px 18px; border-radius: 16px; }
+.reply { margin: auto 0 0; padding: 4px 4px 4px 14px; border-radius: 14px; }
+.composer:focus-within, .reply:focus-within { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.2); }
+.composer input, .reply input { flex: 1 1 auto; min-width: 0; height: 44px; border: 0; background: transparent; font: inherit; font-size: 15px; color: var(--ink); }
+.composer input:focus, .reply input:focus { outline: none; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: var(--ink); color: #fff; cursor: pointer; }
+.reply .btn-send { min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+/* Stick them anywhere */
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 18px; padding: 24px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); min-width: 0; }
+.card h3 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
+.comment { display: flex; gap: 12px; }
+.comment b { display: block; font-size: 14px; font-weight: 600; }
+.comment p { margin: 2px 0 0; font-size: 15px; line-height: 1.45; }
+.canvas { position: relative; flex: 1 1 auto; min-height: 268px; border-radius: 18px; background-color: var(--soft); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
+.cursor { position: absolute; display: flex; align-items: flex-start; gap: 4px; }
+.cursor .label { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 3px 10px 3px 3px; border-radius: 999px; background: var(--c); color: var(--ink); font-size: 13px; font-weight: 600; }
+.cursor .label .av { border-radius: 50%; background: #fff; }
+.c1 { left: 12%; top: 16%; animation: drift1 11s ease-in-out infinite; }
+.c2 { left: 52%; top: 44%; animation: drift2 13s ease-in-out infinite; }
+.c3 { left: 20%; top: 68%; animation: drift3 12s ease-in-out infinite; }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 35% { transform: translate(56px, 26px); } 70% { transform: translate(22px, -10px); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 40% { transform: translate(-64px, -30px); } 75% { transform: translate(-18px, 16px); } }
+@keyframes drift3 { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(40px, -24px); } 65% { transform: translate(92px, 0); } }
+.teams { display: flex; flex-direction: column; gap: 10px; }
+.team { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 8px 12px; border: 2px solid var(--line-soft); border-radius: 18px; background: #fff; color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: background-color 0.15s ease; }
+.team:hover { background: #e9ecf6; }
+.team[aria-pressed="true"] { border-color: var(--ink); background: var(--soft); }
+.team .names { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; }
+.team .names b { font-size: 15px; font-weight: 600; }
+.team .check { visibility: hidden; }
+.team[aria-pressed="true"] .check { visibility: visible; }
+.card .chip { margin-top: auto; }
+
+/* Feature tiles */
+.feature { gap: 18px; padding: 28px; }
+.feature .art { height: 236px; border-radius: 20px; background: var(--tile); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.feature .row { display: flex; align-items: center; gap: 10px; }
+.feature .op { font-size: 26px; font-weight: 800; color: var(--muted); }
+.feature .moods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-content: center; justify-items: center; gap: 12px; padding: 24px; }
+.feature h3 { font-size: 30px; line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; }
+.feature p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
+.feature p code { color: var(--ink); }
+
+/* Docs */
+.docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 16px; align-items: start; }
+.table-card { padding: 4px 24px 12px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); overflow-x: auto; }
+.table-card h3 { padding: 20px 0 6px; font-size: 15px; font-weight: 600; letter-spacing: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { padding: 10px 16px 10px 0; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; font-weight: 600; color: var(--muted); }
+td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line-soft); vertical-align: top; line-height: 1.5; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+td code, .guarantees code { padding: 1px 6px; border-radius: 6px; background: var(--bg); font-size: 0.88em; }
+td:first-child code { padding: 0; background: none; font-size: 0.92em; }
+.snippets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: 16px; }
+.snippet { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 24px; background: var(--card); box-shadow: var(--ring); min-width: 0; }
+.snippet h3 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
+pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(--ink); color: #e6e9f5; font-size: 13.5px; line-height: 1.7; overflow-x: auto; }
+.k { color: #c7b5ff; } .s { color: #9ee6b8; } .n { color: #ffc98a; } .cm { color: #9aa3c4; }
+.guarantees { padding: 24px 28px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); }
+.guarantees ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 14px 40px; }
+.guarantees li { font-size: 15px; line-height: 1.55; color: var(--muted); }
+.guarantees li b { color: var(--ink); font-weight: 600; }
+
+/* Install */
+.install { padding-top: 112px; }
+.peek { position: relative; z-index: 1; display: flex; justify-content: flex-end; gap: 6px; padding-right: 56px; margin-bottom: -20px; }
+.panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: center; gap: 40px; padding: 56px; border-radius: 36px; background: var(--ink); color: #fff; }
+.panel h2 { font-size: clamp(36px, 4vw, 56px); line-height: 1; color: #fff; }
+.panel .copy { display: flex; flex-direction: column; gap: 16px; }
+.panel p { margin: 0; max-width: 28em; font-size: 17px; line-height: 1.55; color: var(--pale); }
+.panel .side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.cmd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 20px; border-radius: 16px; background: var(--navy-2); }
+.cmd code { color: #fff; font-size: 15px; overflow-wrap: anywhere; }
+.cmd .prompt { color: #9aa3c4; }
+.cmd button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.panel pre.code { background: var(--navy-2); }
+.panel .note { font-size: 14px; }
+.panel .note code { color: #fff; }
+
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 64px; padding-bottom: 56px; font-size: 14px; color: var(--muted); }
+.foot .brandline { display: flex; align-items: center; gap: 10px; }
+
+@media (max-width: 900px) {
+  .crowd { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .hero-card { grid-column: 1 / -1; grid-row: 2 / span 1; }
+  .crowd .pk:nth-of-type(n+31) { display: none; }
 }
-.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0; }
-h1, h2, h3 { margin: 0; text-wrap: balance; }
-p { margin: 0; }
-code, pre, .mono { font-family: var(--font-mono); }
-code { font-size: 0.86em; }
-:focus-visible { outline: 2px solid var(--pen); outline-offset: 2px; border-radius: 6px; }
-.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
-.wordmark { display: flex; align-items: baseline; gap: 10px; }
-.wordmark b { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72; }
-.tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; background: var(--card); }
-.top nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.92rem; }
-.top nav a { color: var(--muted); text-decoration: none; }
-.top nav a:hover { color: var(--pen); }
-.eyebrow, .label { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; }
-.eyebrow { color: var(--pen); }
-.label { color: var(--muted); }
-
-.hero { padding-block: 26px 40px; display: grid; gap: 22px; }
-.hero h1 { font-family: var(--font-display); font-weight: 650; font-size: clamp(2.4rem, 5.6vw, 4rem); line-height: 1.03; letter-spacing: -0.015em; font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
-.lede { font-size: 1.12rem; color: var(--muted); max-width: 62ch; }
-.crowd { display: flex; flex-wrap: wrap; gap: 10px; }
-.kit { --s: 64px; width: var(--s); height: var(--s); display: block; flex: none; border-radius: 50%; background: var(--tile); overflow: hidden; }
-.kit svg { width: 100%; height: 100%; display: block; }
-.kit.sq { border-radius: 22%; }
-.kit.bare { background: none; border-radius: 0; overflow: visible; }
-.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 760px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
-.fact b { display: block; font-family: var(--font-display); font-size: 1.6rem; font-weight: 650; font-variation-settings: "SOFT" 100, "opsz" 72; font-variant-numeric: tabular-nums; }
-.fact span { font-size: 0.86rem; color: var(--muted); }
-pre.code { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; overflow-x: auto; font-size: 0.86rem; line-height: 1.65; color: var(--ink); }
-pre.code .c { color: var(--muted); }
-pre.code .s { color: var(--pen); }
-
-section.bench { padding-block: 40px; border-top: 1px dashed var(--line); display: grid; gap: 20px; scroll-margin-top: 12px; }
-.head { display: grid; gap: 8px; max-width: 68ch; }
-.head h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.7rem, 3.4vw, 2.3rem); line-height: 1.1; font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 96; }
-.head p { color: var(--muted); }
-.split { display: grid; grid-template-columns: minmax(250px, 310px) minmax(0, 1fr); gap: 24px; align-items: start; }
-@media (max-width: 840px) { .split { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 14px; min-width: 0; align-content: start; }
-.field { display: grid; gap: 6px; }
-.field label, .field .label { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
-input[type="text"], select {
-  width: 100%; min-width: 0; font: 500 0.98rem var(--font-body); color: var(--ink); background: var(--paper);
-  border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px;
+@media (max-width: 640px) {
+  .table-card table, .table-card tbody, .table-card tr, .table-card td { display: block; }
+  .table-card thead { display: none; }
+  .table-card tr { padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+  .table-card tr:last-child { border-bottom: 0; }
+  .table-card td { padding: 2px 0; border: 0; white-space: normal; }
+  .table-card td:nth-child(2) { font-size: 14px; color: var(--muted); }
 }
-input[type="text"]:focus, select:focus { border-color: var(--pen); outline: none; box-shadow: 0 0 0 3px var(--pen-soft); }
-input[type="range"] { width: 100%; accent-color: var(--pen); }
-.btn { font: 500 0.88rem var(--font-body); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; white-space: nowrap; }
-.btn:hover { border-color: var(--pen); color: var(--pen); }
-.btn[aria-pressed="true"] { border-color: var(--pen); color: var(--pen); background: var(--pen-soft); }
-.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.note { font-size: 0.86rem; color: var(--muted); }
-.stage { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
-@media (max-width: 560px) { .stage { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
-.stage > .kit { --s: 168px; }
-.ladder { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-.ladder figure { margin: 0; display: grid; justify-items: center; gap: 4px; }
-.ladder figcaption { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
-.traits { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: 0.9rem; }
-.traits dt { color: var(--muted); }
-.traits dd { margin: 0; font-family: var(--font-mono); font-size: 0.84rem; overflow-wrap: anywhere; }
-
-.litter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 640px) { .litter { grid-template-columns: minmax(0, 1fr); } }
-.kid { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; align-items: start; }
-.kid .kit { --s: 88px; grid-row: span 2; }
-.kid code { overflow-wrap: anywhere; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px 3px 6px; }
-.chip.new { background: var(--pen-soft); border-color: transparent; color: var(--pen); }
-.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18); }
-.dot + .dot { margin-left: -4px; }
-.parents { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.op { font-family: var(--font-display); font-size: 1.5rem; color: var(--muted); }
-.members { display: flex; flex-wrap: wrap; gap: 6px; }
-.member { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); font-size: 0.86rem; max-width: 100%; }
-.member .kit { --s: 22px; background: none; }
-.member button { border: 0; background: none; color: var(--muted); cursor: pointer; width: 22px; height: 22px; border-radius: 50%; font-size: 1rem; line-height: 1; }
-.member button:hover { background: var(--pen-soft); color: var(--pen); }
-form.add { display: flex; gap: 8px; }
-
-.statuses { display: flex; flex-wrap: wrap; gap: 8px; }
-.motion-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-@media (max-width: 840px) { .motion-grid { grid-template-columns: minmax(0, 1fr); } }
-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-td code { white-space: nowrap; }
-.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
-.wave:hover .pipkin-ear-l { animation: wave-l .5s 2; }
-.wave:hover .pipkin-ear-r { animation: wave-r .5s 2; }
-@keyframes wave-l { 50% { transform: rotate(-24deg) } }
-@keyframes wave-r { 50% { transform: rotate(24deg) } }
-.lists { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
-@media (max-width: 760px) { .lists { grid-template-columns: minmax(0, 1fr); } }
-.lists h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; font-variation-settings: "SOFT" 100, "opsz" 48; margin-bottom: 6px; }
-.lists ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; color: var(--muted); }
-.lists strong { color: var(--ink); font-weight: 600; }
-footer { padding-block: 28px 40px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 560px) {
+  :root { --pad: 16px; }
+  .crowd .pk:nth-of-type(n+19) { display: none; }
+  .hero-card { grid-template-columns: minmax(0, 1fr); padding: 24px; border-radius: 26px; }
+  pre.code { padding: 14px; font-size: 12.5px; }
+  .section, .install { padding-top: 80px; }
+  .panel { padding: 28px; border-radius: 28px; }
+  .peek { padding-right: 16px; }
+  .messages, .app-bar { padding-left: 20px; padding-right: 20px; }
+  .composer { margin: 0 20px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .f0, .f1, .f2, .f3, .f4, .f5, .c1, .c2, .c3 { animation: none; }
+}
 </style>
+</head>
+<body>
 
-<div class="wrap">
-  <header class="top">
-    <div class="wordmark"><b>pipkin</b><span class="tag">v0.1.0</span></div>
-    <nav aria-label="Sections"><a href="#play">Playground</a><a href="#breed">Breed</a><a href="#fuse">Fuse</a><a href="#motion">Motion</a><a href="#api">API</a></nav>
-  </header>
+<header class="wrap top">
+  <a class="brand" href="#top"><span class="av" data-pipkin="maya" style="--s: 36px"></span>pipkin</a>
+  <nav class="nav" aria-label="Main">
+    <a href="#features">Features</a>
+    <a href="#docs">Docs</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/Michaell14/pipkin">GitHub</a>
+  </nav>
+</header>
 
-  <section class="hero" aria-labelledby="title">
-    <div style="display:grid;gap:12px">
-      <span class="eyebrow">Deterministic animal avatars</span>
-      <h1 id="title">Every name gets a pipkin.</h1>
-      <p class="lede">pipkin turns any string into a small animal avatar. The same name always gives the same pipkin, and nothing is stored. Two pipkins can have children, a team can fuse into one pipkin, and every pipkin has room to move.</p>
-    </div>
-    <div class="crowd" id="crowd" aria-label="A crowd of animated kits"></div>
-    <div class="facts">
-      <div class="fact"><b id="f-size">2 KB</b><span>average SVG per pipkin</span></div>
-      <div class="fact"><b>8.4 KB</b><span>library, gzipped</span></div>
-      <div class="fact"><b>0</b><span>dependencies</span></div>
-      <div class="fact"><b>6.8:1</b><span>minimum eye contrast</span></div>
-    </div>
-<pre class="code"><code><span class="c">// npm install pipkin (not published yet)</span>
-import { pipkin } from "pipkin";
-
-avatar.innerHTML = pipkin(user.email, { size: 40, background: "circle" });</code></pre>
-  </section>
-
-  <section class="bench" id="play" aria-labelledby="play-title">
-    <div class="head">
-      <span class="eyebrow">Playground</span>
-      <h2 id="play-title">Type a name</h2>
-      <p>Everything here is computed in your browser by the same code the package ships.</p>
-    </div>
-    <div class="split">
-      <div class="panel">
-        <div class="field"><label for="p-name">Name, id or email</label><input type="text" id="p-name" value="maya@acme.co" autocomplete="off" spellcheck="false"></div>
-        <div class="field"><label for="p-bg">Background</label>
-          <select id="p-bg"><option value="">None</option><option value="circle" selected>Circle</option><option value="squircle">Squircle</option><option value="square">Square</option></select></div>
-        <div class="field"><label for="p-mood">Mood</label><select id="p-mood"></select></div>
-        <div class="field"><label for="p-anim">Animate</label>
-          <select id="p-anim"><option value="off">Off</option><option value="on" selected>Always</option><option value="hover">On hover</option></select></div>
-        <div class="btn-row"><button class="btn" type="button" id="p-copy">Copy SVG</button></div>
-      </div>
-      <div class="panel">
-        <div class="stage">
-          <span class="kit bare" id="p-big"></span>
-          <dl class="traits" id="p-traits"></dl>
+<main id="top">
+  <section class="wrap hero" aria-label="Meet the crowd">
+    <div class="crowd" id="crowd">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <h1>There's one for everyone.</h1>
+          <p class="lede">Any name, email or id gets a small animal of its own. The same name always gets the same one, and nothing is stored.</p>
+          <div class="field">
+            <label class="kicker" for="seed">Type a name, or click anyone</label>
+            <input id="seed" type="text" value="theo" autocomplete="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="actions">
+            <a class="btn btn-dark" href="#install">Get started</a>
+            <a class="btn btn-soft" href="https://github.com/Michaell14/pipkin">View on GitHub</a>
+          </div>
         </div>
-        <div class="ladder" id="p-ladder"></div>
-<pre class="code" id="p-code"></pre>
+        <figure class="result">
+          <div class="tile" id="tile" role="img" aria-label="theo"></div>
+          <figcaption>
+            <code class="call" id="call">pipkin("theo")</code>
+            <span class="desc" id="desc" aria-live="polite"></span>
+          </figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <section class="bench" id="breed" aria-labelledby="breed-title">
-    <div class="head">
-      <span class="eyebrow">Breed</span>
-      <h2 id="breed-title">Two pipkins, one litter</h2>
-      <p>Each child takes its species, body and eyes from one parent or the other, blends their colour and proportions, and has a 6% chance per trait of something new. A child's name is its lineage, so <code>maya×theo#2</code> draws the same child anywhere.</p>
-    </div>
-    <div class="split">
-      <div class="panel">
-        <div class="field"><label for="b-a">Parent A</label><input type="text" id="b-a" value="maya" autocomplete="off" spellcheck="false"></div>
-        <div class="field"><label for="b-b">Parent B</label><input type="text" id="b-b" value="theo" autocomplete="off" spellcheck="false"></div>
-        <div class="btn-row"><button class="btn" type="button" id="b-swap">Swap parents</button><button class="btn" type="button" id="b-next">Next litter</button></div>
-        <p class="note" id="b-note">Swapping parents gives the same litter.</p>
-      </div>
-      <div style="display:grid;gap:14px;min-width:0">
-        <div class="parents" id="b-parents"></div>
-        <div class="litter" id="b-litter"></div>
-      </div>
-    </div>
+  <section class="wrap stats" aria-label="At a glance">
+    <div class="stat"><span>SVG for this pipkin</span><strong id="size">≈2 KB</strong></div>
+    <div class="stat"><span>Dependencies</span><strong>0</strong></div>
+    <div class="stat"><span>Species, earless blob included</span><strong id="species">6</strong></div>
+    <div class="stat"><span>Time to draw one, on this device</span><strong id="speed">&lt;1 ms</strong></div>
   </section>
 
-  <section class="bench" id="fuse" aria-labelledby="fuse-title">
-    <div class="head">
-      <span class="eyebrow">Fuse</span>
-      <h2 id="fuse-title">A team becomes one pipkin</h2>
-      <p>Members melt into one body. Each keeps their colour, their ears where they reach the top, and one eye. Order never matters, and up to nine members fit.</p>
+  <section class="wrap section" id="features">
+    <div class="section-head">
+      <h2>Made for crowded places.</h2>
+      <p>Comments, chats, cursors, leaderboards. Hundreds can share one page, because a pipkin has no ids, defs or filters to collide.</p>
     </div>
-    <div class="split">
-      <div class="panel">
-        <div class="field"><span class="label">Members</span><div class="members" id="f-members"></div></div>
-        <form class="add" id="f-form"><label for="f-add" hidden>Add a member</label><input type="text" id="f-add" placeholder="Add a name" autocomplete="off" spellcheck="false"><button class="btn" type="submit">Add</button></form>
-        <div class="btn-row" id="f-presets"></div>
-        <div class="btn-row"><button class="btn" type="button" id="f-shuffle">Shuffle order</button></div>
-        <p class="note" id="f-note" aria-live="polite">Shuffle the order: the pipkin stays the same.</p>
-      </div>
-      <div class="panel">
-        <div class="stage"><span class="kit bare" id="f-big"></span><div class="ladder" id="f-ladder"></div></div>
-<pre class="code"><code>fuse(<span id="f-code"></span>, { background: <span class="s">"squircle"</span> })</code></pre>
-      </div>
-    </div>
-  </section>
-
-  <section class="bench" id="motion" aria-labelledby="motion-title">
-    <div class="head">
-      <span class="eyebrow">Motion</span>
-      <h2 id="motion-title">Room to move</h2>
-      <p>With <code>animate: true</code>, every moving part sits in its own group, pivoting where it should: ears at their base, eyes at their centre, the body at its feet. pipkin ships a quiet idle loop (breathing, a small bob, blinks and ear twitches), timed per pipkin so a crowd never moves in step. You can add your own animations on top.</p>
-    </div>
-    <div class="motion-grid">
-      <div class="panel">
-        <h3 style="font-size:1rem">Moods as status</h3>
-        <div class="stage"><span class="kit" id="m-big" style="--s:140px"></span>
-          <div style="display:grid;gap:10px"><div class="statuses" id="m-status" role="group" aria-label="Status"></div><p class="note" id="m-note"></p></div></div>
-      </div>
-      <div class="panel">
-        <h3 style="font-size:1rem">Your own animation</h3>
-        <div class="stage"><span class="kit wave" id="m-wave" style="--s:140px"></span>
-          <p class="note">Hover the pipkin: its ears wave, from four lines of CSS.</p></div>
-<pre class="code"><code>.wave:hover .pipkin-ear-l { animation: wave-l .5s 2; }
-.wave:hover .pipkin-ear-r { animation: wave-r .5s 2; }
-@keyframes wave-l { 50% { transform: rotate(-24deg) } }
-@keyframes wave-r { 50% { transform: rotate(24deg) } }</code></pre>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Part</th><th>Pivot</th><th>Default motion</th><th>Timing variable</th></tr></thead>
-        <tbody>
-          <tr><td><code>.pipkin-bob</code></td><td>whole pipkin</td><td>drifts up and down by under a pixel</td><td><code>--pipkin-bob</code>, <code>--pipkin-delay</code></td></tr>
-          <tr><td><code>.pipkin-breathe</code></td><td>bottom of the body</td><td>squashes 1–2% and back</td><td><code>--pipkin-breathe</code>, <code>--pipkin-delay</code></td></tr>
-          <tr><td><code>.pipkin-ear-l</code>, <code>.pipkin-ear-r</code></td><td>base of each ear</td><td>an occasional twitch</td><td><code>--pipkin-twitch</code>, <code>--pipkin-twitch-delay</code></td></tr>
-          <tr><td><code>.pipkin-eye</code></td><td>centre of each eye</td><td>a blink every few seconds</td><td><code>--pipkin-blink</code>, <code>--pipkin-blink-delay</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">Load <code>pipkin/motion.css</code> once per page, or pass <code>embedMotion: true</code> to put the styles inside the SVG so it also animates as an <code>&lt;img&gt;</code>. Motion stops under <code>prefers-reduced-motion</code>.</p>
-  </section>
-
-  <section class="bench" id="api" aria-labelledby="api-title">
-    <div class="head">
-      <span class="eyebrow">Reference</span>
-      <h2 id="api-title">API</h2>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Function</th><th>Returns</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td><code>pipkin(seed, options?)</code></td><td>SVG string</td><td>One pipkin. A seed is a name, id, email, lineage or genome.</td></tr>
-          <tr><td><code>fuse(seeds, options?)</code></td><td>SVG string</td><td>One pipkin for a group of up to 9. Order and duplicates are ignored.</td></tr>
-          <tr><td><code>breed(a, b, { child? })</code></td><td>genome</td><td>Order-free. <code>child</code> picks a sibling. <code>.id</code> is the lineage, <code>.from</code> says where each trait came from.</td></tr>
-          <tr><td><code>kinUri</code>, <code>fuseUri</code></td><td>data URI</td><td>For <code>&lt;img src&gt;</code>, CSS and email-safe pipelines.</td></tr>
-          <tr><td><code>describe(seed)</code></td><td>string</td><td>Alt text, such as <code>"teal bear with dot eyes"</code>.</td></tr>
-          <tr><td><code>genome(seed)</code>, <code>share(trait, value)</code></td><td>genome, number</td><td>The traits behind a pipkin, and how common a trait value is.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Option</th><th>Default</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td><code>size</code></td><td>none</td><td>Sets width and height. Leave it out to size with CSS.</td></tr>
-          <tr><td><code>background</code></td><td><code>false</code></td><td><code>"circle"</code>, <code>"squircle"</code> or <code>"square"</code>, in a pale tint of the pipkin's colour.</td></tr>
-          <tr><td><code>mood</code></td><td><code>"neutral"</code></td><td><code>happy</code>, <code>sleepy</code>, <code>grumpy</code>, <code>worried</code>, <code>excited</code>, <code>determined</code>, <code>smug</code>. Eyelids only, no mouths.</td></tr>
-          <tr><td><code>animate</code></td><td><code>false</code></td><td><code>true</code> or <code>"hover"</code>. Needs inline SVG plus motion.css, or <code>embedMotion</code>.</td></tr>
-          <tr><td><code>embedMotion</code></td><td><code>false</code></td><td>Puts the motion CSS inside the SVG.</td></tr>
-          <tr><td><code>title</code></td><td>none</td><td>Accessible name. Without it the SVG is <code>aria-hidden</code>.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="lists">
-      <div>
-        <h3>Guarantees</h3>
-        <ul>
-          <li><strong>Deterministic.</strong> 41 pinned renders are checked byte for byte on every test run.</li>
-          <li><strong>Normalised names.</strong> Case, spacing and Unicode form don't change the pipkin.</li>
-          <li><strong>Stable traits.</strong> Each trait is hashed by its own key, so adding a trait never moves existing ones. Changing how pipkins look is reserved for a major version.</li>
-          <li><strong>Legible.</strong> Eyes clear 6.8:1 against every body colour; pipkins are checked down to 16&nbsp;px.</li>
-          <li><strong>Safe to repeat.</strong> No ids, defs or filters, so hundreds of pipkins can share a page.</li>
+    <div class="app">
+      <aside class="app-side" aria-label="Channel members">
+        <div class="team-head">
+          <span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 52px" role="img" aria-label="Team avatar: zoe, priya, noah and ava fused"></span>
+          <div><strong>Design crew</strong><span class="small">zoe, priya, noah, ava</span></div>
+        </div>
+        <span class="kicker">Members</span>
+        <ul class="members">
+          <li><span class="av" data-pipkin="zoe" data-mood="determined" style="--s: 34px"></span><span><b>zoe</b><span class="small">Focusing</span></span></li>
+          <li><span class="av" data-pipkin="priya" style="--s: 34px"></span><span><b>priya</b><span class="small">Online</span></span></li>
+          <li><span class="av" data-pipkin="noah" style="--s: 34px"></span><span><b>noah</b><span class="small">Online</span></span></li>
+          <li><span class="av" data-pipkin="ava" style="--s: 34px"></span><span><b>ava</b><span class="small">Online</span></span></li>
+          <li><span class="av" data-pipkin="lena" data-mood="sleepy" style="--s: 34px"></span><span><b>lena</b><span class="small">Away</span></span></li>
         </ul>
-      </div>
-      <div>
-        <h3>Not done yet</h3>
-        <ul>
-          <li><strong>Publishing.</strong> The package is marked private until it has a final name.</li>
-          <li><strong>Cross-engine bytes.</strong> Output is verified in Node and Chromium; other engines may round a coordinate differently.</li>
-          <li><strong>Wrappers.</strong> No React, Vue or Svelte components yet. The SVG string works in all of them today.</li>
-          <li><strong>More motion.</strong> Gaze tracking and transitions between moods are the next steps.</li>
-        </ul>
+        <p class="hint-box">Statuses are just moods: <code>determined</code> for focus, <code>sleepy</code> for away.</p>
+      </aside>
+      <div class="app-main">
+        <div class="app-bar">
+          <span class="channel"><span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 30px"></span># design-crew</span>
+          <span class="stack">
+            <span class="av" data-pipkin="zoe" data-bg="circle" style="--s: 30px"></span>
+            <span class="av" data-pipkin="priya" data-bg="circle" style="--s: 30px"></span>
+            <span class="av" data-pipkin="noah" data-bg="circle" style="--s: 30px"></span>
+            <span class="av" data-pipkin="ava" data-bg="circle" style="--s: 30px"></span>
+            <span class="small" style="margin-left: 10px">4 members</span>
+          </span>
+        </div>
+        <ol class="messages">
+          <li><span class="av" data-pipkin="zoe" style="--s: 44px"></span><div><div class="who"><b>zoe</b><span class="small">10:02</span></div><p>Pushed the new onboarding flow. Can someone check the empty states?</p></div></li>
+          <li><span class="av" data-pipkin="priya" style="--s: 44px"></span><div><div class="who"><b>priya</b><span class="small">10:04</span></div><p>On it. The member list still reads well at 24 px.</p></div></li>
+          <li><span class="av" data-pipkin="noah" style="--s: 44px"></span><div><div class="who"><b>noah</b><span class="small">10:05</span></div><p>Where do we store everyone's avatar?</p></div></li>
+          <li><span class="av" data-pipkin="ava" style="--s: 44px"></span><div><div class="who"><b>ava</b><span class="small">10:05</span></div><p>We don't. Same name, same pipkin, every time.</p></div></li>
+        </ol>
+        <form class="composer" onsubmit="return false">
+          <label class="sr-only" for="chat-msg">Message</label>
+          <input id="chat-msg" type="text" placeholder="Message #design-crew">
+          <button class="icon-btn" type="submit" aria-label="Send message"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button>
+        </form>
       </div>
     </div>
   </section>
 
-  <footer>pipkin 0.1.0. MIT licence. Every pipkin on this page is generated in your browser; nothing is sent or stored.</footer>
-</div>
+  <section class="wrap section" id="anywhere">
+    <div class="section-head">
+      <h2>Stick them anywhere.</h2>
+      <p>The same SVG string works as a comment avatar, a live cursor or a team badge. A fused team gets an avatar of its own.</p>
+    </div>
+    <div class="grid3">
+      <article class="card">
+        <h3>Comments</h3>
+        <div class="comment"><span class="av" data-pipkin="juno"></span><div><b>juno</b><p>Love the new empty state.</p></div></div>
+        <div class="comment"><span class="av" data-pipkin="ines"></span><div><b>ines</b><p>Shipping it after lunch.</p></div></div>
+        <div class="comment"><span class="av" data-pipkin="kofi"></span><div><b>kofi</b><p>Can we keep the bunny?</p></div></div>
+        <form class="reply" onsubmit="return false">
+          <label class="sr-only" for="reply-msg">Reply</label>
+          <input id="reply-msg" type="text" placeholder="Reply">
+          <button class="btn-send" type="submit">Send</button>
+        </form>
+      </article>
+      <article class="card">
+        <h3>Live cursors</h3>
+        <div class="canvas" aria-label="Three live cursors: zoe, kofi and ines" role="img">
+          <div class="cursor c1" style="--c: #ea92b9"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#ea92b9" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="zoe" style="--s: 22px"></span>zoe</span></div>
+          <div class="cursor c2" style="--c: #51c2f8"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#51c2f8" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="kofi" style="--s: 22px"></span>kofi</span></div>
+          <div class="cursor c3" style="--c: #d8aaff"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#d8aaff" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="ines" style="--s: 22px"></span>ines</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <h3>Switch team</h3>
+        <div class="teams">
+          <button class="team" type="button" aria-pressed="true" data-team="zoe,priya,noah,ava"><span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 52px"></span><span class="names"><b>Design crew</b><span class="small">zoe, priya, noah, ava</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+          <button class="team" type="button" aria-pressed="false" data-team="omar,lena,kofi,jun,sam"><span class="av" data-fuse="omar,lena,kofi,jun,sam" style="--s: 52px"></span><span class="names"><b>Platform</b><span class="small">omar, lena, kofi, jun, sam</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+          <button class="team" type="button" aria-pressed="false" data-team="maya,theo"><span class="av" data-fuse="maya,theo" style="--s: 52px"></span><span class="names"><b>Founders</b><span class="small">maya, theo</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+        </div>
+        <code class="chip" id="team-code">fuse(["zoe", "priya", "noah", "ava"])</code>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section" aria-label="Breed, fuse and moods">
+    <div class="grid3">
+      <article class="card feature">
+        <div class="art">
+          <div class="row">
+            <span class="av" data-pipkin="maya" style="--s: 72px" role="img" aria-label="maya"></span>
+            <span class="op" aria-hidden="true">×</span>
+            <span class="av" data-pipkin="theo" style="--s: 72px" role="img" aria-label="theo"></span>
+          </div>
+          <div class="row" id="litter"></div>
+        </div>
+        <h3>Breed any two.</h3>
+        <p>Kids take their traits from both parents, and their lineage is their id. <code>maya×theo#1</code> works as a name anywhere.</p>
+        <code class="chip">breed("maya", "theo")</code>
+      </article>
+      <article class="card feature">
+        <div class="art"><span class="av" data-fuse="omar,lena,kofi,jun,sam" data-anim style="--s: 196px" role="img" aria-label="omar, lena, kofi, jun and sam fused into one pipkin"></span></div>
+        <h3>Fuse a whole team.</h3>
+        <p>Up to nine members melt into one body. Each keeps their colour, their ears and one eye.</p>
+        <code class="chip">fuse(["omar", "lena", "kofi", "jun", "sam"])</code>
+      </article>
+      <article class="card feature">
+        <div class="art moods" id="moods"></div>
+        <h3>Eight moods.</h3>
+        <p>All done with eyelids, so a pipkin is still itself when it's grumpy.</p>
+        <code class="chip">pipkin("zoe", { mood: "smug" })</code>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section" id="docs">
+    <div class="section-head">
+      <h2>A small API, no surprises.</h2>
+      <p>Everything returns a string or a plain object. Bad values throw a <code>TypeError</code> that names the accepted ones.</p>
+    </div>
+    <div class="docs-grid">
+      <div class="table-card">
+        <h3>Functions</h3>
+        <table>
+          <thead><tr><th>Function</th><th>Returns</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>pipkin(seed, options?)</code></td><td>SVG string</td><td>One pipkin. A seed is any name, id or email, a lineage, or a genome.</td></tr>
+            <tr><td><code>fuse(seeds, options?)</code></td><td>SVG string</td><td>One pipkin for up to 9 members. Order and duplicates are ignored.</td></tr>
+            <tr><td><code>breed(a, b, { child? })</code></td><td>genome</td><td>Order-free. <code>child</code> picks a sibling (0, 1, 2…).</td></tr>
+            <tr><td><code>pipkinUri</code>, <code>fuseUri</code></td><td>data URI</td><td>The same, ready for <code>src</code> attributes.</td></tr>
+            <tr><td><code>describe(seed)</code></td><td>string</td><td>Alt text, such as <code>"pink bunny with dot eyes"</code>.</td></tr>
+            <tr><td><code>genome(seed)</code></td><td>genome</td><td><code>{ id, gen, genes, from, parents }</code>. <code>from</code> says which parent each trait came from.</td></tr>
+            <tr><td><code>share(trait, value)</code></td><td>number</td><td>How common a trait value is: <code>share("species", "fox")</code> is <code>0.16</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-card">
+        <h3>Options</h3>
+        <table>
+          <thead><tr><th>Option</th><th>Default</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>size</code></td><td>none</td><td>Sets <code>width</code> and <code>height</code>. Leave it out to size with CSS.</td></tr>
+            <tr><td><code>background</code></td><td><code>false</code></td><td><code>"circle"</code>, <code>"squircle"</code> or <code>"square"</code>, in a pale tint of the pipkin's colour.</td></tr>
+            <tr><td><code>mood</code></td><td><code>"neutral"</code></td><td><code>happy</code>, <code>sleepy</code>, <code>grumpy</code>, <code>worried</code>, <code>excited</code>, <code>determined</code>, <code>smug</code>.</td></tr>
+            <tr><td><code>animate</code></td><td><code>false</code></td><td><code>true</code>, or <code>"hover"</code> to play only while hovered. Load <code>pipkin/motion.css</code> once.</td></tr>
+            <tr><td><code>embedMotion</code></td><td><code>false</code></td><td>Puts the motion CSS inside the SVG, so it animates on its own, even as an <code>&lt;img&gt;</code>.</td></tr>
+            <tr><td><code>title</code></td><td>none</td><td>Accessible name. Without it the SVG is <code>aria-hidden</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="snippets">
+      <div class="snippet">
+        <h3>React</h3>
+<pre class="code"><code>&lt;span
+  className=<span class="s">"avatar"</span>
+  dangerouslySetInnerHTML={{
+    __html: pipkin(user.id, { size: <span class="n">32</span> }),
+  }}
+/&gt;</code></pre>
+      </div>
+      <div class="snippet">
+        <h3>Vue</h3>
+<pre class="code"><code>&lt;span
+  class=<span class="s">"avatar"</span>
+  v-html=<span class="s">"pipkin(user.id, { size: 32 })"</span>
+&gt;&lt;/span&gt;</code></pre>
+      </div>
+      <div class="snippet">
+        <h3>Images, CSS and email</h3>
+<pre class="code"><code>img.src = pipkinUri(user.email, {
+  background: <span class="s">"circle"</span>,
+});</code></pre>
+      </div>
+      <div class="snippet">
+        <h3>Motion</h3>
+<pre class="code"><code><span class="k">import</span> <span class="s">"pipkin/motion.css"</span>;
+
+el.innerHTML = pipkin(user.id, { animate: <span class="n">true</span> });</code></pre>
+      </div>
+    </div>
+    <div class="guarantees">
+      <h3 class="kicker">Guarantees</h3>
+      <ul>
+        <li><b>Deterministic.</b> The same input gives the same SVG, byte for byte. 41 pinned renders are checked on every test run.</li>
+        <li><b>Normalised names.</b> Case, spacing and Unicode form don't change the pipkin, so <code>"Theo "</code> is <code>"theo"</code>.</li>
+        <li><b>Stable traits.</b> Each trait is hashed on its own key, so a new trait never moves the old ones. Changing how pipkins look is a major version.</li>
+        <li><b>Legible.</b> Eyes clear 6.8:1 contrast against every body colour, and pipkins are checked down to 16 px.</li>
+        <li><b>Safe to repeat.</b> No ids, <code>&lt;defs&gt;</code>, gradients or filters, so hundreds of pipkins can share a page.</li>
+        <li><b>Private.</b> Nothing is stored or sent anywhere. Every pipkin on this page was drawn in your browser.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap install" id="install" aria-label="Install">
+    <div class="peek" aria-hidden="true">
+      <span class="av" data-pipkin="tara" data-anim style="--s: 76px"></span>
+      <span class="av" data-pipkin="juno" data-anim style="--s: 68px"></span>
+      <span class="av" data-pipkin="odin" data-anim style="--s: 80px"></span>
+      <span class="av" data-pipkin="finn" data-anim style="--s: 70px"></span>
+    </div>
+    <div class="panel">
+      <div class="copy">
+        <h2>Get yours in one line.</h2>
+        <p>No dependencies and about 8.4 KB gzipped. pipkin returns an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
+      </div>
+      <div class="side">
+        <div class="cmd">
+          <code><span class="prompt">$ </span>npm install github:Michaell14/pipkin</code>
+          <button type="button" data-copy="npm install github:Michaell14/pipkin">Copy</button>
+        </div>
+<pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
+
+avatar.innerHTML = pipkin(user.email, {
+  size: <span class="n">40</span>,
+  background: <span class="s">"circle"</span>,
+});</code></pre>
+        <p class="note">Not on npm yet. Until the first release this installs it straight from GitHub; after that it's <code>npm install pipkin</code>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <span class="brandline"><span class="av" data-pipkin="maya" style="--s: 28px"></span>pipkin 0.1.0 is MIT licensed.</span>
+  <a href="https://github.com/Michaell14/pipkin">Source on GitHub</a>
+</footer>
 
 <script type="module">
 
@@ -1328,158 +1512,100 @@ function describe(seed) {
 const PIPKIN = { VERSION, pipkin, fuse, pipkinUri, fuseUri, breed, genome, describe, share, TRAITS, MOODS, MOTION_CSS, MAX_MEMBERS, normalize, fingerprint };
 
 const $ = (s) => document.querySelector(s);
-const escHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const uiKit = (svg, size, label, cls = "") => `<span class="kit ${cls}" style="--s:${size}px" role="img" aria-label="${escHtml(label)}">${svg}</span>`;
-const uiDot = (seed) => `<i class="dot" style="background:${palette(PIPKIN.genome(seed).genes).body}"></i>`;
+const $$ = (s) => [...document.querySelectorAll(s)];
+const quote = (list) => list.map((n) => JSON.stringify(n)).join(", ");
 
-// Hero crowd
-const uiCrowdNames = ["maya@acme.co", "theo@acme.co", "iris@acme.co", "omar@acme.co", "lena@acme.co", "kofi@acme.co", "jun@acme.co", "sam@acme.co", "zoe@acme.co", "priya@acme.co", "noah@acme.co", "ava@acme.co"];
-$("#crowd").innerHTML = uiCrowdNames.map((n) => uiKit(PIPKIN.pipkin(n, { animate: true }), 68, PIPKIN.describe(n))).join("");
-{
-  let total = 0;
-  for (let i = 0; i < 120; i++) total += PIPKIN.pipkin(`sample${i}@example.com`).length;
-  $("#f-size").textContent = `${(total / 120 / 1024).toFixed(1)} KB`;
-}
-
-// Playground
-$("#p-mood").innerHTML = PIPKIN.MOODS.map((m) => `<option value="${m}">${m[0].toUpperCase() + m.slice(1)}</option>`).join("");
-function uiOptions() {
-  const anim = $("#p-anim").value;
+// Every placeholder avatar: data-pipkin="name" (or data-fuse="a,b,c"), plus data-mood, data-bg, data-anim.
+function hydrate(el) {
   const o = {};
-  if ($("#p-bg").value) o.background = $("#p-bg").value;
-  if ($("#p-mood").value !== "neutral") o.mood = $("#p-mood").value;
-  if (anim !== "off") o.animate = anim === "hover" ? "hover" : true;
-  return o;
+  if (el.dataset.mood) o.mood = el.dataset.mood;
+  if (el.dataset.bg) o.background = el.dataset.bg;
+  if ("anim" in el.dataset) o.animate = true;
+  el.innerHTML = el.dataset.fuse ? PIPKIN.fuse(el.dataset.fuse.split(","), o) : PIPKIN.pipkin(el.dataset.pipkin, o);
 }
-function uiPlay() {
-  const name = $("#p-name").value;
-  const o = uiOptions();
-  const g = PIPKIN.genome(name).genes;
-  $("#p-big").innerHTML = PIPKIN.pipkin(name, { ...o, title: PIPKIN.describe(name) });
-  $("#p-ladder").innerHTML = [16, 20, 24, 32, 48, 64].map((s) => `<figure>${uiKit(PIPKIN.pipkin(name, { ...o, size: s }), s, `${s} pixels`, "bare")}<figcaption>${s}px</figcaption></figure>`).join("");
-  $("#p-traits").innerHTML =
-    `<dt>Species</dt><dd>${g.species} · ${Math.round(PIPKIN.share("species", g.species) * 100)}% of names</dd>` +
-    `<dt>Body</dt><dd>${g.body}</dd><dt>Eyes</dt><dd>${g.eyes}</dd><dt>Colour</dt><dd>${colourName(g.hue)} (hue ${Math.round(g.hue)}°)</dd>` +
-    `<dt>Alt text</dt><dd>${escHtml(PIPKIN.describe(name))}</dd>`;
-  const parts = Object.entries(o).map(([k, v]) => `${k}: <span class="s">${escHtml(JSON.stringify(v))}</span>`);
-  $("#p-code").innerHTML = `<code>pipkin(<span class="s">${escHtml(JSON.stringify(name))}</span>${parts.length ? `, { ${parts.join(", ")} }` : ""})</code>`;
-}
-for (const id of ["#p-name", "#p-bg", "#p-mood", "#p-anim"]) $(id).addEventListener("input", uiPlay);
-$("#p-copy").addEventListener("click", async () => {
-  const svg = PIPKIN.pipkin($("#p-name").value, uiOptions());
-  try {
-    await navigator.clipboard.writeText(svg);
-    $("#p-copy").textContent = "Copied";
-  } catch {
-    $("#p-copy").textContent = "Copy isn't available here";
-  }
-  setTimeout(() => ($("#p-copy").textContent = "Copy SVG"), 1600);
+
+// Breeding litter and the moods grid are built from the API, not written out by hand.
+$("#litter").innerHTML = [0, 1, 2, 3]
+  .map((k) => {
+    const kid = PIPKIN.breed("maya", "theo", { child: k });
+    return `<span class="av" style="--s: 54px" role="img" aria-label="${kid.id}, ${PIPKIN.describe(kid)}">${PIPKIN.pipkin(kid)}</span>`;
+  })
+  .join("");
+$("#moods").innerHTML = PIPKIN.MOODS.map((m) => `<span class="av" data-pipkin="zoe" data-mood="${m}" style="--s: 60px" role="img" aria-label="zoe, ${m}"></span>`).join("");
+$$("[data-pipkin], [data-fuse]").forEach(hydrate);
+$("#favicon").href = PIPKIN.pipkinUri("maya", { background: "circle" });
+$("#species").textContent = String(PIPKIN.TRAITS.species.values.length);
+
+// The crowd. Click anyone to put their name in the box.
+const CROWD = ["theo", "omar", "lena", "juno", "zoe", "basil", "priya", "iris", "odin", "ines", "kofi", "maya", "ava", "dev", "rosa", "ezra", "mila", "arlo", "nia", "yuki", "otto", "sana", "leo", "ruby", "finn", "amara", "hugo", "lila", "kai", "nora", "eli", "tara", "max", "idris", "cleo", "remy", "anya", "felix", "ivy", "oren", "zara", "milo", "lucia", "wren", "pia", "jun", "sam", "noah"];
+const input = $("#seed");
+const crowd = CROWD.map((name, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "pk";
+  b.dataset.name = name;
+  b.setAttribute("aria-label", `${name}, ${PIPKIN.describe(name)}`);
+  b.setAttribute("aria-pressed", "false");
+  b.innerHTML = `<span class="f f${i % 6}">${PIPKIN.pipkin(name, { animate: true })}</span><span class="tag" aria-hidden="true">${name}</span>`;
+  b.addEventListener("click", () => {
+    input.value = name;
+    show(name);
+  });
+  $("#crowd").append(b);
+  return b;
 });
 
-// Breed
-let uiLitter = 0;
-const uiLabel = { species: (v) => (v === "none" ? "no ears" : v), body: (v) => `${v} body`, eyes: (v) => `${v} eyes` };
-function uiChip(text, src, A, B) {
-  if (src === "new") return `<span class="chip new">${escHtml(text)} · new</span>`;
-  const dots = src === A.id && src !== B.id ? uiDot(A) : src === B.id && src !== A.id ? uiDot(B) : uiDot(A) + uiDot(B);
-  return `<span class="chip">${dots}${escHtml(text)}</span>`;
+function show(seed) {
+  const words = PIPKIN.describe(seed);
+  $("#tile").innerHTML = PIPKIN.pipkin(seed, { background: "squircle", animate: true });
+  $("#tile").setAttribute("aria-label", words);
+  $("#call").textContent = `pipkin(${JSON.stringify(seed)})`;
+  $("#desc").textContent = words;
+  $("#size").textContent = `${(new Blob([PIPKIN.pipkin(seed)]).size / 1024).toFixed(1)} KB`;
+  const key = PIPKIN.normalize(seed);
+  for (const b of crowd) b.setAttribute("aria-pressed", String(b.dataset.name === key));
 }
-function uiBreed() {
-  const ra = $("#b-a").value.trim() || "maya";
-  const rb = $("#b-b").value.trim() || "theo";
-  const A = PIPKIN.genome(ra);
-  const B = PIPKIN.genome(rb);
-  $("#b-parents").innerHTML = `${uiKit(PIPKIN.pipkin(A), 64, A.id)}<code>${escHtml(A.id)}</code><span class="op" aria-hidden="true">×</span>${uiKit(PIPKIN.pipkin(B), 64, B.id)}<code>${escHtml(B.id)}</code>`;
-  let html = "";
-  for (let k = uiLitter; k < uiLitter + 4; k++) {
-    const c = PIPKIN.breed(A, B, { child: k });
-    const chips = [uiChip(colourName(c.genes.hue) + (c.from.hue === "mix" ? ", blended" : ""), c.from.hue, A, B)];
-    for (const key of ["species", "body", "eyes"]) chips.push(uiChip(uiLabel[key](c.genes[key]), c.from[key], A, B));
-    html += `<article class="kid">${uiKit(PIPKIN.pipkin(c, { animate: "hover" }), 88, PIPKIN.describe(c))}<code>${escHtml(c.id)}</code><div class="chips">${chips.join("")}</div></article>`;
-  }
-  $("#b-litter").innerHTML = html;
-}
-for (const id of ["#b-a", "#b-b"]) $(id).addEventListener("input", () => { uiLitter = 0; uiBreed(); });
-$("#b-swap").addEventListener("click", () => {
-  [$("#b-a").value, $("#b-b").value] = [$("#b-b").value, $("#b-a").value];
-  uiBreed();
-  $("#b-note").textContent = "Swapped. Same litter, because parent order is ignored.";
-});
-$("#b-next").addEventListener("click", () => {
-  uiLitter += 4;
-  uiBreed();
-  $("#b-note").textContent = `Children #${uiLitter} to #${uiLitter + 3}. Every number is a new sibling.`;
-});
+const fromUrl = new URLSearchParams(location.search).get("name");
+if (fromUrl) input.value = fromUrl;
+input.addEventListener("input", () => show(input.value));
+show(input.value);
 
-// Fuse
-const uiPresets = { "Pair": ["maya", "theo"], "Design": ["maya", "theo", "iris"], "Engineering": ["omar", "lena", "kofi", "jun", "sam"], "Everyone": ["maya", "theo", "iris", "omar", "lena", "kofi", "jun", "sam"] };
-let uiTeam = ["maya", "theo", "iris"];
-function uiFuse(note) {
-  $("#f-members").innerHTML = uiTeam.map((m, i) => `<span class="member">${uiKit(PIPKIN.pipkin(m), 22, m)}<span>${escHtml(m)}</span><button type="button" data-i="${i}" aria-label="Remove ${escHtml(m)}">×</button></span>`).join("") || `<span class="note">No members yet.</span>`;
-  if (uiTeam.length) {
-    $("#f-big").innerHTML = PIPKIN.fuse(uiTeam, { animate: true, title: `${uiTeam.join(", ")} as one pipkin` });
-    $("#f-ladder").innerHTML = [20, 28, 40, 56].map((s) => `<figure>${uiKit(PIPKIN.fuse(uiTeam, { background: "squircle", size: s }), s, `${s} pixels`, "bare")}<figcaption>${s}px</figcaption></figure>`).join("");
-  } else {
-    $("#f-big").innerHTML = "";
-    $("#f-ladder").innerHTML = "";
-  }
-  $("#f-code").textContent = JSON.stringify(uiTeam);
-  if (note) $("#f-note").textContent = note;
+// Measured, not claimed: the average time to draw one pipkin here.
+setTimeout(() => {
+  const runs = 300;
+  const t0 = performance.now();
+  for (let i = 0; i < runs; i++) PIPKIN.pipkin(`guest-${i}@example.com`);
+  const ms = (performance.now() - t0) / runs;
+  $("#speed").textContent = ms < 0.1 ? `${ms.toFixed(2)} ms` : ms < 10 ? `${ms.toFixed(1)} ms` : `${Math.round(ms)} ms`;
+}, 400);
+
+// Team switcher.
+for (const btn of $$(".team")) {
+  btn.addEventListener("click", () => {
+    for (const other of $$(".team")) other.setAttribute("aria-pressed", String(other === btn));
+    $("#team-code").textContent = `fuse([${quote(btn.dataset.team.split(","))}])`;
+  });
 }
-$("#f-members").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-i]");
-  if (!b) return;
-  const [gone] = uiTeam.splice(Number(b.dataset.i), 1);
-  uiFuse(`Removed ${gone}.`);
-});
-$("#f-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const v = $("#f-add").value.trim();
-  if (!v) return;
-  if (uiTeam.length >= PIPKIN.MAX_MEMBERS) return uiFuse(`A fused pipkin holds up to ${PIPKIN.MAX_MEMBERS} members.`);
-  if (!uiTeam.includes(v)) uiTeam.push(v);
-  $("#f-add").value = "";
-  uiFuse(`Added ${v}.`);
-});
-$("#f-presets").innerHTML = Object.keys(uiPresets).map((k) => `<button class="btn" type="button" data-p="${k}">${k} · ${uiPresets[k].length}</button>`).join("");
-$("#f-presets").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-p]");
-  if (!b) return;
-  uiTeam = uiPresets[b.dataset.p].slice();
-  uiFuse(`Loaded ${b.dataset.p}.`);
-});
-$("#f-shuffle").addEventListener("click", () => {
-  if (uiTeam.length < 2) return uiFuse("Add at least two members to shuffle.");
-  const before = PIPKIN.fingerprint(PIPKIN.fuse(uiTeam));
-  const order = uiTeam.join();
-  for (let t = 0; t < 10 && uiTeam.join() === order; t++)
-    for (let i = uiTeam.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [uiTeam[i], uiTeam[j]] = [uiTeam[j], uiTeam[i]];
+
+// Copy buttons.
+for (const btn of $$("[data-copy]")) {
+  const label = btn.textContent;
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy);
+      btn.textContent = "Copied";
+    } catch {
+      btn.textContent = "Select and copy";
     }
-  const after = PIPKIN.fingerprint(PIPKIN.fuse(uiTeam));
-  uiFuse(`New order: ${uiTeam.join(", ")}. Fingerprint ${after === before ? "unchanged" : "changed"} (${after}).`);
-});
-
-// Motion
-const uiStatuses = [["Online", "neutral"], ["Away", "sleepy"], ["Focusing", "determined"], ["Celebrating", "happy"], ["Stuck", "worried"]];
-let uiStatus = 0;
-function uiMotion() {
-  const [label, mood] = uiStatuses[uiStatus];
-  $("#m-big").innerHTML = PIPKIN.pipkin("lena@acme.co", { animate: true, mood, background: "circle", title: `Lena, ${label.toLowerCase()}` });
-  $("#m-status").innerHTML = uiStatuses.map(([l], i) => `<button class="btn" type="button" data-s="${i}" aria-pressed="${i === uiStatus}">${l}</button>`).join("");
-  $("#m-note").innerHTML = `<code>pipkin(name, { animate: true, mood: "${mood}" })</code>`;
+    clearTimeout(btn._timer);
+    btn._timer = setTimeout(() => (btn.textContent = label), 1600);
+  });
 }
-$("#m-status").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-s]");
-  if (!b) return;
-  uiStatus = Number(b.dataset.s);
-  uiMotion();
-});
-$("#m-wave").innerHTML = PIPKIN.pipkin("kofi@acme.co", { animate: true, background: "circle", title: "Hover to wave" });
 
-uiPlay();
-uiBreed();
-uiFuse();
-uiMotion();
+// Pause the crowd's idle motion while it is off screen.
+const hero = $(".hero");
+new IntersectionObserver(([entry]) => hero.classList.toggle("is-off", !entry.isIntersecting)).observe(hero);
+document.body.dataset.ready = "1";
 </script>
+</body>
+</html>

@@ -47,7 +47,9 @@ const out = page
   .replace("/*PIPKIN-LIBRARY*/", () => inline)
   .replace("/*PIPKIN-MOTION*/", () => motionCss)
   .replace(/__VERSION__/g, version)
-  .replace("__GZIP__", (gzipSync(shipped).length / 1024).toFixed(1));
+  .replace(/__GZIP__/g, (gzipSync(shipped).length / 1024).toFixed(1));
 writeFileSync(new URL("docs/index.html", root), out);
-writeFileSync(new URL("docs/preview.html", root), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' + out);
+// The page is a full document; preview.html only adds the head tags when it is a fragment.
+const head = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
+writeFileSync(new URL("docs/preview.html", root), /^<!doctype/i.test(out) ? out : head + out);
 console.log(`docs/index.html  ${(out.length / 1024).toFixed(1)} KB`);
