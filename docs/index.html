@@ -1592,6 +1592,8 @@ shuffled(FRIENDS).forEach((name, k) => {
   friendAt.set(from + Math.floor(Math.random() * (to - from)), name);
 });
 const input = $("#seed");
+// The visitor stays anonymous ("You") in the chat until they type a name or click someone.
+let named = false;
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const queue = [...SAMPLES];
 let samplesShown = 0;
@@ -1615,6 +1617,7 @@ const crowd = Array.from({ length: SLOTS }, (_, i) => {
   b.innerHTML = `<span class="f f${i % 6}">${PIPKIN.pipkin(name, { animate: true })}</span><span class="tag" aria-hidden="true">${name}</span>`;
   b.addEventListener("click", () => {
     input.value = name;
+    named = true;
     show(name);
     if (friend) surprise(b);
   });
@@ -1789,6 +1792,7 @@ if (fromUrl) input.value = fromUrl;
 // Typing a friend's whole name sets off their easter egg too, once per time it is typed.
 let lastFriend = "";
 input.addEventListener("input", () => {
+  named = true;
   show(input.value);
   const key = PIPKIN.normalize(input.value);
   const friend = crowd.find((b) => b.dataset.friend && b.dataset.name === key);
@@ -1814,13 +1818,22 @@ for (const btn of $$(".team")) {
   });
 }
 
-// Chat, comments and the live cursor. You appear as whoever is in the name box at the top.
+// Chat, comments and the live cursor. You are anonymous ("You", drawn from the seed "you")
+// until you type a name or click someone; after that you are whoever is in the name box.
 function me() {
-  return (input.value.trim() || "you").slice(0, 32);
+  const typed = input.value.trim().slice(0, 32);
+  return named && typed ? typed : null;
+}
+function label(name) {
+  return name ?? "You";
+}
+function seedOf(name) {
+  return name ?? "you";
 }
 function setPlaceholders() {
-  $("#chat-msg").placeholder = `Message #design-crew as ${me()}`;
-  $("#reply-msg").placeholder = `Reply as ${me()}`;
+  const name = me();
+  $("#chat-msg").placeholder = name ? `Message #design-crew as ${name}` : "Message #design-crew";
+  $("#reply-msg").placeholder = name ? `Reply as ${name}` : "Reply";
 }
 function clock() {
   const now = new Date();
@@ -1837,11 +1850,14 @@ function byline(name, time) {
   const head = document.createElement("div");
   head.className = "who";
   const who = document.createElement("b");
-  who.textContent = name;
-  const tag = document.createElement("span");
-  tag.className = "you";
-  tag.textContent = "you";
-  head.append(who, tag);
+  who.textContent = label(name);
+  head.append(who);
+  if (name) {
+    const tag = document.createElement("span");
+    tag.className = "you";
+    tag.textContent = "you";
+    head.append(tag);
+  }
   if (time) {
     const when = document.createElement("span");
     when.className = "small";
@@ -1857,34 +1873,50 @@ function entry(tag, className, name, size, text, time) {
   const words = document.createElement("p");
   words.textContent = text;
   body.append(byline(name, time), words);
-  row.append(avatar(name, size), body);
+  row.append(avatar(seedOf(name), size), body);
   return row;
 }
 
-// Posting in the chat adds you to the team, and the team avatar re-fuses with you in it.
-const team = ["zoe", "priya", "noah", "ava"];
+// Posting in the chat makes you a member, and the team avatar re-fuses with you in it. You are
+// one member: if you post again under a new name, your entry is renamed rather than duplicated.
+const TEAM = ["zoe", "priya", "noah", "ava"];
+let mine = null;
 function join(name) {
-  const key = PIPKIN.normalize(name);
-  if (team.some((m) => PIPKIN.normalize(m) === key)) return;
-  team.push(name);
-  const item = document.createElement("li");
-  item.className = "new";
-  const text = document.createElement("span");
-  const who = document.createElement("b");
-  who.textContent = name;
-  const status = document.createElement("span");
-  status.className = "small";
-  status.textContent = "Just joined";
-  text.append(who, status);
-  item.append(avatar(name, 34), text);
-  $("#members").append(item);
-  if ($$("#stack .av").length < 7) $("#member-count").before(avatar(name, 30, { background: "circle" }));
-  $("#member-count").textContent = `${team.length} members`;
-  const fused = PIPKIN.fuse(team);
+  const seed = seedOf(name);
+  const already = TEAM.includes(PIPKIN.normalize(seed));
+  if (already && mine) {
+    mine.item.remove();
+    mine.stack.remove();
+    mine = null;
+  }
+  if (!already) {
+    if (!mine) {
+      const item = document.createElement("li");
+      item.className = "new";
+      const text = document.createElement("span");
+      const who = document.createElement("b");
+      const status = document.createElement("span");
+      status.className = "small";
+      status.textContent = "Just joined";
+      text.append(who, status);
+      item.append(avatar(seed, 34), text);
+      $("#members").append(item);
+      const stack = avatar(seed, 30, { background: "circle" });
+      $("#member-count").before(stack);
+      mine = { item, stack, who };
+    }
+    mine.who.textContent = label(name);
+    mine.item.querySelector(".av").innerHTML = PIPKIN.pipkin(seed);
+    mine.stack.innerHTML = PIPKIN.pipkin(seed, { background: "circle" });
+  }
+  const seeds = already ? TEAM : [...TEAM, seed];
+  const names = already ? TEAM : [...TEAM, label(name)];
+  const fused = PIPKIN.fuse(seeds);
+  $("#member-count").textContent = `${seeds.length} members`;
   $("#team-avatar").innerHTML = fused;
   $("#channel-avatar").innerHTML = fused;
-  $("#team-avatar").setAttribute("aria-label", `Team avatar: ${team.join(", ")} fused`);
-  $("#team-names").textContent = team.join(", ");
+  $("#team-avatar").setAttribute("aria-label", `Team avatar: ${names.join(", ")} fused`);
+  $("#team-names").textContent = names.join(", ");
 }
 function send(form, field, list, build) {
   form.addEventListener("submit", (event) => {
@@ -1913,9 +1945,9 @@ function place(event) {
 canvas.addEventListener("pointerenter", (event) => {
   if (event.pointerType === "touch") return;
   const name = me();
-  myCursor.querySelector(".me-name").textContent = name;
-  myCursor.querySelector(".av").innerHTML = PIPKIN.pipkin(name);
-  myCursor.style.setProperty("--c", palette(PIPKIN.genome(name).genes).body);
+  myCursor.querySelector(".me-name").textContent = label(name);
+  myCursor.querySelector(".av").innerHTML = PIPKIN.pipkin(seedOf(name));
+  myCursor.style.setProperty("--c", palette(PIPKIN.genome(seedOf(name)).genes).body);
   place(event);
   canvas.classList.add("has-me");
 });
