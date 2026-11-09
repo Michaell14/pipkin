@@ -56,7 +56,14 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .btn-soft:hover { background: #e9ecf6; color: var(--ink); }
 .btn-npm { gap: 12px; padding: 0 18px; font-weight: 500; }
 .btn-npm code { font-size: 14px; }
-.btn-npm .copy-label { font-size: 13px; color: var(--muted); }
+/* Copy feedback swaps things of equal size, so a click never moves the layout. */
+.btn-npm .ic { flex: none; color: var(--muted); }
+.btn-npm .ic-done, .btn-npm.copied .ic-copy { display: none; }
+.btn-npm.copied .ic-done { display: block; color: #1d7f55; }
+.swap { display: inline-grid; }
+.swap > span { grid-area: 1 / 1; text-align: center; }
+.swap .done, .copied .swap .idle { visibility: hidden; }
+.copied .swap .done { visibility: visible; }
 
 /* Header */
 .top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 20px; padding-bottom: 20px; }
@@ -278,7 +285,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
           </div>
           <div class="actions">
             <a class="btn btn-dark" href="#install">Get started</a>
-            <button class="btn btn-soft btn-npm" type="button" data-copy="npm i pipkin"><code>npm i pipkin</code><span class="copy-label" data-label>Copy</span></button>
+            <button class="btn btn-soft btn-npm" type="button" data-copy="npm i pipkin" aria-label="Copy the install command: npm i pipkin"><code>npm i pipkin</code><svg class="ic ic-copy" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><svg class="ic ic-done" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
           </div>
         </div>
         <figure class="result">
@@ -314,7 +321,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
       <div class="side">
         <div class="cmd">
           <code><span class="prompt">$ </span>npm install pipkin</code>
-          <button type="button" data-copy="npm install pipkin"><span data-label>Copy</span></button>
+          <button type="button" data-copy="npm install pipkin" aria-label="Copy the install command: npm install pipkin"><span class="swap"><span class="idle">Copy</span><span class="done" aria-hidden="true">Copied</span></span></button>
         </div>
 <pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
 
@@ -521,6 +528,8 @@ el.innerHTML = pipkin(user.id, { animate: <span class="n">true</span> });</code>
   </section>
 
 </main>
+
+<p class="sr-only" id="copy-status" role="status"></p>
 
 <footer class="wrap foot">
   <span class="brandline"><span class="av" data-pipkin="maya" style="--s: 28px"></span>pipkin __VERSION__ is MIT licensed.</span>
@@ -797,19 +806,34 @@ for (const btn of $$(".team")) {
   });
 }
 
-// Copy buttons.
-for (const btn of $$("[data-copy]")) {
-  const target = btn.querySelector("[data-label]") || btn;
-  const label = target.textContent;
-  btn.addEventListener("click", async () => {
+// Copy buttons. Feedback is a class swap between equal-sized states, so nothing reflows, and
+// screen readers hear it through the status line.
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.cssText = "position: fixed; top: 0; left: 0; opacity: 0";
+    document.body.append(area);
+    area.select();
+    let ok = false;
     try {
-      await navigator.clipboard.writeText(btn.dataset.copy);
-      target.textContent = "Copied";
-    } catch {
-      target.textContent = "Select and copy";
-    }
+      ok = document.execCommand("copy");
+    } catch {}
+    area.remove();
+    return ok;
+  }
+}
+for (const btn of $$("[data-copy]")) {
+  btn.addEventListener("click", async () => {
+    if (!(await copyText(btn.dataset.copy))) return;
+    btn.classList.add("copied");
+    $("#copy-status").textContent = `Copied ${btn.dataset.copy}`;
     clearTimeout(btn._timer);
-    btn._timer = setTimeout(() => (target.textContent = label), 1600);
+    btn._timer = setTimeout(() => btn.classList.remove("copied"), 1600);
   });
 }
 
