@@ -259,34 +259,39 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 @media (min-width: 1240px) {
   .panel { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; }
 }
-/* Pickers: a package manager (radio group) and a framework (tabs). The chosen one is the only tab stop. */
-.seg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 4px; border-radius: 999px; background: var(--navy-2); }
-.seg button, .tabs button { border: 0; background: transparent; color: var(--pale); font: inherit; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
-.seg button { min-height: 34px; padding: 0 14px; border-radius: 999px; font-family: var(--mono); font-size: 13px; }
-.seg button:hover, .tabs button:hover { color: #fff; }
-.seg button[aria-checked="true"] { background: #fff; color: var(--ink); }
-.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 16px; }
-.tabs button { min-height: 36px; padding: 0 12px; border-radius: 10px; font-size: 15px; font-weight: 600; }
-.tabs button[aria-selected="true"] { background: var(--navy-3); color: #fff; }
+/* Pickers: each shows the current choice, and the others drop down from it. */
+.side .kicker { color: #9aa3c4; }
+.side .gap { margin-top: 16px; }
+.anchor { position: relative; display: inline-flex; }
+.trigger { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 10px; border: 0; border-radius: 9px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
+.trigger:hover, .trigger[aria-expanded="true"] { background: #3a4578; }
+.trigger svg { flex: none; opacity: 0.75; transition: transform 0.15s ease; }
+.trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.cmd .trigger { min-height: 30px; margin-right: 2px; padding: 0 8px; font-family: var(--mono); font-size: 15px; font-weight: 400; }
+.trigger.quiet { background: transparent; color: var(--pale); font-weight: 500; }
+.trigger.quiet:hover, .trigger.quiet[aria-expanded="true"] { background: transparent; color: #fff; }
+.menu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; display: flex; flex-direction: column; gap: 2px; min-width: 230px; padding: 6px; border-radius: 14px; background: var(--navy-3); box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08); animation: menu-in 0.14s ease-out; }
+.menu[hidden] { display: none; }
+.menu.right { left: auto; right: 0; }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-4px) scale(0.97); } }
+.menu button { display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-items: center; column-gap: 14px; width: 100%; padding: 9px 10px; border: 0; border-radius: 9px; background: transparent; color: #fff; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.3; text-align: left; white-space: nowrap; cursor: pointer; }
+.menu button:hover, .menu button:focus { outline: none; background: rgba(255, 255, 255, 0.08); }
+.menu button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.menu.mono button { font-family: var(--mono); font-weight: 400; }
+.menu .sub { grid-column: 1; font-family: var(--mono); font-size: 12px; font-weight: 400; color: #aeb6d4; }
+.menu .chk { grid-column: 2; grid-row: 1; visibility: hidden; color: #9ee6b8; }
+.menu [aria-checked="true"] .chk { visibility: visible; }
 .cmd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 20px; border-radius: 16px; background: var(--navy-2); }
-.cmd code { color: #fff; font-size: 15px; overflow-wrap: anywhere; }
+.cmd code { display: inline-flex; flex-wrap: wrap; align-items: center; color: #fff; font-size: 15px; white-space: pre; }
 .cmd .prompt { color: #9aa3c4; }
-.cmd button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.cmd > button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
 /* The snippet, in an editor-like card. Its height is reserved for the longest snippet (--lines,
    set by the script), so switching never moves the page. */
-.editor { border-radius: 18px; background: var(--navy-2); overflow: hidden; }
-.editor-bar { display: flex; align-items: center; gap: 14px; padding: 6px 6px 6px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
-.editor-bar .file { margin-right: auto; font-size: 13px; color: #9aa3c4; }
-.panel .editor pre.code { min-height: calc(var(--lines, 10) * 1.7em + 32px); border-radius: 0; background: transparent; }
-.switch { position: relative; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--pale); cursor: pointer; user-select: none; }
-.switch:hover, .switch:has(input:checked) { color: #fff; }
-.switch input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
-.switch .track { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--navy-3); transition: background-color 0.15s ease; }
-.switch .track::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--pale); transition: transform 0.15s ease, background-color 0.15s ease; }
-.switch input:checked + .track { background: #9ee6b8; }
-.switch input:checked + .track::after { transform: translateX(14px); background: var(--ink); }
-.switch input:focus-visible + .track { outline: 3px solid var(--focus); outline-offset: 2px; }
-.copy-code { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--pale); cursor: pointer; }
+.editor { border-radius: 18px; background: var(--navy-2); }
+.editor-bar { display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.editor-bar .file { min-width: 0; margin-right: auto; overflow: hidden; font-size: 13px; color: #9aa3c4; text-overflow: ellipsis; white-space: nowrap; }
+.panel .editor pre.code { min-height: calc(var(--lines, 10) * 1.7em + 32px); border-radius: 0 0 18px 18px; background: transparent; }
+.copy-code { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--pale); cursor: pointer; }
 .copy-code:hover { background: var(--navy-3); color: #fff; }
 .copy-code.copied { color: #9ee6b8; }
 .panel .note { max-width: none; font-size: 14px; overflow-wrap: anywhere; }
@@ -310,6 +315,10 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 }
 @media (max-width: 560px) {
   :root { --pad: 16px; }
+  .cmd { padding-left: 14px; }
+  .cmd code, .cmd .trigger { font-size: 14px; }
+  .cmd .prompt { display: none; }
+  .cmd > button { padding: 0 12px; }
   .crowd .sm-hide { display: none; }
   .hero-card { grid-template-columns: minmax(0, 1fr); padding: 24px; border-radius: 26px; }
   pre.code { padding: 14px; font-size: 12.5px; }
@@ -386,28 +395,27 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
         <p>No dependencies and about __GZIP__ KB gzipped. pipkin returns an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
       </div>
       <div class="side">
-        <div class="seg" role="radiogroup" aria-label="Package manager">
-          <button type="button" role="radio" aria-checked="true" data-pm="npm">npm</button>
-          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="pnpm">pnpm</button>
-          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="yarn">yarn</button>
-          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="bun">bun</button>
-        </div>
+        <span class="kicker">Install</span>
         <div class="cmd">
-          <code><span class="prompt">$ </span><span id="pm-cmd">npm install pipkin</span></code>
-          <button type="button" id="pm-copy" data-copy="npm install pipkin" aria-label="Copy the install command: npm install pipkin"><span class="swap"><span class="idle">Copy</span><span class="done" aria-hidden="true">Copied</span></span></button>
+          <code><span class="prompt">$ </span><span class="anchor"><button type="button" class="trigger" id="pm-button" aria-haspopup="menu" aria-expanded="false" aria-controls="pm-menu" aria-label="Package manager: npm"><span id="pm-name">npm</span><svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button><span class="menu mono" id="pm-menu" role="menu" aria-label="Package manager" hidden><button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" data-pm="npm"><span>npm i pipkin</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-pm="pnpm"><span>pnpm add pipkin</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-pm="yarn"><span>yarn add pipkin</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-pm="bun"><span>bun add pipkin</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></span></span><span id="pm-rest"> i pipkin</span></code>
+          <button type="button" id="pm-copy" data-copy="npm i pipkin" aria-label="Copy the install command: npm i pipkin"><span class="swap"><span class="idle">Copy</span><span class="done" aria-hidden="true">Copied</span></span></button>
         </div>
-        <div class="tabs" role="tablist" aria-label="Framework">
-          <button type="button" role="tab" id="fw-react" aria-selected="true" aria-controls="usage" data-fw="react">React</button>
-          <button type="button" role="tab" id="fw-vue" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="vue">Vue</button>
-          <button type="button" role="tab" id="fw-svelte" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="svelte">Svelte</button>
-          <button type="button" role="tab" id="fw-solid" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="solid">Solid</button>
-          <button type="button" role="tab" id="fw-vanilla" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="vanilla">Vanilla</button>
-          <button type="button" role="tab" id="fw-image" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="image">Image URL</button>
-        </div>
-        <div class="editor" role="tabpanel" id="usage" aria-labelledby="fw-react">
+        <span class="kicker gap">Use it</span>
+        <div class="editor">
           <div class="editor-bar">
+            <span class="anchor"><button type="button" class="trigger" id="fw-button" aria-haspopup="menu" aria-expanded="false" aria-controls="fw-menu" aria-label="Framework: React"><span id="fw-name">React</span><svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button><span class="menu" id="fw-menu" role="menu" aria-label="Framework" hidden>
+              <button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" data-fw="react"><span>React</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">dangerouslySetInnerHTML</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-fw="vue"><span>Vue</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">v-html</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-fw="svelte"><span>Svelte</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">{@html}</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-fw="solid"><span>Solid</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">innerHTML</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-fw="vanilla"><span>Vanilla</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">el.innerHTML</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-fw="image"><span>Image URL</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">pipkinUri()</span></button>
+            </span></span>
             <code class="file" id="usage-file">Avatar.jsx</code>
-            <label class="switch"><input type="checkbox" role="switch" id="usage-animate"><span class="track" aria-hidden="true"></span>Animate</label>
+            <span class="anchor"><button type="button" class="trigger quiet" id="motion-button" aria-haspopup="menu" aria-expanded="false" aria-controls="motion-menu" aria-label="Motion: Still"><span id="motion-name">Still</span><svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button><span class="menu right" id="motion-menu" role="menu" aria-label="Motion" hidden>
+              <button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" data-motion="still"><span>Still</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">a static SVG</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-motion="animated"><span>Animated</span><svg class="chk" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="sub">adds pipkin/motion.css</span></button>
+            </span></span>
             <button type="button" class="copy-code" id="usage-copy" data-copy="" data-copy-label="the React code" aria-label="Copy the code"><svg class="ic ic-copy" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><svg class="ic ic-done" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
           </div>
 <pre class="code" id="usage-code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
@@ -1073,9 +1081,9 @@ canvas.addEventListener("pointermove", (event) => {
 });
 canvas.addEventListener("pointerleave", () => canvas.classList.remove("has-me"));
 
-// Install panel: pick a package manager and a framework, and flip Animate. Snippets are plain
+// Install panel: menus for the package manager, the framework and motion. Snippets are plain
 // text, highlighted here, so the copy button copies exactly what is shown. Choices are remembered.
-const INSTALL = { npm: "npm install pipkin", pnpm: "pnpm add pipkin", yarn: "yarn add pipkin", bun: "bun add pipkin" };
+const INSTALL = { npm: "npm i pipkin", pnpm: "pnpm add pipkin", yarn: "yarn add pipkin", bun: "bun add pipkin" };
 const withCss = (a, indent = "") => (a ? `\n${indent}import "pipkin/motion.css"; // once per app` : "");
 const withAnim = (a) => (a ? ", animate: true" : "");
 const USAGE = {
@@ -1151,69 +1159,128 @@ const saveChoice = (key, value) => {
   } catch {}
 };
 
-// One choice out of a row of buttons: click, or arrow keys (Home and End too) to move and pick.
-function picker(items, attr, keys, onPick) {
-  const pick = (item, focus) => {
-    for (const other of items) {
-      other.setAttribute(attr, String(other === item));
-      other.tabIndex = other === item ? 0 : -1;
-    }
-    if (focus) item.focus();
-    onPick(item);
-  };
-  items.forEach((item, i) => {
-    item.addEventListener("click", () => pick(item, false));
-    item.addEventListener("keydown", (event) => {
-      const n = items.length;
-      const to = event.key === "Home" ? 0 : event.key === "End" ? n - 1 : Object.hasOwn(keys, event.key) ? (i + keys[event.key] + n) % n : -1;
-      if (to < 0) return;
-      event.preventDefault();
-      pick(items[to], true);
-    });
-  });
-  return pick;
+// Menu buttons: each button shows the current choice and opens a menu of all of them. In a menu,
+// arrow keys, Home, End and first letters move; Enter or Space picks; Escape closes.
+let openMenu = null;
+function closeMenu(refocus) {
+  if (!openMenu) return;
+  const { button, menu } = openMenu;
+  openMenu = null;
+  menu.hidden = true;
+  button.setAttribute("aria-expanded", "false");
+  if (refocus) button.focus();
 }
+function menuButton(button, onPick) {
+  const menu = document.getElementById(button.getAttribute("aria-controls"));
+  const items = [...menu.querySelectorAll('[role="menuitemradio"]')];
+  const open = () => {
+    closeMenu(false);
+    menu.hidden = false;
+    button.setAttribute("aria-expanded", "true");
+    openMenu = { button, menu };
+    (items.find((item) => item.getAttribute("aria-checked") === "true") || items[0]).focus();
+  };
+  button.addEventListener("click", () => (openMenu && openMenu.menu === menu ? closeMenu(false) : open()));
+  button.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    event.preventDefault();
+    open();
+  });
+  menu.addEventListener("keydown", (event) => {
+    const i = items.indexOf(document.activeElement);
+    const n = items.length;
+    let to = -1;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu(true);
+      return;
+    }
+    if (event.key === "ArrowDown") to = (i + 1) % n;
+    else if (event.key === "ArrowUp") to = (i - 1 + n) % n;
+    else if (event.key === "Home") to = 0;
+    else if (event.key === "End") to = n - 1;
+    else if (event.key.length === 1 && event.key !== " ") {
+      const letter = event.key.toLowerCase();
+      const hit = [...items.slice(i + 1), ...items.slice(0, i + 1)].find((item) => item.textContent.trim().toLowerCase().startsWith(letter));
+      if (hit) to = items.indexOf(hit);
+    }
+    if (to < 0) return;
+    event.preventDefault();
+    items[to].focus();
+  });
+  // Tabbing away closes the menu; a click outside is handled below.
+  menu.addEventListener("focusout", (event) => {
+    if (openMenu && openMenu.menu === menu && event.relatedTarget && !menu.contains(event.relatedTarget) && event.relatedTarget !== button) closeMenu(false);
+  });
+  for (const item of items) {
+    item.addEventListener("click", () => {
+      onPick(item);
+      closeMenu(true);
+    });
+  }
+}
+document.addEventListener("pointerdown", (event) => {
+  if (openMenu && !openMenu.menu.contains(event.target) && !openMenu.button.contains(event.target)) closeMenu(false);
+});
+const markChecked = (menuId, attr, value) => {
+  for (const item of document.getElementById(menuId).querySelectorAll(`[${attr}]`)) item.setAttribute("aria-checked", String(item.getAttribute(attr) === value));
+};
 
+const pmButton = $("#pm-button");
 const pmCopy = $("#pm-copy");
-const pickPm = picker($$("[data-pm]"), "aria-checked", { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }, (btn) => {
-  const cmd = INSTALL[btn.dataset.pm];
-  $("#pm-cmd").textContent = cmd;
+function setPm(id) {
+  const cmd = INSTALL[id];
+  $("#pm-name").textContent = id;
+  $("#pm-rest").textContent = cmd.slice(id.length);
+  pmButton.setAttribute("aria-label", `Package manager: ${id}`);
   pmCopy.dataset.copy = cmd;
   pmCopy.setAttribute("aria-label", `Copy the install command: ${cmd}`);
   pmCopy.classList.remove("copied");
-  saveChoice("pipkin-pm", btn.dataset.pm);
+  markChecked("pm-menu", "data-pm", id);
+}
+menuButton(pmButton, (item) => {
+  setPm(item.dataset.pm);
+  saveChoice("pipkin-pm", item.dataset.pm);
 });
 
 const usageCode = $("#usage-code");
 const usageCopy = $("#usage-copy");
-const animateSwitch = $("#usage-animate");
 let framework = "react";
+let animated = false;
 function showUsage() {
   const { label, file, code } = USAGE[framework];
-  const text = code(animateSwitch.checked);
+  const text = code(animated);
+  const motion = animated ? "Animated" : "Still";
   usageCode.querySelector("code").innerHTML = highlight(text);
   $("#usage-file").textContent = file;
-  $("#usage").setAttribute("aria-labelledby", `fw-${framework}`);
+  $("#fw-name").textContent = label;
+  $("#fw-button").setAttribute("aria-label", `Framework: ${label}`);
+  $("#motion-name").textContent = motion;
+  $("#motion-button").setAttribute("aria-label", `Motion: ${motion}`);
+  markChecked("fw-menu", "data-fw", framework);
+  markChecked("motion-menu", "data-motion", motion.toLowerCase());
   usageCopy.dataset.copy = text;
   usageCopy.dataset.copyLabel = `the ${label} code`;
   usageCopy.classList.remove("copied");
 }
-const pickFramework = picker($$("[data-fw]"), "aria-selected", { ArrowLeft: -1, ArrowRight: 1 }, (btn) => {
-  framework = btn.dataset.fw;
+menuButton($("#fw-button"), (item) => {
+  framework = item.dataset.fw;
   showUsage();
   saveChoice("pipkin-framework", framework);
 });
-animateSwitch.addEventListener("change", () => {
+menuButton($("#motion-button"), (item) => {
+  animated = item.dataset.motion === "animated";
   showUsage();
-  saveChoice("pipkin-animate", animateSwitch.checked ? "1" : "0");
+  saveChoice("pipkin-animate", animated ? "1" : "0");
 });
 // Reserve room for the longest snippet.
 const longest = Math.max(...Object.values(USAGE).flatMap(({ code }) => [code(false), code(true)]).map((c) => c.split("\n").length));
 usageCode.style.setProperty("--lines", longest);
 
-animateSwitch.checked = savedChoice("pipkin-animate", (v) => v === "1" || v === "0", "0") === "1";
-pickPm($(`[data-pm="${savedChoice("pipkin-pm", (v) => Object.hasOwn(INSTALL, v), "npm")}"]`), false);
-pickFramework($(`[data-fw="${savedChoice("pipkin-framework", (v) => Object.hasOwn(USAGE, v), "react")}"]`), false);
+animated = savedChoice("pipkin-animate", (v) => v === "1" || v === "0", "0") === "1";
+framework = savedChoice("pipkin-framework", (v) => Object.hasOwn(USAGE, v), "react");
+setPm(savedChoice("pipkin-pm", (v) => Object.hasOwn(INSTALL, v), "npm"));
+showUsage();
 
 // Copy buttons. Feedback is a class swap between equal-sized states, so nothing reflows, and
 // screen readers hear it through the status line.
