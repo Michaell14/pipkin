@@ -6,6 +6,8 @@
 <title>pipkin · deterministic animal avatars that breed and fuse</title>
 <meta name="description" content="Any name, email or id gets a small animal of its own. Zero dependencies, about 2 KB of SVG per avatar. Breed two names into a child, or fuse a team into one avatar.">
 <meta name="theme-color" content="#F3F5FB">
+<!-- Hide the hero card until the load animation takes over, so it never flashes. Skipped under reduced motion. -->
+<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro");</script>
 <link rel="icon" id="favicon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,7 +74,7 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .nav a { text-decoration: none; }
 
 /* Hero: the crowd flows around the card */
-.crowd { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding-top: 8px; }
+.crowd { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding-top: 8px; }
 .hero-card { grid-column: 4 / 10; grid-row: 2 / 6; position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 15vw, 220px); align-items: center; gap: 28px; padding: 36px; border-radius: 32px; background: var(--card); box-shadow: 0 30px 60px -28px rgba(20, 26, 51, 0.35), var(--ring); }
 .hero-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .hero h1 { font-size: clamp(36px, 3.6vw, 54px); line-height: 0.98; }
@@ -87,7 +89,7 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .call { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
 .desc { font-size: 14px; color: var(--muted); }
 
-.pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; }
+.pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease; }
 .pk:hover { background: #fff; transform: translateY(-2px); }
 .pk[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 2px var(--ink); }
 .pk .f { display: block; width: 76%; height: 76%; }
@@ -101,6 +103,15 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .f4 { animation: float 4.9s ease-in-out -3.1s infinite; --tilt: -1deg; }
 .f5 { animation: float 4.3s ease-in-out -1.9s infinite; --tilt: 1.5deg; }
 .is-off * { animation-play-state: paused !important; }
+
+/* Load animation: one fused pipkin bursts into the crowd, then the card rises. The script runs it;
+   this only hides the card and stats until then, and shows them anyway if the script never runs. */
+.intro .hero-card, .intro .stats { opacity: 0; animation: intro-failsafe 0s linear 2.5s forwards; }
+@keyframes intro-failsafe { to { opacity: 1; } }
+.intro-blob { position: absolute; z-index: 3; width: min(320px, 44vw); aspect-ratio: 1 / 1; translate: -50% -50%; pointer-events: none; }
+.intro-blob svg { display: block; width: 100%; height: 100%; }
+.pk.peeking { overflow: hidden; }
+.pk.peeking[aria-pressed="true"] { background: transparent; box-shadow: none; }
 
 /* Easter eggs for the friends in the crowd */
 .bubble { position: absolute; left: 50%; bottom: calc(100% + 4px); z-index: 6; display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; background: #fff; color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 10px 24px -10px rgba(20, 26, 51, 0.45), 0 0 0 1px rgba(20, 26, 51, 0.08); transform: translateX(-50%); pointer-events: none; animation: pop 0.18s ease-out; }
@@ -806,6 +817,66 @@ input.addEventListener("input", () => {
 });
 show(input.value);
 
+// Load animation ("unfuse + peek"): a fused pipkin appears where the card is and bursts, and as it
+// does everyone pops up out of their own square, nearest first. Then the card and the stats rise
+// in. About 1.7 seconds in all.
+function intro() {
+  const root = document.documentElement;
+  if (!root.classList.contains("intro")) return;
+  const card = $(".hero-card");
+  const grid = $("#crowd");
+  const at = card.getBoundingClientRect();
+  // Opened scrolled down (a #link, or a restored position)? Skip it.
+  if (at.bottom < 0 || at.top > innerHeight) {
+    root.classList.remove("intro");
+    return;
+  }
+  const cx = at.left + at.width / 2;
+  const cy = at.top + at.height / 2;
+  const frame = grid.getBoundingClientRect();
+  const blob = document.createElement("div");
+  blob.className = "intro-blob";
+  blob.setAttribute("aria-hidden", "true");
+  blob.style.left = `${cx - frame.left}px`;
+  blob.style.top = `${cy - frame.top}px`;
+  blob.innerHTML = PIPKIN.fuse(crowd.slice(0, 9).map((b) => b.dataset.name));
+  grid.append(blob);
+  blob
+    .animate(
+      [
+        { transform: "scale(0)", opacity: 1 },
+        { transform: "scale(1.08)", offset: 0.3 },
+        { transform: "scale(1)", offset: 0.45 },
+        { transform: "scale(1.05)", opacity: 1, offset: 0.68 },
+        { transform: "scale(1.7)", opacity: 0 },
+      ],
+      { duration: 900, easing: "cubic-bezier(.3,1,.4,1)", fill: "both" },
+    )
+    .finished.then(() => blob.remove());
+  // As it bursts, each pipkin pops up out of its own square (the square clips it until it is out),
+  // nearest to the card first, with a little jitter so it doesn't look mechanical.
+  for (const b of crowd) {
+    if (!b.offsetParent) continue;
+    const r = b.getBoundingClientRect();
+    const dist = Math.hypot(cx - (r.left + r.width / 2), cy - (r.top + r.height / 2));
+    const done = () => b.classList.remove("peeking");
+    b.classList.add("peeking");
+    b.querySelector(".f")
+      .animate([{ transform: "translateY(135%)" }, { transform: "translateY(0)" }], {
+        duration: 550,
+        delay: 640 + dist * 0.5 + Math.random() * 200,
+        easing: "cubic-bezier(.3,1.25,.5,1)",
+        fill: "backwards",
+      })
+      .finished.then(done, done);
+  }
+  const rise = [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }];
+  card.animate(rise, { duration: 500, delay: 850, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  $(".stats").animate(rise, { duration: 500, delay: 1100, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  root.classList.remove("intro");
+}
+intro();
+
 // Measured, not claimed: the average time to draw one pipkin here.
 setTimeout(() => {
   const runs = 300;
@@ -813,7 +884,7 @@ setTimeout(() => {
   for (let i = 0; i < runs; i++) PIPKIN.pipkin(`guest-${i}@example.com`);
   const ms = (performance.now() - t0) / runs;
   $("#speed").textContent = ms < 0.1 ? `${ms.toFixed(2)} ms` : ms < 10 ? `${ms.toFixed(1)} ms` : `${Math.round(ms)} ms`;
-}, 400);
+}, 2000); // after the load animation, so the timing loop can't make it stutter
 
 // Team switcher.
 for (const btn of $$(".team")) {
