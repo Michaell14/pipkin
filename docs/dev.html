@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>pipkin dev sheet</title>
+<link rel="stylesheet" href="../src/motion.css">
+<style>body{margin:0;padding:12px;font:11px system-ui;background:#f3f5f0}h3{margin:8px 0 4px;font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}.c{display:flex;flex-direction:column;align-items:center;gap:2px}
+.t{width:72px;height:72px;background:#fff;border-radius:12px}.t.big{width:104px;height:104px}.t svg{width:100%;height:100%;display:block}
+.s{display:block;border-radius:50%;background:#e9ece7}</style>
+<body><script type="module">
+import { pipkin, fuse, breed, MOODS } from "../src/index.js";
+const names = ["maya","theo","iris","omar","lena","kofi","jun","sam","zoe","priya","noah","ava","ines","dev","rosa","ezra"];
+const cell = (s, l = "", cls = "") => `<div class="c"><div class="t ${cls}">${s}</div>${l}</div>`;
+let h = "<h3>singles</h3><div class=row>" + names.map(n => cell(pipkin(n), n)).join("") + "</div>";
+h += "<h3>breed maya × theo</h3><div class=row>" + cell(pipkin("maya"),"maya") + cell(pipkin("theo"),"theo") + [0,1,2,3,4].map(k => cell(pipkin(`maya×theo#${k}`), "#"+k)).join("") + "</div>";
+h += "<h3>fuse</h3><div class=row>" + [2,3,4,5,7,9].map(n => cell(fuse(names.slice(0, n)), "n="+n, "big")).join("") + "</div>";
+h += "<h3>moods (maya, theo)</h3><div class=row>" + MOODS.map(m => cell(pipkin("maya", { mood: m }), m)).join("") + MOODS.map(m => cell(pipkin("theo", { mood: m }), m)).join("") + "</div>";
+h += "<h3>backgrounds + sizes</h3><div class=row>" + ["circle","squircle","square"].map(b => cell(pipkin("iris", { background: b }), b)).join("") + [16,20,24,32,48].map(s => `<div class=c>${pipkin("omar", { background: "circle", size: s })}${s}</div>`).join("") + [20,32,48].map(s => `<div class=c>${fuse(names.slice(0,3), { background: "squircle", size: s })}g${s}</div>`).join("") + "</div>";
+h += "<h3>animated</h3><div class=row id=anim>" + names.slice(0, 8).map(n => cell(pipkin(n, { animate: true }), n, "big")).join("") + cell(fuse(names.slice(0,3), { animate: true }), "group", "big") + "</div>";
+document.body.innerHTML = h;
+document.body.dataset.ready = "1";
+</script>

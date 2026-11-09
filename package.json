@@ -1,0 +1,48 @@
+{
+  "name": "pipkin",
+  "version": "0.1.0",
+  "description": "Deterministic animal avatars that breed and fuse. Zero dependencies.",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./motion.css": "./src/motion.css"
+  },
+  "files": [
+    "src",
+    "types",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/pipkin.test.js",
+    "build": "node scripts/build.mjs",
+    "golden": "node scripts/golden.mjs"
+  },
+  "keywords": [
+    "avatar",
+    "identicon",
+    "deterministic",
+    "svg",
+    "generative",
+    "animal",
+    "pipkin"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}
