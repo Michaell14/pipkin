@@ -2,17 +2,27 @@
   "name": "pipkin",
   "version": "0.1.0",
   "description": "Deterministic animal avatars that breed and fuse. Zero dependencies.",
-  "private": true,
+  "homepage": "https://github.com/Michaell14/pipkin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Michaell14/pipkin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Michaell14/pipkin/issues"
+  },
   "type": "module",
   "main": "./src/index.js",
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
+  "unpkg": "./dist/pipkin.min.js",
+  "jsdelivr": "./dist/pipkin.min.js",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
       "default": "./src/index.js"
     },
-    "./motion.css": "./src/motion.css"
+    "./motion.css": "./src/motion.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -30,7 +40,8 @@
   "scripts": {
     "test": "node --test test/pipkin.test.js",
     "build": "node scripts/build.mjs",
-    "golden": "node scripts/golden.mjs"
+    "golden": "node scripts/golden.mjs",
+    "prepublishOnly": "npm test && npm run build"
   },
   "keywords": [
     "avatar",

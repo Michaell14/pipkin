@@ -218,7 +218,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 .cmd .prompt { color: #9aa3c4; }
 .cmd button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
 .panel pre.code { background: var(--navy-2); }
-.panel .note { font-size: 14px; }
+.panel .note { font-size: 14px; overflow-wrap: anywhere; }
 .panel .note code { color: #fff; }
 
 .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 64px; padding-bottom: 56px; font-size: 14px; color: var(--muted); }
@@ -507,8 +507,8 @@ el.innerHTML = pipkin(user.id, { animate: <span class="n">true</span> });</code>
       </div>
       <div class="side">
         <div class="cmd">
-          <code><span class="prompt">$ </span>npm install github:Michaell14/pipkin</code>
-          <button type="button" data-copy="npm install github:Michaell14/pipkin">Copy</button>
+          <code><span class="prompt">$ </span>npm install pipkin</code>
+          <button type="button" data-copy="npm install pipkin">Copy</button>
         </div>
 <pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
 
@@ -516,7 +516,7 @@ avatar.innerHTML = pipkin(user.email, {
   size: <span class="n">40</span>,
   background: <span class="s">"circle"</span>,
 });</code></pre>
-        <p class="note">Not on npm yet. Until the first release this installs it straight from GitHub; after that it's <code>npm install pipkin</code>.</p>
+        <p class="note">No bundler? Import it from a CDN: <code>https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js</code></p>
       </div>
     </div>
   </section>

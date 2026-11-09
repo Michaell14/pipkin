@@ -14,7 +14,17 @@ Every name gets a **pipkin**: a small flat animal (cat, fox, bear, mouse, bunny,
 - **Fusing.** `fuse(["maya", "theo", "iris"])` draws one pipkin for a whole team: members melt into one body, each keeping their colour, their ears and one eye.
 - **Motion.** `animate: true` adds a quiet idle loop (breathing, a small bob, blinks, ear twitches), and every moving part is exposed for your own CSS.
 
-> Not on npm yet: the package is marked `private` until its first release. Use it from this repository or copy `dist/pipkin.min.js`.
+## Install
+
+```sh
+npm install pipkin
+```
+
+It is plain ES modules with TypeScript types: no build step and no dependencies. Without a bundler, import it from a CDN:
+
+```js
+import { pipkin } from "https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js";
+```
 
 ## Usage
 
@@ -140,7 +150,6 @@ npm run golden     # re-pin test/golden.json (only for intended visual changes)
 
 ## Not done yet
 
-- An npm release.
 - Byte-identical output is verified in Node and Chromium; other engines could round a coordinate differently.
 - Framework components. The SVG string works in all of them today.
 - More motion: gaze tracking and transitions between moods.
