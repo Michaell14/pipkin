@@ -41,6 +41,7 @@
     "test": "node --test test/pipkin.test.js",
     "build": "node scripts/build.mjs",
     "golden": "node scripts/golden.mjs",
+    "og": "node scripts/og.mjs",
     "prepublishOnly": "npm test && npm run build"
   },
   "keywords": [

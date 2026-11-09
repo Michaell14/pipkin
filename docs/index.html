@@ -6,6 +6,26 @@
 <title>pipkin · deterministic animal avatars that breed and fuse</title>
 <meta name="description" content="Any name, email or id gets a small animal of its own. Zero dependencies, about 2 KB of SVG per avatar. Breed two names into a child, or fuse a team into one avatar.">
 <meta name="theme-color" content="#F3F5FB">
+<!-- Share previews.  becomes the site's origin at build time (see scripts/build.mjs);
+     docs/og/ is rendered by `npm run og`. Discord plays the video; elsewhere the still shows. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pipkin">
+<meta property="og:url" content="/">
+<meta property="og:title" content="pipkin · deterministic animal avatars that breed and fuse">
+<meta property="og:description" content="Any name, email or id gets a small animal of its own. Same name, same pipkin, every time.">
+<meta property="og:image" content="/og/pipkin.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A crowd of small animal avatars around the words: pipkin, there's one for everyone.">
+<meta property="og:video" content="/og/pipkin.mp4">
+<meta property="og:video:secure_url" content="/og/pipkin.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1200">
+<meta property="og:video:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="pipkin · deterministic animal avatars that breed and fuse">
+<meta name="twitter:description" content="Any name, email or id gets a small animal of its own. Same name, same pipkin, every time.">
+<meta name="twitter:image" content="/og/pipkin.png">
 <!-- Hide the hero card until the load animation takes over, so it never flashes. Skipped under reduced motion. -->
 <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro");</script>
 <link rel="icon" id="favicon" href="data:,">

@@ -43,7 +43,13 @@ writeFileSync(new URL("src/motion.css", root), "/* pipkin motion: idle life for 
 const page = read("docs/page.html");
 const inline = `${body}\nconst PIPKIN = { ${PUBLIC.join(", ")} };`;
 const motionCss = read("src/motion.css");
+// Share-preview tags need absolute URLs. On Vercel the production domain comes from its system
+// environment variables; set SITE_URL (like https://example.com) to override. With neither, the
+// tags fall back to root-relative paths.
+const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const site = (process.env.SITE_URL || (vercel ? `https://${vercel}` : "")).replace(/\/+$/, "");
 const out = page
+  .replace(/__SITE__/g, site)
   .replace("/*PIPKIN-LIBRARY*/", () => inline)
   .replace("/*PIPKIN-MOTION*/", () => motionCss)
   .replace(/__VERSION__/g, version)
