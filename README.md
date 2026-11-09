@@ -146,6 +146,7 @@ npm install        # only esbuild, for the minified build
 npm test           # node --test
 npm run build      # dist/, src/motion.css and docs/index.html
 npm run golden     # re-pin test/golden.json (only for intended visual changes)
+npm run og         # re-render the share preview, docs/og/ (needs Playwright and ffmpeg)
 ```
 
 ## Not done yet
