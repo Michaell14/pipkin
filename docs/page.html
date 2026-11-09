@@ -819,7 +819,7 @@ show(input.value);
 
 // Load animation ("unfuse + peek"): a fused pipkin appears where the card is and bursts, and as it
 // does everyone pops up out of their own square, nearest first. Then the card and the stats rise
-// in. About 1.7 seconds in all.
+// in. About 2.3 seconds in all.
 function intro() {
   const root = document.documentElement;
   if (!root.classList.contains("intro")) return;
@@ -839,18 +839,21 @@ function intro() {
   blob.setAttribute("aria-hidden", "true");
   blob.style.left = `${cx - frame.left}px`;
   blob.style.top = `${cy - frame.top}px`;
-  blob.innerHTML = PIPKIN.fuse(crowd.slice(0, 9).map((b) => b.dataset.name));
+  blob.innerHTML = PIPKIN.fuse(crowd.slice(0, 9).map((b) => b.dataset.name), { animate: true });
   grid.append(blob);
+  // Pops in, breathes for a beat (and blinks), squeezes, then bursts at about 1.2 s.
   blob
     .animate(
       [
-        { transform: "scale(0)", opacity: 1 },
-        { transform: "scale(1.08)", offset: 0.3 },
-        { transform: "scale(1)", offset: 0.45 },
-        { transform: "scale(1.05)", opacity: 1, offset: 0.68 },
+        { transform: "scale(0)", opacity: 1, easing: "cubic-bezier(.3,1.4,.5,1)" },
+        { transform: "scale(1)", offset: 0.2, easing: "ease-in-out" },
+        { transform: "scale(1.04)", offset: 0.42, easing: "ease-in-out" },
+        { transform: "scale(1)", offset: 0.6, easing: "ease-in" },
+        { transform: "scale(0.92)", opacity: 1, offset: 0.74, easing: "ease-out" },
+        { transform: "scale(1.35)", opacity: 0.55, offset: 0.87, easing: "ease-in" },
         { transform: "scale(1.7)", opacity: 0 },
       ],
-      { duration: 900, easing: "cubic-bezier(.3,1,.4,1)", fill: "both" },
+      { duration: 1600, fill: "both" },
     )
     .finished.then(() => blob.remove());
   // As it bursts, each pipkin pops up out of its own square (the square clips it until it is out),
@@ -864,15 +867,15 @@ function intro() {
     b.querySelector(".f")
       .animate([{ transform: "translateY(135%)" }, { transform: "translateY(0)" }], {
         duration: 550,
-        delay: 640 + dist * 0.5 + Math.random() * 200,
+        delay: 1180 + dist * 0.5 + Math.random() * 200,
         easing: "cubic-bezier(.3,1.25,.5,1)",
         fill: "backwards",
       })
       .finished.then(done, done);
   }
   const rise = [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }];
-  card.animate(rise, { duration: 500, delay: 850, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
-  $(".stats").animate(rise, { duration: 500, delay: 1100, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  card.animate(rise, { duration: 500, delay: 1350, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  $(".stats").animate(rise, { duration: 500, delay: 1600, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
   root.classList.remove("intro");
 }
 intro();
