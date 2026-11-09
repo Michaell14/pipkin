@@ -68,6 +68,9 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .btn-dark:hover { background: #2a3358; color: #fff; }
 .btn-soft { background: var(--soft); border-color: var(--line); color: var(--ink); }
 .btn-soft:hover { background: #e9ecf6; color: var(--ink); }
+.btn-npm { gap: 12px; padding: 0 18px; font-weight: 500; }
+.btn-npm code { font-size: 14px; }
+.btn-npm .copy-label { font-size: 13px; color: var(--muted); }
 
 /* Header */
 .top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 20px; padding-bottom: 20px; }
@@ -218,7 +221,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 .cmd .prompt { color: #9aa3c4; }
 .cmd button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
 .panel pre.code { background: var(--navy-2); }
-.panel .note { font-size: 14px; overflow-wrap: anywhere; }
+.panel .note { max-width: none; font-size: 14px; overflow-wrap: anywhere; }
 .panel .note code { color: #fff; }
 
 .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 64px; padding-bottom: 56px; font-size: 14px; color: var(--muted); }
@@ -262,6 +265,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
     <a href="#features">Features</a>
     <a href="#docs">Docs</a>
     <a href="#install">Install</a>
+    <a href="https://www.npmjs.com/package/pipkin">npm</a>
     <a href="https://github.com/Michaell14/pipkin">GitHub</a>
   </nav>
 </header>
@@ -279,7 +283,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
           </div>
           <div class="actions">
             <a class="btn btn-dark" href="#install">Get started</a>
-            <a class="btn btn-soft" href="https://github.com/Michaell14/pipkin">View on GitHub</a>
+            <button class="btn btn-soft btn-npm" type="button" data-copy="npm i pipkin"><code>npm i pipkin</code><span class="copy-label" data-label>Copy</span></button>
           </div>
         </div>
         <figure class="result">
@@ -298,6 +302,34 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
     <div class="stat"><span>Dependencies</span><strong>0</strong></div>
     <div class="stat"><span>Species, earless blob included</span><strong id="species">6</strong></div>
     <div class="stat"><span>Time to draw one, on this device</span><strong id="speed">&lt;1 ms</strong></div>
+  </section>
+
+  <section class="wrap install" id="install" aria-label="Install">
+    <div class="peek" aria-hidden="true">
+      <span class="av" data-pipkin="tara" data-anim style="--s: 76px"></span>
+      <span class="av" data-pipkin="juno" data-anim style="--s: 68px"></span>
+      <span class="av" data-pipkin="odin" data-anim style="--s: 80px"></span>
+      <span class="av" data-pipkin="finn" data-anim style="--s: 70px"></span>
+    </div>
+    <div class="panel">
+      <div class="copy">
+        <h2>Get yours in one line.</h2>
+        <p>No dependencies and about 8.4 KB gzipped. pipkin returns an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
+      </div>
+      <div class="side">
+        <div class="cmd">
+          <code><span class="prompt">$ </span>npm install pipkin</code>
+          <button type="button" data-copy="npm install pipkin"><span data-label>Copy</span></button>
+        </div>
+<pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
+
+avatar.innerHTML = pipkin(user.email, {
+  size: <span class="n">40</span>,
+  background: <span class="s">"circle"</span>,
+});</code></pre>
+        <p class="note">No bundler? Import it from a CDN: <code>https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js</code></p>
+      </div>
+    </div>
   </section>
 
   <section class="wrap section" id="features">
@@ -493,33 +525,6 @@ el.innerHTML = pipkin(user.id, { animate: <span class="n">true</span> });</code>
     </div>
   </section>
 
-  <section class="wrap install" id="install" aria-label="Install">
-    <div class="peek" aria-hidden="true">
-      <span class="av" data-pipkin="tara" data-anim style="--s: 76px"></span>
-      <span class="av" data-pipkin="juno" data-anim style="--s: 68px"></span>
-      <span class="av" data-pipkin="odin" data-anim style="--s: 80px"></span>
-      <span class="av" data-pipkin="finn" data-anim style="--s: 70px"></span>
-    </div>
-    <div class="panel">
-      <div class="copy">
-        <h2>Get yours in one line.</h2>
-        <p>No dependencies and about 8.4 KB gzipped. pipkin returns an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
-      </div>
-      <div class="side">
-        <div class="cmd">
-          <code><span class="prompt">$ </span>npm install pipkin</code>
-          <button type="button" data-copy="npm install pipkin">Copy</button>
-        </div>
-<pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
-
-avatar.innerHTML = pipkin(user.email, {
-  size: <span class="n">40</span>,
-  background: <span class="s">"circle"</span>,
-});</code></pre>
-        <p class="note">No bundler? Import it from a CDN: <code>https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js</code></p>
-      </div>
-    </div>
-  </section>
 </main>
 
 <footer class="wrap foot">
@@ -1589,16 +1594,17 @@ for (const btn of $$(".team")) {
 
 // Copy buttons.
 for (const btn of $$("[data-copy]")) {
-  const label = btn.textContent;
+  const target = btn.querySelector("[data-label]") || btn;
+  const label = target.textContent;
   btn.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(btn.dataset.copy);
-      btn.textContent = "Copied";
+      target.textContent = "Copied";
     } catch {
-      btn.textContent = "Select and copy";
+      target.textContent = "Select and copy";
     }
     clearTimeout(btn._timer);
-    btn._timer = setTimeout(() => (btn.textContent = label), 1600);
+    btn._timer = setTimeout(() => (target.textContent = label), 1600);
   });
 }
 
