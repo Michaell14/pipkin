@@ -138,7 +138,12 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .stack { display: flex; align-items: center; }
 .stack .av { margin-left: -8px; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
 .stack .av:first-child { margin-left: 0; }
-.messages { flex: 1 1 auto; list-style: none; margin: 0; padding: 28px; display: flex; flex-direction: column; gap: 22px; }
+.messages { flex: 1 1 auto; list-style: none; margin: 0; padding: 28px; display: flex; flex-direction: column; gap: 22px; max-height: 480px; overflow-y: auto; }
+.comments { display: flex; flex-direction: column; gap: 18px; max-height: 320px; overflow-y: auto; }
+.who b, .members b { overflow-wrap: anywhere; }
+.you { padding: 1px 7px; border-radius: 6px; background: var(--tile); font-size: 11px; font-weight: 600; color: var(--muted); }
+.new { animation: arrive 0.25s ease-out; }
+@keyframes arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .messages li { display: flex; gap: 14px; }
 .who { display: flex; align-items: baseline; gap: 8px; }
 .messages p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
@@ -162,6 +167,10 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .cursor { position: absolute; display: flex; align-items: flex-start; gap: 4px; }
 .cursor .label { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 3px 10px 3px 3px; border-radius: 999px; background: var(--c); color: var(--ink); font-size: 13px; font-weight: 600; }
 .cursor .label .av { border-radius: 50%; background: #fff; }
+/* Your own cursor: hidden until a mouse enters the box, then it replaces the system pointer. */
+.cursor.me { left: 0; top: 0; z-index: 3; display: none; pointer-events: none; }
+.canvas.has-me { cursor: none; }
+.canvas.has-me .cursor.me { display: flex; }
 .c1 { left: 12%; top: 16%; animation: drift1 11s ease-in-out infinite; }
 .c2 { left: 52%; top: 44%; animation: drift2 13s ease-in-out infinite; }
 .c3 { left: 20%; top: 68%; animation: drift3 12s ease-in-out infinite; }
@@ -254,7 +263,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .f0, .f1, .f2, .f3, .f4, .f5, .c1, .c2, .c3, .bubble { animation: none; }
+  .f0, .f1, .f2, .f3, .f4, .f5, .c1, .c2, .c3, .bubble, .new { animation: none; }
   .zz { animation: none; opacity: 1; }
 }
 </style>
@@ -342,11 +351,11 @@ avatar.innerHTML = pipkin(user.email, {
     <div class="app">
       <aside class="app-side" aria-label="Channel members">
         <div class="team-head">
-          <span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 52px" role="img" aria-label="Team avatar: zoe, priya, noah and ava fused"></span>
-          <div><strong>Design crew</strong><span class="small">zoe, priya, noah, ava</span></div>
+          <span class="av" id="team-avatar" data-fuse="zoe,priya,noah,ava" style="--s: 52px" role="img" aria-label="Team avatar: zoe, priya, noah and ava fused"></span>
+          <div><strong>Design crew</strong><span class="small" id="team-names">zoe, priya, noah, ava</span></div>
         </div>
         <span class="kicker">Members</span>
-        <ul class="members">
+        <ul class="members" id="members">
           <li><span class="av" data-pipkin="zoe" data-mood="determined" style="--s: 34px"></span><span><b>zoe</b><span class="small">Focusing</span></span></li>
           <li><span class="av" data-pipkin="priya" style="--s: 34px"></span><span><b>priya</b><span class="small">Online</span></span></li>
           <li><span class="av" data-pipkin="noah" style="--s: 34px"></span><span><b>noah</b><span class="small">Online</span></span></li>
@@ -357,24 +366,24 @@ avatar.innerHTML = pipkin(user.email, {
       </aside>
       <div class="app-main">
         <div class="app-bar">
-          <span class="channel"><span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 30px"></span># design-crew</span>
-          <span class="stack">
+          <span class="channel"><span class="av" id="channel-avatar" data-fuse="zoe,priya,noah,ava" style="--s: 30px"></span># design-crew</span>
+          <span class="stack" id="stack">
             <span class="av" data-pipkin="zoe" data-bg="circle" style="--s: 30px"></span>
             <span class="av" data-pipkin="priya" data-bg="circle" style="--s: 30px"></span>
             <span class="av" data-pipkin="noah" data-bg="circle" style="--s: 30px"></span>
             <span class="av" data-pipkin="ava" data-bg="circle" style="--s: 30px"></span>
-            <span class="small" style="margin-left: 10px">4 members</span>
+            <span class="small" id="member-count" style="margin-left: 10px">4 members</span>
           </span>
         </div>
-        <ol class="messages">
+        <ol class="messages" id="messages" aria-live="polite">
           <li><span class="av" data-pipkin="zoe" style="--s: 44px"></span><div><div class="who"><b>zoe</b><span class="small">10:02</span></div><p>Pushed the new onboarding flow. Can someone check the empty states?</p></div></li>
           <li><span class="av" data-pipkin="priya" style="--s: 44px"></span><div><div class="who"><b>priya</b><span class="small">10:04</span></div><p>On it. The member list still reads well at 24 px.</p></div></li>
           <li><span class="av" data-pipkin="noah" style="--s: 44px"></span><div><div class="who"><b>noah</b><span class="small">10:05</span></div><p>Where do we store everyone's avatar?</p></div></li>
           <li><span class="av" data-pipkin="ava" style="--s: 44px"></span><div><div class="who"><b>ava</b><span class="small">10:05</span></div><p>We don't. Same name, same pipkin, every time.</p></div></li>
         </ol>
-        <form class="composer" onsubmit="return false">
+        <form class="composer" id="chat-form" onsubmit="return false">
           <label class="sr-only" for="chat-msg">Message</label>
-          <input id="chat-msg" type="text" placeholder="Message #design-crew">
+          <input id="chat-msg" type="text" placeholder="Message #design-crew" maxlength="280" autocomplete="off">
           <button class="icon-btn" type="submit" aria-label="Send message"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button>
         </form>
       </div>
@@ -389,12 +398,14 @@ avatar.innerHTML = pipkin(user.email, {
     <div class="grid3">
       <article class="card">
         <h3>Comments</h3>
-        <div class="comment"><span class="av" data-pipkin="juno"></span><div><b>juno</b><p>Love the new empty state.</p></div></div>
-        <div class="comment"><span class="av" data-pipkin="ines"></span><div><b>ines</b><p>Shipping it after lunch.</p></div></div>
-        <div class="comment"><span class="av" data-pipkin="kofi"></span><div><b>kofi</b><p>Can we keep the bunny?</p></div></div>
-        <form class="reply" onsubmit="return false">
+        <div class="comments" id="comments" aria-live="polite">
+          <div class="comment"><span class="av" data-pipkin="juno"></span><div><b>juno</b><p>Love the new empty state.</p></div></div>
+          <div class="comment"><span class="av" data-pipkin="ines"></span><div><b>ines</b><p>Shipping it after lunch.</p></div></div>
+          <div class="comment"><span class="av" data-pipkin="kofi"></span><div><b>kofi</b><p>Can we keep the bunny?</p></div></div>
+        </div>
+        <form class="reply" id="reply-form" onsubmit="return false">
           <label class="sr-only" for="reply-msg">Reply</label>
-          <input id="reply-msg" type="text" placeholder="Reply">
+          <input id="reply-msg" type="text" placeholder="Reply" maxlength="280" autocomplete="off">
           <button class="btn-send" type="submit">Send</button>
         </form>
       </article>
@@ -403,6 +414,7 @@ avatar.innerHTML = pipkin(user.email, {
         <div class="canvas" aria-label="Three live cursors: zoe, kofi and ines" role="img">
           <div class="cursor c1" style="--c: #ea92b9"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#ea92b9" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="zoe" style="--s: 22px"></span>zoe</span></div>
           <div class="cursor c2" style="--c: #51c2f8"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#51c2f8" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="kofi" style="--s: 22px"></span>kofi</span></div>
+          <div class="cursor me" id="my-cursor" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" style="fill: var(--c)" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" style="--s: 22px"></span><span class="me-name">you</span></span></div>
           <div class="cursor c3" style="--c: #d8aaff"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#d8aaff" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="ines" style="--s: 22px"></span>ines</span></div>
         </div>
       </article>
@@ -775,6 +787,7 @@ function show(seed) {
   $("#size").textContent = `${(new Blob([PIPKIN.pipkin(seed)]).size / 1024).toFixed(1)} KB`;
   const key = PIPKIN.normalize(seed);
   for (const b of crowd) b.setAttribute("aria-pressed", String(b.dataset.name === key));
+  setPlaceholders();
 }
 const fromUrl = new URLSearchParams(location.search).get("name");
 if (fromUrl) input.value = fromUrl;
@@ -805,6 +818,116 @@ for (const btn of $$(".team")) {
     $("#team-code").textContent = `fuse([${quote(btn.dataset.team.split(","))}])`;
   });
 }
+
+// Chat, comments and the live cursor. You appear as whoever is in the name box at the top.
+function me() {
+  return (input.value.trim() || "you").slice(0, 32);
+}
+function setPlaceholders() {
+  $("#chat-msg").placeholder = `Message #design-crew as ${me()}`;
+  $("#reply-msg").placeholder = `Reply as ${me()}`;
+}
+function clock() {
+  const now = new Date();
+  return `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+function avatar(name, size, options) {
+  const el = document.createElement("span");
+  el.className = "av";
+  el.style.setProperty("--s", `${size}px`);
+  el.innerHTML = PIPKIN.pipkin(name, options);
+  return el;
+}
+function byline(name, time) {
+  const head = document.createElement("div");
+  head.className = "who";
+  const who = document.createElement("b");
+  who.textContent = name;
+  const tag = document.createElement("span");
+  tag.className = "you";
+  tag.textContent = "you";
+  head.append(who, tag);
+  if (time) {
+    const when = document.createElement("span");
+    when.className = "small";
+    when.textContent = time;
+    head.append(when);
+  }
+  return head;
+}
+function entry(tag, className, name, size, text, time) {
+  const row = document.createElement(tag);
+  row.className = className;
+  const body = document.createElement("div");
+  const words = document.createElement("p");
+  words.textContent = text;
+  body.append(byline(name, time), words);
+  row.append(avatar(name, size), body);
+  return row;
+}
+
+// Posting in the chat adds you to the team, and the team avatar re-fuses with you in it.
+const team = ["zoe", "priya", "noah", "ava"];
+function join(name) {
+  const key = PIPKIN.normalize(name);
+  if (team.some((m) => PIPKIN.normalize(m) === key)) return;
+  team.push(name);
+  const item = document.createElement("li");
+  item.className = "new";
+  const text = document.createElement("span");
+  const who = document.createElement("b");
+  who.textContent = name;
+  const status = document.createElement("span");
+  status.className = "small";
+  status.textContent = "Just joined";
+  text.append(who, status);
+  item.append(avatar(name, 34), text);
+  $("#members").append(item);
+  if ($$("#stack .av").length < 7) $("#member-count").before(avatar(name, 30, { background: "circle" }));
+  $("#member-count").textContent = `${team.length} members`;
+  const fused = PIPKIN.fuse(team);
+  $("#team-avatar").innerHTML = fused;
+  $("#channel-avatar").innerHTML = fused;
+  $("#team-avatar").setAttribute("aria-label", `Team avatar: ${team.join(", ")} fused`);
+  $("#team-names").textContent = team.join(", ");
+}
+function send(form, field, list, build) {
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = field.value.trim();
+    if (!text) return;
+    list.append(build(me(), text));
+    list.scrollTop = list.scrollHeight;
+    field.value = "";
+  });
+}
+send($("#chat-form"), $("#chat-msg"), $("#messages"), (name, text) => {
+  join(name);
+  return entry("li", "new", name, 44, text, clock());
+});
+send($("#reply-form"), $("#reply-msg"), $("#comments"), (name, text) => entry("div", "comment new", name, 40, text));
+setPlaceholders();
+
+// Inside the "Live cursors" box, a mouse pointer becomes your own labelled cursor.
+const canvas = $(".canvas");
+const myCursor = $("#my-cursor");
+function place(event) {
+  const box = canvas.getBoundingClientRect();
+  myCursor.style.transform = `translate(${event.clientX - box.left - 4}px, ${event.clientY - box.top - 3}px)`;
+}
+canvas.addEventListener("pointerenter", (event) => {
+  if (event.pointerType === "touch") return;
+  const name = me();
+  myCursor.querySelector(".me-name").textContent = name;
+  myCursor.querySelector(".av").innerHTML = PIPKIN.pipkin(name);
+  myCursor.style.setProperty("--c", palette(PIPKIN.genome(name).genes).body);
+  place(event);
+  canvas.classList.add("has-me");
+});
+canvas.addEventListener("pointermove", (event) => {
+  if (event.pointerType !== "touch") place(event);
+});
+canvas.addEventListener("pointerleave", () => canvas.classList.remove("has-me"));
 
 // Copy buttons. Feedback is a class swap between equal-sized states, so nothing reflows, and
 // screen readers hear it through the status line.
