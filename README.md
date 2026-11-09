@@ -40,7 +40,7 @@ import { pipkin } from "https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js
 <span class="avatar" v-html="pipkin(user.id, { size: 32 })"></span>
 ```
 
-**Where you need a URL** (an `<img>`, CSS, email templates):
+**Where you need a URL** (an `<img>` or a CSS background):
 
 ```js
 img.src = pipkinUri(user.email, { background: "circle" });

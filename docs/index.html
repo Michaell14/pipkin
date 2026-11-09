@@ -93,9 +93,11 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .btn-npm { gap: 12px; padding: 0 18px; font-weight: 500; }
 .btn-npm code { font-size: 14px; }
 /* Copy feedback swaps things of equal size, so a click never moves the layout. */
-.btn-npm .ic { flex: none; color: var(--muted); }
-.btn-npm .ic-done, .btn-npm.copied .ic-copy { display: none; }
-.btn-npm.copied .ic-done { display: block; color: #1d7f55; }
+.ic { flex: none; }
+.ic-done, .copied > .ic-copy { display: none; }
+.copied > .ic-done { display: block; }
+.btn-npm .ic { color: var(--muted); }
+.btn-npm.copied .ic-done { color: #1d7f55; }
 .swap { display: inline-grid; }
 .swap > span { grid-area: 1 / 1; text-align: center; }
 .swap .done, .copied .swap .idle { visibility: hidden; }
@@ -253,9 +255,6 @@ tr:last-child td { border-bottom: 0; }
 td:first-child { white-space: nowrap; }
 td code, .guarantees code { padding: 1px 6px; border-radius: 6px; background: var(--bg); font-size: 0.88em; }
 td:first-child code { padding: 0; background: none; font-size: 0.92em; }
-.snippets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: 16px; }
-.snippet { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 24px; background: var(--card); box-shadow: var(--ring); min-width: 0; }
-.snippet h3 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
 pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(--ink); color: #e6e9f5; font-size: 13.5px; line-height: 1.7; overflow-x: auto; }
 .k { color: #c7b5ff; } .s { color: #9ee6b8; } .n { color: #ffc98a; } .cm { color: #9aa3c4; }
 .guarantees { padding: 24px 28px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); }
@@ -266,16 +265,44 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 /* Install */
 .install { padding-top: 112px; }
 .peek { position: relative; z-index: 1; display: flex; justify-content: flex-end; gap: 6px; padding-right: 56px; margin-bottom: -20px; }
-.panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: center; gap: 40px; padding: 56px; border-radius: 36px; background: var(--ink); color: #fff; }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 40px; padding: 56px; border-radius: 36px; background: var(--ink); color: #fff; }
 .panel h2 { font-size: clamp(36px, 4vw, 56px); line-height: 1; color: #fff; }
 .panel .copy { display: flex; flex-direction: column; gap: 16px; }
 .panel p { margin: 0; max-width: 28em; font-size: 17px; line-height: 1.55; color: var(--pale); }
 .panel .side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (min-width: 1240px) {
+  .panel { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; }
+}
+/* Pickers: a package manager (radio group) and a framework (tabs). The chosen one is the only tab stop. */
+.seg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 4px; border-radius: 999px; background: var(--navy-2); }
+.seg button, .tabs button { border: 0; background: transparent; color: var(--pale); font: inherit; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease; }
+.seg button { min-height: 34px; padding: 0 14px; border-radius: 999px; font-family: var(--mono); font-size: 13px; }
+.seg button:hover, .tabs button:hover { color: #fff; }
+.seg button[aria-checked="true"] { background: #fff; color: var(--ink); }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 16px; }
+.tabs button { min-height: 36px; padding: 0 12px; border-radius: 10px; font-size: 15px; font-weight: 600; }
+.tabs button[aria-selected="true"] { background: var(--navy-3); color: #fff; }
 .cmd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 20px; border-radius: 16px; background: var(--navy-2); }
 .cmd code { color: #fff; font-size: 15px; overflow-wrap: anywhere; }
 .cmd .prompt { color: #9aa3c4; }
 .cmd button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--navy-3); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
-.panel pre.code { background: var(--navy-2); }
+/* The snippet, in an editor-like card. Its height is reserved for the longest snippet (--lines,
+   set by the script), so switching never moves the page. */
+.editor { border-radius: 18px; background: var(--navy-2); overflow: hidden; }
+.editor-bar { display: flex; align-items: center; gap: 14px; padding: 6px 6px 6px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.editor-bar .file { margin-right: auto; font-size: 13px; color: #9aa3c4; }
+.panel .editor pre.code { min-height: calc(var(--lines, 10) * 1.7em + 32px); border-radius: 0; background: transparent; }
+.switch { position: relative; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--pale); cursor: pointer; user-select: none; }
+.switch:hover, .switch:has(input:checked) { color: #fff; }
+.switch input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+.switch .track { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--navy-3); transition: background-color 0.15s ease; }
+.switch .track::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--pale); transition: transform 0.15s ease, background-color 0.15s ease; }
+.switch input:checked + .track { background: #9ee6b8; }
+.switch input:checked + .track::after { transform: translateX(14px); background: var(--ink); }
+.switch input:focus-visible + .track { outline: 3px solid var(--focus); outline-offset: 2px; }
+.copy-code { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--pale); cursor: pointer; }
+.copy-code:hover { background: var(--navy-3); color: #fff; }
+.copy-code.copied { color: #9ee6b8; }
 .panel .note { max-width: none; font-size: 14px; overflow-wrap: anywhere; }
 .panel .note code { color: #fff; }
 
@@ -373,16 +400,37 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
         <p>No dependencies and about 8.4 KB gzipped. pipkin returns an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
       </div>
       <div class="side">
-        <div class="cmd">
-          <code><span class="prompt">$ </span>npm install pipkin</code>
-          <button type="button" data-copy="npm install pipkin" aria-label="Copy the install command: npm install pipkin"><span class="swap"><span class="idle">Copy</span><span class="done" aria-hidden="true">Copied</span></span></button>
+        <div class="seg" role="radiogroup" aria-label="Package manager">
+          <button type="button" role="radio" aria-checked="true" data-pm="npm">npm</button>
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="pnpm">pnpm</button>
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="yarn">yarn</button>
+          <button type="button" role="radio" aria-checked="false" tabindex="-1" data-pm="bun">bun</button>
         </div>
-<pre class="code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
+        <div class="cmd">
+          <code><span class="prompt">$ </span><span id="pm-cmd">npm install pipkin</span></code>
+          <button type="button" id="pm-copy" data-copy="npm install pipkin" aria-label="Copy the install command: npm install pipkin"><span class="swap"><span class="idle">Copy</span><span class="done" aria-hidden="true">Copied</span></span></button>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Framework">
+          <button type="button" role="tab" id="fw-react" aria-selected="true" aria-controls="usage" data-fw="react">React</button>
+          <button type="button" role="tab" id="fw-vue" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="vue">Vue</button>
+          <button type="button" role="tab" id="fw-svelte" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="svelte">Svelte</button>
+          <button type="button" role="tab" id="fw-solid" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="solid">Solid</button>
+          <button type="button" role="tab" id="fw-vanilla" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="vanilla">Vanilla</button>
+          <button type="button" role="tab" id="fw-image" aria-selected="false" aria-controls="usage" tabindex="-1" data-fw="image">Image URL</button>
+        </div>
+        <div class="editor" role="tabpanel" id="usage" aria-labelledby="fw-react">
+          <div class="editor-bar">
+            <code class="file" id="usage-file">Avatar.jsx</code>
+            <label class="switch"><input type="checkbox" role="switch" id="usage-animate"><span class="track" aria-hidden="true"></span>Animate</label>
+            <button type="button" class="copy-code" id="usage-copy" data-copy="" data-copy-label="the React code" aria-label="Copy the code"><svg class="ic ic-copy" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><svg class="ic ic-done" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+          </div>
+<pre class="code" id="usage-code"><code><span class="k">import</span> { pipkin } <span class="k">from</span> <span class="s">"pipkin"</span>;
 
-avatar.innerHTML = pipkin(user.email, {
-  size: <span class="n">40</span>,
-  background: <span class="s">"circle"</span>,
-});</code></pre>
+<span class="k">export</span> <span class="k">function</span> Avatar({ id }) {
+  <span class="k">const</span> svg = pipkin(id, { size: <span class="n">32</span> });
+  <span class="k">return</span> &lt;span dangerouslySetInnerHTML={{ __html: svg }} /&gt;;
+}</code></pre>
+        </div>
         <p class="note">No bundler? Import it from a CDN: <code>https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js</code></p>
       </div>
     </div>
@@ -539,36 +587,6 @@ avatar.innerHTML = pipkin(user.email, {
             <tr><td><code>title</code></td><td>none</td><td>Accessible name. Without it the SVG is <code>aria-hidden</code>.</td></tr>
           </tbody>
         </table>
-      </div>
-    </div>
-    <div class="snippets">
-      <div class="snippet">
-        <h3>React</h3>
-<pre class="code"><code>&lt;span
-  className=<span class="s">"avatar"</span>
-  dangerouslySetInnerHTML={{
-    __html: pipkin(user.id, { size: <span class="n">32</span> }),
-  }}
-/&gt;</code></pre>
-      </div>
-      <div class="snippet">
-        <h3>Vue</h3>
-<pre class="code"><code>&lt;span
-  class=<span class="s">"avatar"</span>
-  v-html=<span class="s">"pipkin(user.id, { size: 32 })"</span>
-&gt;&lt;/span&gt;</code></pre>
-      </div>
-      <div class="snippet">
-        <h3>Images, CSS and email</h3>
-<pre class="code"><code>img.src = pipkinUri(user.email, {
-  background: <span class="s">"circle"</span>,
-});</code></pre>
-      </div>
-      <div class="snippet">
-        <h3>Motion</h3>
-<pre class="code"><code><span class="k">import</span> <span class="s">"pipkin/motion.css"</span>;
-
-el.innerHTML = pipkin(user.id, { animate: <span class="n">true</span> });</code></pre>
       </div>
     </div>
     <div class="guarantees">
@@ -2050,6 +2068,148 @@ canvas.addEventListener("pointermove", (event) => {
 });
 canvas.addEventListener("pointerleave", () => canvas.classList.remove("has-me"));
 
+// Install panel: pick a package manager and a framework, and flip Animate. Snippets are plain
+// text, highlighted here, so the copy button copies exactly what is shown. Choices are remembered.
+const INSTALL = { npm: "npm install pipkin", pnpm: "pnpm add pipkin", yarn: "yarn add pipkin", bun: "bun add pipkin" };
+const withCss = (a, indent = "") => (a ? `\n${indent}import "pipkin/motion.css"; // once per app` : "");
+const withAnim = (a) => (a ? ", animate: true" : "");
+const USAGE = {
+  react: { label: "React", file: "Avatar.jsx", code: (a) => `import { pipkin } from "pipkin";${withCss(a)}
+
+export function Avatar({ id }) {
+  const svg = pipkin(id, { size: 32${withAnim(a)} });
+  return <span dangerouslySetInnerHTML={{ __html: svg }} />;
+}` },
+  vue: { label: "Vue", file: "Avatar.vue", code: (a) => `<script setup>
+import { pipkin } from "pipkin";${withCss(a)}
+
+defineProps({ id: String });
+<\/script>
+
+<template>
+  <span v-html="pipkin(id, { size: 32${withAnim(a)} })"></span>
+</template>` },
+  svelte: { label: "Svelte", file: "Avatar.svelte", code: (a) => `<script>
+  import { pipkin } from "pipkin";${withCss(a, "  ")}
+
+  let { id } = $props();
+<\/script>
+
+<span>{@html pipkin(id, { size: 32${withAnim(a)} })}</span>` },
+  solid: { label: "Solid", file: "Avatar.jsx", code: (a) => `import { pipkin } from "pipkin";${withCss(a)}
+
+export function Avatar(props) {
+  const svg = () => pipkin(props.id, { size: 32${withAnim(a)} });
+  return <span innerHTML={svg()} />;
+}` },
+  vanilla: { label: "Vanilla", file: "main.js", code: (a) => `import { pipkin } from "pipkin";${withCss(a)}
+
+avatar.innerHTML = pipkin(user.email, {
+  size: 40,
+  background: "circle",${a ? "\n  animate: true," : ""}
+});` },
+  image: { label: "Image URL", file: "main.js", code: (a) => a ? `import { pipkinUri } from "pipkin";
+
+// With embedMotion, it animates even as an <img>.
+img.src = pipkinUri(user.email, {
+  background: "circle",
+  animate: true,
+  embedMotion: true,
+});` : `import { pipkinUri } from "pipkin";
+
+// A data URI, for an <img> src or a CSS background.
+img.src = pipkinUri(user.email, { background: "circle" });` },
+};
+const TOKENS = /("(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`)|(\/\/[^\n]*)|\b(import|from|export|function|return|const|let)\b|\b(\d+|true)\b/g;
+const escapeHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function highlight(code) {
+  let out = "";
+  let last = 0;
+  for (const m of code.matchAll(TOKENS)) {
+    const cls = m[1] ? "s" : m[2] ? "cm" : m[3] ? "k" : "n";
+    out += `${escapeHtml(code.slice(last, m.index))}<span class="${cls}">${escapeHtml(m[0])}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + escapeHtml(code.slice(last));
+}
+const savedChoice = (key, ok, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    return ok(value) ? value : fallback;
+  } catch {
+    return fallback;
+  }
+};
+const saveChoice = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
+};
+
+// One choice out of a row of buttons: click, or arrow keys (Home and End too) to move and pick.
+function picker(items, attr, keys, onPick) {
+  const pick = (item, focus) => {
+    for (const other of items) {
+      other.setAttribute(attr, String(other === item));
+      other.tabIndex = other === item ? 0 : -1;
+    }
+    if (focus) item.focus();
+    onPick(item);
+  };
+  items.forEach((item, i) => {
+    item.addEventListener("click", () => pick(item, false));
+    item.addEventListener("keydown", (event) => {
+      const n = items.length;
+      const to = event.key === "Home" ? 0 : event.key === "End" ? n - 1 : Object.hasOwn(keys, event.key) ? (i + keys[event.key] + n) % n : -1;
+      if (to < 0) return;
+      event.preventDefault();
+      pick(items[to], true);
+    });
+  });
+  return pick;
+}
+
+const pmCopy = $("#pm-copy");
+const pickPm = picker($$("[data-pm]"), "aria-checked", { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }, (btn) => {
+  const cmd = INSTALL[btn.dataset.pm];
+  $("#pm-cmd").textContent = cmd;
+  pmCopy.dataset.copy = cmd;
+  pmCopy.setAttribute("aria-label", `Copy the install command: ${cmd}`);
+  pmCopy.classList.remove("copied");
+  saveChoice("pipkin-pm", btn.dataset.pm);
+});
+
+const usageCode = $("#usage-code");
+const usageCopy = $("#usage-copy");
+const animateSwitch = $("#usage-animate");
+let framework = "react";
+function showUsage() {
+  const { label, file, code } = USAGE[framework];
+  const text = code(animateSwitch.checked);
+  usageCode.querySelector("code").innerHTML = highlight(text);
+  $("#usage-file").textContent = file;
+  $("#usage").setAttribute("aria-labelledby", `fw-${framework}`);
+  usageCopy.dataset.copy = text;
+  usageCopy.dataset.copyLabel = `the ${label} code`;
+  usageCopy.classList.remove("copied");
+}
+const pickFramework = picker($$("[data-fw]"), "aria-selected", { ArrowLeft: -1, ArrowRight: 1 }, (btn) => {
+  framework = btn.dataset.fw;
+  showUsage();
+  saveChoice("pipkin-framework", framework);
+});
+animateSwitch.addEventListener("change", () => {
+  showUsage();
+  saveChoice("pipkin-animate", animateSwitch.checked ? "1" : "0");
+});
+// Reserve room for the longest snippet.
+const longest = Math.max(...Object.values(USAGE).flatMap(({ code }) => [code(false), code(true)]).map((c) => c.split("\n").length));
+usageCode.style.setProperty("--lines", longest);
+
+animateSwitch.checked = savedChoice("pipkin-animate", (v) => v === "1" || v === "0", "0") === "1";
+pickPm($(`[data-pm="${savedChoice("pipkin-pm", (v) => Object.hasOwn(INSTALL, v), "npm")}"]`), false);
+pickFramework($(`[data-fw="${savedChoice("pipkin-framework", (v) => Object.hasOwn(USAGE, v), "react")}"]`), false);
+
 // Copy buttons. Feedback is a class swap between equal-sized states, so nothing reflows, and
 // screen readers hear it through the status line.
 async function copyText(text) {
@@ -2075,7 +2235,7 @@ for (const btn of $$("[data-copy]")) {
   btn.addEventListener("click", async () => {
     if (!(await copyText(btn.dataset.copy))) return;
     btn.classList.add("copied");
-    $("#copy-status").textContent = `Copied ${btn.dataset.copy}`;
+    $("#copy-status").textContent = `Copied ${btn.dataset.copyLabel || btn.dataset.copy}`;
     clearTimeout(btn._timer);
     btn._timer = setTimeout(() => btn.classList.remove("copied"), 1600);
   });
