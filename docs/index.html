@@ -103,7 +103,7 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .call { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
 .desc { font-size: 14px; color: var(--muted); }
 
-.pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; }
+.pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease; }
 .pk:hover { background: #fff; transform: translateY(-2px); }
 .pk[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 2px var(--ink); }
 .pk .f { display: block; width: 76%; height: 76%; }
@@ -124,6 +124,8 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 @keyframes intro-failsafe { to { opacity: 1; } }
 .intro-blob { position: absolute; z-index: 3; width: min(320px, 44vw); aspect-ratio: 1 / 1; translate: -50% -50%; pointer-events: none; }
 .intro-blob svg { display: block; width: 100%; height: 100%; }
+.pk.peeking { overflow: hidden; }
+.pk.peeking[aria-pressed="true"] { background: transparent; box-shadow: none; }
 
 /* Easter eggs for the friends in the crowd */
 .bubble { position: absolute; left: 50%; bottom: calc(100% + 4px); z-index: 6; display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; background: #fff; color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 10px 24px -10px rgba(20, 26, 51, 0.45), 0 0 0 1px rgba(20, 26, 51, 0.08); transform: translateX(-50%); pointer-events: none; animation: pop 0.18s ease-out; }
@@ -1810,8 +1812,9 @@ input.addEventListener("input", () => {
 });
 show(input.value);
 
-// Load animation ("unfuse"): a fused pipkin appears where the card is, bursts, and the whole crowd
-// flies out of it to their places. Then the card and the stats rise in. About 1.5 seconds in all.
+// Load animation ("unfuse + peek"): a fused pipkin appears where the card is and bursts, and as it
+// does everyone pops up out of their own square, nearest first. Then the card and the stats rise
+// in. About 1.7 seconds in all.
 function intro() {
   const root = document.documentElement;
   if (!root.classList.contains("intro")) return;
@@ -1845,21 +1848,26 @@ function intro() {
       { duration: 900, easing: "cubic-bezier(.3,1,.4,1)", fill: "both" },
     )
     .finished.then(() => blob.remove());
+  // As it bursts, each pipkin pops up out of its own square (the square clips it until it is out),
+  // nearest to the card first, with a little jitter so it doesn't look mechanical.
   for (const b of crowd) {
     if (!b.offsetParent) continue;
     const r = b.getBoundingClientRect();
-    const dx = cx - (r.left + r.width / 2);
-    const dy = cy - (r.top + r.height / 2);
-    b.animate([{ transform: `translate(${dx}px, ${dy}px) scale(.25)`, opacity: 0 }, { transform: "none", opacity: 1 }], {
-      duration: 700,
-      delay: 540 + Math.hypot(dx, dy) * 0.3,
-      easing: "cubic-bezier(.2,.9,.25,1.12)",
-      fill: "backwards",
-    });
+    const dist = Math.hypot(cx - (r.left + r.width / 2), cy - (r.top + r.height / 2));
+    const done = () => b.classList.remove("peeking");
+    b.classList.add("peeking");
+    b.querySelector(".f")
+      .animate([{ transform: "translateY(135%)" }, { transform: "translateY(0)" }], {
+        duration: 550,
+        delay: 640 + dist * 0.5 + Math.random() * 200,
+        easing: "cubic-bezier(.3,1.25,.5,1)",
+        fill: "backwards",
+      })
+      .finished.then(done, done);
   }
   const rise = [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }];
-  card.animate(rise, { duration: 500, delay: 800, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
-  $(".stats").animate(rise, { duration: 500, delay: 950, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  card.animate(rise, { duration: 500, delay: 850, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  $(".stats").animate(rise, { duration: 500, delay: 1100, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
   root.classList.remove("intro");
 }
 intro();
