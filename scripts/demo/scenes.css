@@ -1,0 +1,119 @@
+/* The scenes in scenes.js. Each scene's rules hang off the class it puts on its box. */
+
+/* ---------------------------------------------------------------- open-stage scenes (the tour's) */
+.sc h1 { margin: 0; font-size: 104px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; }
+.sc .cap { position: absolute; left: 0; right: 0; top: 70px; text-align: center; }
+.sc .cap .code { margin-top: 18px; font-family: var(--mono); font-size: 40px; color: var(--code, var(--muted)); white-space: pre; }
+.sc .cap .code b { font-weight: 400; color: var(--code-strong, var(--ink)); }
+.sc.lower h1, .sc.lower .proof div { text-transform: lowercase; }
+
+/* Type a name */
+.sc-type .brand { position: absolute; left: 128px; top: 96px; z-index: 5; display: flex; align-items: center; gap: 14px; font-size: 46px; font-weight: 800; letter-spacing: -0.03em; }
+.sc-type .brand .logo { width: 62px; height: 62px; }
+.sc-type h1 { position: absolute; left: 128px; top: 258px; font-size: 108px; }
+.sc-type .field { position: absolute; left: 128px; top: 566px; width: 940px; height: 136px; display: flex; align-items: center; padding: 0 44px; border-radius: 34px; background: #fff; box-shadow: 0 30px 60px -30px rgba(20, 26, 51, 0.3), 0 0 0 2px var(--line); font-family: var(--mono); font-size: 56px; white-space: pre; }
+.sc-type .field .p { color: #9aa1b9; }
+.sc-type .caret { display: inline-block; width: 5px; height: 68px; margin: 0 2px; border-radius: 3px; background: var(--ink); }
+.sc-type .kinds { position: absolute; left: 128px; top: 746px; display: flex; gap: 12px; }
+.sc-type .kind { position: relative; padding: 13px 30px; border-radius: 999px; font-size: 38px; font-weight: 600; color: var(--muted); }
+.sc-type .kind::before { content: ""; position: absolute; inset: 0; border-radius: 999px; background: var(--ink); opacity: var(--on, 0); }
+.sc-type .kind span { position: relative; }
+.sc-type .face { left: 1196px; top: 206px; width: 600px; height: 600px; }
+.sc-type .says { position: absolute; left: 1196px; top: 832px; width: 600px; font-size: 40px; font-weight: 600; color: var(--muted); text-align: center; }
+/* On a colour wash there is no tile behind the face, so the face can be larger. */
+.sc-type.washed .face { left: 1146px; top: 150px; width: 700px; height: 700px; }
+.sc-type.washed .says { left: 1146px; top: 846px; width: 700px; color: rgba(20, 26, 51, 0.62); }
+.sc-type.washed .kind { color: rgba(20, 26, 51, 0.62); }
+.sc-type.washed .field { box-shadow: 0 30px 60px -30px rgba(20, 26, 51, 0.35); }
+
+/* The same face everywhere */
+.sc-app .app { position: absolute; left: 170px; top: 236px; width: 1580px; height: 668px; display: grid; grid-template-columns: 470px 1fr; border-radius: 48px; background: #fff; color: var(--ink); box-shadow: 0 50px 90px -50px rgba(20, 26, 51, 0.45), 0 0 0 2px rgba(20, 26, 51, 0.06); }
+.sc-app .side { padding: 40px 38px; border-right: 2px solid var(--line); }
+.sc-app .side .kicker { margin: 0 0 16px 6px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.08em; color: var(--muted); }
+.sc-app .row { display: flex; align-items: center; gap: 24px; height: 134px; padding: 0 6px; }
+.sc-app .av { position: relative; flex: none; width: var(--d, 100px); height: var(--d, 100px); }
+.sc-app .row b { display: block; font-size: 46px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
+.sc-app .row i { display: block; font-size: 30px; font-style: normal; color: var(--muted); }
+.sc-app .main { display: flex; flex-direction: column; }
+.sc-app .bar { display: flex; align-items: center; justify-content: space-between; height: 148px; padding: 0 50px; border-bottom: 2px solid var(--line); font-size: 50px; font-weight: 800; letter-spacing: -0.025em; }
+.sc-app .stack { display: flex; align-items: center; }
+.sc-app .stack .av { --d: 92px; margin-left: -24px; border-radius: 50%; box-shadow: 0 0 0 6px #fff; }
+.sc-app .msgs { display: flex; flex-direction: column; gap: 44px; padding: 46px 50px; }
+.sc-app .msg { display: flex; gap: 40px; }
+.sc-app .msg .av { --d: 132px; }
+.sc-app .msg b { font-size: 46px; font-weight: 700; letter-spacing: -0.015em; }
+.sc-app .msg i { margin-left: 16px; font-size: 30px; font-style: normal; color: var(--muted); }
+.sc-app .bars { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
+.sc-app .bars span { display: block; height: 26px; border-radius: 13px; background: #e6e9f3; }
+.sc-app .ring { position: absolute; inset: -12px; border-radius: 50%; box-shadow: 0 0 0 7px var(--ink); }
+.sc-app .proof { position: absolute; left: 0; right: 0; top: 862px; display: flex; justify-content: center; }
+.sc-app .proof div { padding: 22px 52px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 54px; font-weight: 700; letter-spacing: -0.02em; box-shadow: 0 24px 40px -20px rgba(20, 26, 51, 0.6); }
+
+/* Fuse */
+.sc-fuse .melt { position: absolute; left: 180px; top: 290px; width: 1560px; height: 780px; }
+
+/* Moods, in close-up */
+.sc-mood .moody { position: absolute; left: 660px; top: 268px; width: 600px; height: 600px; overflow: hidden; border-radius: 34%; }
+.sc-mood .moody .pk { left: -150px; top: -110px; width: 900px; height: 900px; }
+.sc-mood .mood { position: absolute; left: 0; right: 0; top: 836px; display: flex; justify-content: center; }
+.sc-mood .mood div { min-width: 340px; padding: 18px 48px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 50px; text-align: center; box-shadow: 0 24px 40px -20px rgba(20, 26, 51, 0.6); }
+
+/* The end card, in a crowd */
+.sc-card .grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); padding: 10px; }
+.sc-card .cell { display: grid; place-items: center; overflow: hidden; }
+.sc-card .cell div { width: 128px; height: 128px; }
+.sc-card .card { grid-column: 3 / 10; grid-row: 2 / 6; margin: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; border-radius: 52px; background: #fff; box-shadow: 0 50px 90px -44px rgba(20, 26, 51, 0.4), 0 0 0 2px rgba(20, 26, 51, 0.06); }
+.sc-card .mark { display: flex; align-items: center; gap: 22px; font-size: 132px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.sc-card .mark .logo { width: 128px; height: 128px; }
+.sc-card .line { font-size: 68px; font-weight: 700; letter-spacing: -0.025em; }
+.sc-card .cmd { margin-top: 10px; padding: 20px 50px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 48px; }
+.sc-card .facts { font-size: 34px; font-weight: 500; color: var(--muted); }
+
+/* ---------------------------------------------------------------- panels (the pop cut's) */
+.panel { position: absolute; left: 0; top: -90px; width: 1920px; height: 1260px; border-radius: 90px 90px 0 0; overflow: hidden; }
+.panel.dark { background: var(--ink); color: #fff; --tag: #8f98bd; --code: #8f98bd; --code-strong: #fff; }
+.panel.tinted { --branch: #fff; --times: rgba(20, 26, 51, 0.35); --tag: rgba(20, 26, 51, 0.62); --code: rgba(20, 26, 51, 0.62); }
+.in { position: absolute; left: 0; top: 90px; width: 1920px; height: 1080px; }
+.big { position: absolute; left: 0; right: 0; margin: 0; font-size: 180px; font-weight: 900; letter-spacing: -0.045em; line-height: 1; text-align: center; white-space: nowrap; }
+.chip { position: absolute; left: 0; right: 0; top: 946px; display: flex; justify-content: center; }
+.chip div { padding: 16px 42px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 42px; white-space: pre; }
+.chip.light div { background: #fff; color: var(--ink); }
+
+/* hi */
+.pp-hi .face { left: 590px; top: 6px; width: 740px; height: 740px; }
+.pp-hi .big { top: 706px; height: 200px; font-size: 200px; line-height: 200px; }
+.pp-hi .big > span { display: inline-block; }
+.pp-hi .caret { display: inline-block; width: 0.07em; height: 0.74em; margin: 0 0.02em -0.04em 0.03em; border-radius: 0.04em; background: var(--ink); }
+
+/* The wall */
+.pp-wall .wall { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(16, 120px); grid-template-rows: repeat(9, 120px); }
+.pp-wall .wall div { display: grid; place-items: center; }
+.pp-wall .wall svg { width: 96px; height: 96px; }
+.pp-wall .claim { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: grid; place-items: center; }
+.pp-wall .claim div { padding: 54px 92px 62px; border-radius: 64px; background: var(--ink); color: #fff; font-size: 124px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.02; text-align: center; box-shadow: 0 60px 100px -40px rgba(20, 26, 51, 0.7); }
+
+/* Same input, same avatar */
+.pp-same .big { top: 96px; }
+.pp-same .proof div { font-family: var(--font); font-size: 54px; font-weight: 800; letter-spacing: -0.02em; }
+
+/* Breed and fuse */
+.pp-breed { --branch: #fff; --times: rgba(20, 26, 51, 0.35); }
+.pp-breed .big, .pp-fuse .big { top: 64px; font-size: 168px; }
+.pp-fuse .melt { position: absolute; left: 510px; top: 196px; width: 900px; height: 900px; }
+.pp-fuse .chip { top: 972px; z-index: 2; }
+
+/* Moods */
+.pp-mood .close { position: absolute; left: 150px; top: 200px; width: 680px; height: 680px; overflow: hidden; border-radius: 50%; }
+.pp-mood .close .pk { left: -170px; top: -120px; width: 1020px; height: 1020px; }
+.pp-mood .say { position: absolute; left: 900px; top: 296px; font-size: 104px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+.pp-mood .word { position: absolute; left: 892px; top: 410px; font-size: 250px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; transform-origin: 0 60%; }
+.pp-mood .chip { left: 900px; right: auto; top: 716px; }
+
+/* The end */
+.pp-end .mark { position: absolute; left: 0; right: 0; top: 150px; display: flex; align-items: center; justify-content: center; gap: 34px; font-size: 250px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; }
+.pp-end .mark .logo { width: 230px; height: 230px; }
+.pp-end .line { position: absolute; left: 0; right: 0; top: 440px; font-size: 80px; font-weight: 800; letter-spacing: -0.03em; text-align: center; color: #c3c9dd; }
+.pp-end .chip { top: 590px; }
+.pp-end .chip div { padding: 22px 60px; font-size: 60px; }
+.pp-end .facts { position: absolute; left: 0; right: 0; top: 744px; font-size: 38px; font-weight: 500; text-align: center; color: #8f98bd; }
+.pp-end .row .pk { width: 210px; height: 210px; top: 906px; }

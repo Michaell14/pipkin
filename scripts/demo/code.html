@@ -83,15 +83,9 @@ h1 { margin: 0; font-size: 104px; font-weight: 800; letter-spacing: -0.035em; li
 </div>
 
 <script>
-const HERO = "maya@acme.co";
-for (const logo of $$(".logo")) logo.innerHTML = pipkin("maya");
-for (const name of $$(".name")) name.textContent = CFG.brand;
-
-const GHOST = "\u0000ghost";
-const ghost = (o) => {
-  const c = palette(genome("ruby").genes);
-  return pipkin("ruby", { ...o, mood: "sleepy" }).replaceAll(c.body, "#3b4677").replaceAll(c.ink, "#8f98bd");
-};
+brandFill(document);
+// On the dark stage the nameless blob is a dim blue.
+const nightGhost = (o) => ghost(o, ["#3b4677", "#e6e9f3", "#8f98bd"]);
 
 // ---------------------------------------------------------------- the editor
 // Each line has a text that may change over time; `keys` are the times its characters appear.
@@ -194,7 +188,7 @@ const T2 = 3700;
   });
   tw(L.says.node, { o: [0, 1] }, done + 120, 260, E.soft);
   tw(L.says.node, { o: 0.42 }, T2, 300, E.soft);
-  const face = hero($("#face"), GHOST, { render: (who, o) => (who === GHOST ? ghost(o) : pipkin(who, o)) });
+  const face = hero($("#face"), GHOST, { render: (who, o) => (who === GHOST ? nightGhost(o) : pipkin(who, o)) });
   for (let i = 0; i < HERO.length; i++) face.name(keys[open + i], HERO.slice(0, i + 1));
   swaps.forEach(([t, v]) => face.name(t, v));
   face.hop(done + 240, 46).blink(done + 700, swaps[0][0] + 300, swaps[1][0] + 320, swaps[1][0] + 900);

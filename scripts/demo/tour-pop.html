@@ -1,0 +1,15 @@
+<!-- Tour x pop, tour-led: the tour's script and headlines, staged on the pop cut's colour panels. -->
+<div id="stage"></div>
+<script>
+const CUTS = [0, 4400, 7650, 11300, 15050, 17300, 1e9];
+// Typing recolours the whole frame, one keystroke at a time.
+typeScene(panel(CUTS[0], CUTS[1], { slide: false, bg: NAMELESS }), CUTS[0], { wash: true, until: CUTS[1] + 600 });
+appScene(panel(CUTS[1], CUTS[2], { bg: wash(HERO) }), CUTS[1]);
+breedScene(panel(CUTS[2], CUTS[3], { bg: oklch(0.915, 0.05, genome("rosa×priya#1").genes.hue), cls: "tinted" }), CUTS[2]);
+fuseScene(panel(CUTS[3], CUTS[4], { cls: "dark" }), CUTS[3], { until: CUTS[4] + 600 });
+moodScene(panel(CUTS[4], CUTS[5], { bg: wash(HERO), cls: "tinted" }), CUTS[4], { tile: "rgba(255, 255, 255, 0.55)" });
+cardEnd(panel(CUTS[5], CUTS[6], { bg: "var(--bg)" }), CUTS[5]);
+
+const DURATION = 20400;
+const POSTER = 19400;
+</script>

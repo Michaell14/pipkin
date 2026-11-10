@@ -1,0 +1,17 @@
+<!-- Pop x tour, half and half: the pop cut's opening and end card around the tour's walkthrough. -->
+<div id="stage"></div>
+<script>
+hiScene(panel(0, 2650, { slide: false }), 0);
+// The wall's panel stays on as the stage for the tour's scenes, once the wall itself has drained away.
+const END = 17700;
+wallScene(panel(2650, END, { bg: "var(--bg)" }), 2650).out(4430);
+const lower = { lower: true };
+appScene(act(4600, 3350), 4600, lower).out(7620);
+breedScene(act(7920, 3850), 7920, lower).out(11420);
+fuseScene(act(11680, 3900), 11680, lower).out(15240);
+moodScene(act(15500, 2500), 15500, lower).out(17630);
+popEnd(panel(END, 1e9, { cls: "dark" }), END);
+
+const DURATION = 20800;
+const POSTER = 19900;
+</script>

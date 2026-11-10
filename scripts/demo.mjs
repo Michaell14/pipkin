@@ -4,12 +4,13 @@
 //   node scripts/demo.mjs tour pop        just these
 //   node scripts/demo.mjs tour --stills=0.5,3,12.4 --out=/tmp/x   single frames instead of a video
 //
-// Each cut is one page, scripts/demo/<cut>.html, built on scripts/demo/kit.js. A page is a pure
-// function of time, so the frames are stepped exactly and rendered by several tabs at once.
+// Each cut is one page, scripts/demo/<cut>.html, that lines up scenes from scripts/demo/scenes.js
+// (the timeline kit under them is scripts/demo/kit.js). A page is a pure function of time, so the
+// frames are stepped exactly and rendered by several tabs at once.
 // Needs Playwright with Chromium and ffmpeg on the PATH, like `npm run og`.
 import { createRequire } from "node:module";
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +26,7 @@ try {
 
 const root = new URL("../", import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), "utf8");
-const CUTS = ["tour", "code", "pop"];
+const CUTS = ["tour", "code", "pop", "tour-pop", "pop-tour", "type-pop"];
 const W = 1920;
 const H = 1080;
 
@@ -56,26 +57,36 @@ const library = ["hash", "genome", "color", "geometry", "motion", "render", "ind
 const { MOTION_CSS } = await import(new URL("src/motion.js", root).href);
 const gzip = (await import("node:zlib")).gzipSync(read("dist/pipkin.min.js")).length;
 
-const page = (cut) => `<!doctype html><html><head><meta charset="utf-8">
+// Everything but the cut itself. The cut goes in once the fonts are loaded, because scenes measure text.
+const shell = `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=block">
 <style>${MOTION_CSS}</style>
 <style>${read("scripts/demo/kit.css")}</style>
+<style>${read("scripts/demo/scenes.css")}</style>
 </head><body>
 <script>const CFG = ${JSON.stringify({ brand: BRAND, install: INSTALL, kb: (gzip / 1024).toFixed(1) })};</script>
 <script>${library}</script>
 <script>${read("scripts/demo/kit.js")}</script>
-${read(`scripts/demo/${cut}.html`)}
+<script>${read("scripts/demo/scenes.js")}</script>
 </body></html>`;
+const FACES = ["400 20px Gabarito", "600 20px Gabarito", "700 20px Gabarito", "800 20px Gabarito", "900 20px Gabarito", '400 20px "DM Mono"', '500 20px "DM Mono"'];
 
-async function open(browser, html) {
+async function open(browser, cut) {
   const tab = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE });
   tab.on("pageerror", (e) => console.error("page error:", e.message));
   tab.on("console", (m) => m.type() === "error" && console.error("console:", m.text()));
-  await tab.setContent(html, { waitUntil: "networkidle" });
-  await tab.evaluate(async () => {
-    await Promise.all(["400 20px Gabarito", "600 20px Gabarito", "700 20px Gabarito", "800 20px Gabarito", "900 20px Gabarito", '400 20px "DM Mono"', '500 20px "DM Mono"'].map((f) => document.fonts.load(f)));
-    await document.fonts.ready;
-  });
+  await tab.setContent(shell, { waitUntil: "networkidle" });
+  await tab.evaluate((faces) => Promise.all(faces.map((f) => document.fonts.load(f, "Aa0 ×·"))), FACES);
+  // Markup and styles go in as they are; scripts are re-created so that they run.
+  await tab.evaluate((html) => {
+    const holder = document.createElement("template");
+    holder.innerHTML = html;
+    for (const node of [...holder.content.children]) {
+      if (node.tagName !== "SCRIPT") document.body.append(node);
+      else document.body.append(Object.assign(document.createElement("script"), { textContent: node.textContent }));
+    }
+  }, read(`scripts/demo/${cut}.html`));
+  await tab.evaluate(() => document.fonts.ready);
   return tab;
 }
 const shoot = async (tab, t, path) => {
@@ -86,15 +97,14 @@ const shoot = async (tab, t, path) => {
 mkdirSync(outDir, { recursive: true });
 const browser = await chromium.launch();
 for (const cut of cuts.length ? cuts : CUTS) {
-  const html = page(cut);
   if (stills) {
-    const tab = await open(browser, html);
+    const tab = await open(browser, cut);
     for (const s of stills.split(",")) await shoot(tab, Number(s) * 1000, join(outDir, `${cut}-${Number(s).toFixed(2).padStart(5, "0")}.png`));
     await tab.close();
     continue;
   }
   const started = Date.now();
-  const tabs = await Promise.all(Array.from({ length: JOBS }, () => open(browser, html)));
+  const tabs = await Promise.all(Array.from({ length: JOBS }, () => open(browser, cut)));
   const duration = await tabs[0].evaluate(() => DURATION);
   const poster = await tabs[0].evaluate(() => POSTER);
   const frames = Math.round((duration / 1000) * FPS);

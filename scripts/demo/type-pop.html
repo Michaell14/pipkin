@@ -1,0 +1,15 @@
+<!-- Tour x pop, pop-led: the pop cut, but it opens on the tour's trick of typing a name live. -->
+<div id="stage"></div>
+<script>
+const CUTS = [0, 4150, 6050, 8500, 11900, 15500, 17800, 1e9];
+hiScene(panel(CUTS[0], CUTS[1], { slide: false, bg: NAMELESS }), CUTS[0], { typed: true, until: CUTS[1] + 600 });
+wallScene(panel(CUTS[1], CUTS[2], { bg: "var(--bg)" }), CUTS[1]);
+sameScene(panel(CUTS[2], CUTS[3]), CUTS[2]);
+popBreed(panel(CUTS[3], CUTS[4]), CUTS[3]);
+popFuse(panel(CUTS[4], CUTS[5], { cls: "dark" }), CUTS[4], { until: CUTS[5] + 600 });
+popMood(panel(CUTS[5], CUTS[6]), CUTS[5]);
+popEnd(panel(CUTS[6], CUTS[7], { cls: "dark" }), CUTS[6]);
+
+const DURATION = 20800;
+const POSTER = 19900;
+</script>
