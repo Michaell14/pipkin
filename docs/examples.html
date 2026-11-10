@@ -56,6 +56,7 @@
   --lift: 0 0 0 1px rgba(20, 26, 51, 0.08), 0 16px 36px -24px rgba(20, 26, 51, 0.4);
 }
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
 a { color: var(--ink); }
 a:hover { color: #3b4466; }
@@ -191,10 +192,32 @@ p { margin: 0; }
 .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 48px; padding-bottom: 56px; font-size: 14px; color: var(--muted); }
 .foot .brandline { display: flex; align-items: center; gap: 10px; }
 
+/* Phones: one scrolling row each for the nav and the filters, and nothing wider than the screen. */
 @media (max-width: 560px) {
   :root { --pad: 16px; }
-  .intro { padding-top: 28px; }
-  .moods { grid-template-columns: repeat(4, 56px); gap: 12px; }
+  .top { padding-top: 14px; padding-bottom: 8px; gap: 4px; }
+  .nav, .filters { flex-wrap: nowrap; width: calc(100% + 2 * var(--pad)); margin-left: calc(-1 * var(--pad)); margin-right: calc(-1 * var(--pad)); padding-left: var(--pad); padding-right: var(--pad); overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+  .nav::-webkit-scrollbar, .filters::-webkit-scrollbar { display: none; }
+  .nav { gap: 22px; }
+  .nav a { flex: none; padding: 10px 0; }
+  .nav a[aria-current="page"]::after { bottom: 2px; }
+  .nav a:last-child, .filter:last-child { margin-right: 20px; }
+  .filter { flex: none; }
+  .intro { padding-top: 20px; padding-bottom: 24px; }
+  .intro h1 { font-size: 48px; }
+  .intro p { font-size: 16px; }
+  .ex-art { padding: 24px 12px; }
+  .row.end { gap: 10px; }
+  .moods { grid-template-columns: repeat(4, minmax(0, 56px)); gap: 12px 8px; }
+}
+/* The size ladder only fits up to 48 px on the narrowest phones. */
+@media (max-width: 400px) {
+  .row.end .col:last-child { display: none; }
+}
+@media (pointer: coarse) {
+  .ex-copy { width: 44px; height: 44px; margin: -6px -6px -6px 0; }
+  .filter { height: 44px; }
+  .filter, .ex-copy { -webkit-tap-highlight-color: transparent; }
 }
 @media (prefers-reduced-motion: reduce) {
   .c1, .c2, .caret, .skels i { animation: none; }
