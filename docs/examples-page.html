@@ -17,9 +17,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="__SITE__/og/pipkins.png">
 <link rel="icon" id="favicon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=swap">
+<!-- The fonts are served from here (docs/fonts/), and the ones the first screen needs start loading at once. -->
+<link rel="preload" href="fonts/gabarito-v9-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dm-mono-v16-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>/*PIPKIN-FONTS*/</style>
 <style>/*PIPKIN-MOTION*/</style>
 <style>
 /* Examples: a filterable wall of components built with pipkins. Every avatar is drawn by the
@@ -162,8 +163,11 @@ p { margin: 0; }
 .task b { font-size: 15px; }
 .loading { display: flex; align-items: center; gap: 14px; padding: 18px; }
 .skels { flex: 1; display: flex; flex-direction: column; gap: 9px; }
-.skels i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #e8ebf3 0, #f3f5fb 50%, #e8ebf3 100%); background-size: 400px 100%; animation: shimmer 1.4s linear infinite; }
-@keyframes shimmer { from { background-position: -200px 0; } to { background-position: 200px 0; } }
+/* The shimmer is a wider strip sliding behind each bar, so it moves with a transform (which the
+   compositor can do alone) instead of repainting a background position on every frame. */
+.skels i { position: relative; display: block; height: 12px; border-radius: 6px; overflow: hidden; }
+.skels i::before { content: ""; position: absolute; top: 0; bottom: 0; left: -400px; right: 0; background: linear-gradient(90deg, #e8ebf3 0, #f3f5fb 50%, #e8ebf3 100%) -200px 0 / 400px 100%; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { to { transform: translateX(400px); } }
 .canvas { position: relative; width: 100%; height: 200px; border-radius: 14px; background-color: var(--soft); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
 .cursor { position: absolute; display: flex; align-items: flex-start; gap: 4px; }
 .cursor path { fill: var(--c); }
@@ -183,7 +187,8 @@ p { margin: 0; }
   .moods { grid-template-columns: repeat(4, 56px); gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .c1, .c2, .caret, .skels i { animation: none; }
+  .c1, .c2, .caret { animation: none; }
+  .skels i::before { animation: none; background-position: 0 0; }
 }
 </style>
 </head>
@@ -363,30 +368,6 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 $("#litter").innerHTML = [0, 1, 2, 3].map((k) => `<span class="av" data-breed="maya,theo,${k}" style="--s: 44px"></span>`).join("");
 $("#mood-grid").innerHTML = PIPKIN.MOODS.map((m) => `<span class="col"><span class="av" data-pipkin="maya" data-mood="${m}" style="--s: 52px"></span><span class="small mono">${m}</span></span>`).join("");
 
-// Every placeholder avatar: data-pipkin (or data-fuse, or data-breed="a,b,child"), with data-mood,
-// data-bg and data-anim. Each gets an accessible name from describe().
-for (const el of $$("[data-pipkin], [data-fuse], [data-breed]")) {
-  const o = {};
-  if (el.dataset.mood) o.mood = el.dataset.mood;
-  if (el.dataset.bg) o.background = el.dataset.bg;
-  if ("anim" in el.dataset) o.animate = true;
-  if (el.dataset.fuse) {
-    el.innerHTML = PIPKIN.fuse(el.dataset.fuse.split(","), o);
-  } else if (el.dataset.breed) {
-    const [a, b, k] = el.dataset.breed.split(",");
-    const kid = PIPKIN.breed(a, b, { child: Number(k) });
-    el.innerHTML = PIPKIN.pipkin(kid, o);
-    el.setAttribute("role", "img");
-    el.setAttribute("aria-label", `${kid.id}, ${PIPKIN.describe(kid)}`);
-  } else {
-    el.innerHTML = PIPKIN.pipkin(el.dataset.pipkin, o);
-  }
-}
-// Colours from the pipkin itself: cursor labels and the profile cover.
-for (const el of $$("[data-cursor]")) el.style.setProperty("--c", palette(PIPKIN.genome(el.dataset.cursor).genes).body);
-for (const el of $$("[data-tint]")) el.style.background = `${palette(PIPKIN.genome(el.dataset.tint).genes).body}55`;
-$("#favicon").href = PIPKIN.pipkinUri("maya", { background: "circle" });
-
 // Filters. The choice is kept in the address (#social), so a filtered wall can be shared.
 const filters = $$(".filter");
 function show(cat) {
@@ -402,6 +383,48 @@ for (const f of filters) {
 }
 show(location.hash.slice(1));
 addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+// Every placeholder avatar: data-pipkin (or data-fuse, or data-breed="a,b,child"), with data-mood,
+// data-bg and data-anim. Each gets an accessible name from describe(). The wall shows many of
+// them several times, so each distinct one is drawn once and reused.
+const drawings = new Map();
+function hydrate(el) {
+  const { pipkin: name, fuse, breed, mood, bg } = el.dataset;
+  const animate = "anim" in el.dataset;
+  let kid = null;
+  if (!fuse && breed) {
+    const [a, b, k] = breed.split(",");
+    kid = PIPKIN.breed(a, b, { child: Number(k) });
+  }
+  const key = JSON.stringify([name, fuse, breed, mood, bg, animate]);
+  let svg = drawings.get(key);
+  if (!svg) {
+    const o = {};
+    if (mood) o.mood = mood;
+    if (bg) o.background = bg;
+    if (animate) o.animate = true;
+    svg = fuse ? PIPKIN.fuse(fuse.split(","), o) : PIPKIN.pipkin(kid || name, o);
+    drawings.set(key, svg);
+  }
+  el.innerHTML = svg;
+  if (kid) {
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", `${kid.id}, ${PIPKIN.describe(kid)}`);
+  }
+}
+// Colours from the pipkin itself: cursor labels and the profile cover.
+for (const el of $$("[data-cursor]")) el.style.setProperty("--c", palette(PIPKIN.genome(el.dataset.cursor).genes).body);
+for (const el of $$("[data-tint]")) el.style.background = `${palette(PIPKIN.genome(el.dataset.tint).genes).body}55`;
+$("#favicon").href = PIPKIN.pipkinUri("maya", { background: "circle" });
+
+// The cards on screen are filled in first and painted; the rest of the wall follows a frame later,
+// so the first screen isn't kept waiting for avatars further down.
+const waiting = $$("[data-pipkin], [data-fuse], [data-breed]");
+const onScreen = waiting.map((el) => {
+  const box = el.getBoundingClientRect();
+  return box.width > 0 && box.bottom >= 0 && box.top <= innerHeight;
+});
+waiting.forEach((el, k) => onScreen[k] && hydrate(el));
 
 // Copy buttons copy the whole call; screen readers hear it through the status line.
 async function copyText(text) {
@@ -431,6 +454,15 @@ for (const btn of $$("[data-copy]")) {
     clearTimeout(btn._timer);
     btn._timer = setTimeout(() => btn.classList.remove("copied"), 1600);
   });
+}
+
+// The first screen is drawn and working. Once it has been painted, fill in the rest of the wall.
+if (onScreen.includes(false)) {
+  await new Promise((resolve) => {
+    requestAnimationFrame(() => setTimeout(resolve));
+    setTimeout(resolve, 250); // a hidden tab has no frames
+  });
+  waiting.forEach((el, k) => onScreen[k] || hydrate(el));
 }
 document.body.dataset.ready = "1";
 </script>

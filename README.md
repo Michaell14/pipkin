@@ -139,7 +139,7 @@ Moods double as states: switch `mood` to `"sleepy"` for away, `"determined"` for
 
 ## Size
 
-`dist/pipkins.min.js` is about 8.4 KB gzipped, with no dependencies. A static pipkin is about 2 KB of SVG; a fused group of nine is under 12 KB.
+`dist/pipkins.min.js` is about 8.9 KB gzipped, with no dependencies. A static pipkin is about 2 KB of SVG; a fused group of nine is under 12 KB.
 
 ## Development
 
