@@ -147,7 +147,10 @@ npm test           # node --test
 npm run build      # dist/, src/motion.css, docs/index.html and docs/examples.html
 npm run golden     # re-pin test/golden.json (only for intended visual changes)
 npm run og         # re-render the share preview, docs/og/ (needs Playwright and ffmpeg)
+npm run demo       # re-render the demo videos, docs/demo/ (needs Playwright and ffmpeg)
 ```
+
+`npm run demo` renders three 20-second cuts at 1080p60: `tour` (light, the site's look), `code` (dark, an editor with each call playing out beside it) and `pop` (full-bleed colour and big type). Pass names to render only some (`npm run demo -- pop`), and `--stills=1.5,12` to write single frames instead of a video. Each cut is one page in `scripts/demo/`, built on the small timeline kit in `scripts/demo/kit.js`.
 
 ## Not done yet
 

@@ -1,0 +1,260 @@
+<!-- The pop cut: full-bleed colour, big lowercase type, hard cuts. The fastest of the three. -->
+<style>
+.panel { position: absolute; left: 0; top: -90px; width: 1920px; height: 1260px; border-radius: 90px 90px 0 0; overflow: hidden; }
+.in { position: absolute; left: 0; top: 90px; width: 1920px; height: 1080px; }
+.big { position: absolute; left: 0; right: 0; margin: 0; font-size: 180px; font-weight: 900; letter-spacing: -0.045em; line-height: 1; text-align: center; white-space: nowrap; }
+.chip { position: absolute; left: 0; right: 0; top: 946px; display: flex; justify-content: center; }
+.chip div { padding: 16px 42px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 42px; white-space: pre; }
+.chip.light div { background: #fff; color: var(--ink); }
+
+/* 1: hi */
+#hi-face { left: 590px; top: 6px; width: 740px; height: 740px; }
+#hi { top: 706px; height: 200px; font-size: 200px; line-height: 200px; }
+#hi-in { display: inline-block; }
+
+/* 2: the wall */
+#wall { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(16, 120px); grid-template-rows: repeat(9, 120px); }
+#wall div { display: grid; place-items: center; }
+#wall svg { width: 96px; height: 96px; }
+#claim { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: grid; place-items: center; }
+#claim div { padding: 54px 92px 62px; border-radius: 64px; background: var(--ink); color: #fff; font-size: 124px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.02; text-align: center; box-shadow: 0 60px 100px -40px rgba(20, 26, 51, 0.7); }
+
+/* 3: same */
+#p3 .big { top: 96px; }
+#p3-proof div { font-family: var(--font); font-size: 54px; font-weight: 800; letter-spacing: -0.02em; }
+
+/* 4: breed */
+#p4 { --branch: #fff; --times: rgba(20, 26, 51, 0.35); }
+#p4 .big, #p5 .big { top: 64px; font-size: 168px; }
+
+/* 5: fuse */
+#p5 { background: var(--ink); color: #fff; }
+#melt { position: absolute; left: 510px; top: 196px; width: 900px; height: 900px; }
+#p5 .chip { top: 972px; z-index: 2; }
+
+/* 6: moods */
+#close { position: absolute; left: 150px; top: 200px; width: 680px; height: 680px; overflow: hidden; border-radius: 50%; }
+#close .pk { left: -170px; top: -120px; width: 1020px; height: 1020px; }
+#p6 .say { position: absolute; left: 900px; top: 296px; font-size: 104px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+#p6 .word { position: absolute; left: 892px; top: 410px; font-size: 250px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; transform-origin: 0 60%; }
+#p6 .chip { left: 900px; right: auto; top: 716px; }
+
+/* 7: the end */
+#p7 { background: var(--ink); color: #fff; }
+#mark { position: absolute; left: 0; right: 0; top: 150px; display: flex; align-items: center; justify-content: center; gap: 34px; font-size: 250px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; }
+#mark .logo { width: 230px; height: 230px; }
+#line { position: absolute; left: 0; right: 0; top: 440px; font-size: 80px; font-weight: 800; letter-spacing: -0.03em; text-align: center; color: #c3c9dd; }
+#p7 .chip { top: 590px; }
+#p7 .chip div { padding: 22px 60px; font-size: 60px; }
+#facts { position: absolute; left: 0; right: 0; top: 744px; font-size: 38px; font-weight: 500; text-align: center; color: #8f98bd; }
+#row .pk { width: 210px; height: 210px; top: 906px; }
+</style>
+
+<div id="stage">
+  <section class="panel" id="p1"><div class="in">
+    <div class="pk" id="hi-face"></div>
+    <h1 class="big" id="hi"><span id="hi-in"><span>hi, </span><span id="who"></span><span>.</span></span></h1>
+    <div class="chip"><div id="hi-code"></div></div>
+  </div></section>
+
+  <section class="panel" id="p2" style="background:var(--bg)"><div class="in">
+    <div id="wall"></div>
+    <div id="claim"><div>anything with a name<br>gets a face.</div></div>
+  </div></section>
+
+  <section class="panel" id="p3"><div class="in">
+    <h1 class="big">same input.</h1>
+    <h1 class="big">same avatar.</h1>
+    <h1 class="big">forever.</h1>
+    <div class="chip" id="p3-code"><div>pipkin("maya@acme.co")</div></div>
+    <div class="chip" id="p3-proof"><div>no storage. no uploads.</div></div>
+  </div></section>
+
+  <section class="panel" id="p4"><div class="in">
+    <h1 class="big">they breed.</h1>
+    <div class="chip"><div>breed("rosa", "priya")</div></div>
+  </div></section>
+
+  <section class="panel" id="p5"><div class="in">
+    <h1 class="big">they fuse.</h1>
+    <div id="melt"></div>
+    <div class="chip light"><div>fuse(team)</div></div>
+  </div></section>
+
+  <section class="panel" id="p6"><div class="in">
+    <div id="close"><div class="pk"></div></div>
+    <div class="say">they have moods.</div>
+    <div class="word"></div>
+    <div class="chip"><div id="mood-code"></div></div>
+  </div></section>
+
+  <section class="panel" id="p7"><div class="in">
+    <div id="mark"><span class="logo"></span><span class="name"></span></div>
+    <div id="line">there's one for everyone.</div>
+    <div class="chip light"><div id="cmd"></div></div>
+    <div id="facts"></div>
+    <div id="row"></div>
+  </div></section>
+</div>
+
+<script>
+const HERO = "maya@acme.co";
+const wash = (name) => oklch(0.9, 0.06, genome(name).genes.hue);
+const deep = (name) => oklch(0.44, 0.13, genome(name).genes.hue);
+for (const logo of $$(".logo")) logo.innerHTML = pipkin("maya");
+for (const name of $$(".name")) name.textContent = CFG.brand;
+
+// Panels stack: each one slides up over the last.
+const CUTS = [0, 2650, 4750, 7350, 10950, 14750, 17150];
+const END = 20300;
+$$(".panel").forEach((p, i) => {
+  scene(p, CUTS[i] - 20, (CUTS[i + 1] ?? 1e9) + 520);
+  if (i) tw(p, { y: [1200, 0] }, CUTS[i], 480, E.out);
+});
+const stamp = (node, t, from = 0.86) => {
+  tw(node, { o: [0, 1] }, t, 70, E.lin);
+  tw(node, { s: [from, 1] }, t, 520, E.spring(0.5));
+};
+
+// ---------------------------------------------------------------- 1: hi, maya.
+{
+  const T = CUTS[0];
+  // A name, an email, a username, an id, a key: anything.
+  const cast = [[-1e9, "cleo"], [T + 820, HERO], [T + 1420, "@theo"], [T + 1900, "user_48213"], [T + 2270, "7f3a-9c21"]];
+  const face = hero($("#hi-face"), "cleo");
+  cast.slice(1).forEach(([t, n]) => face.name(t, n));
+  face.hop(T + 140, 50).blink(T + 520, T + 1180);
+  const p1 = $("#p1");
+  const who = $("#who");
+  const line = $("#hi");
+  // Long names shrink to fit the frame.
+  const size = new Map(
+    cast.map(([, name]) => {
+      who.textContent = name;
+      return [name, Math.min(200, (200 * 1700) / $("#hi-in").offsetWidth)];
+    }),
+  );
+  on((t) => {
+    if (t > CUTS[1] + 600) return;
+    const name = latest(cast, t)[1];
+    p1.style.background = wash(name);
+    line.style.fontSize = size.get(name).toFixed(1) + "px";
+    who.textContent = name;
+    who.style.color = deep(name);
+    $("#hi-code").textContent = `pipkin("${name}")`;
+  });
+  cast.slice(1).forEach(([t]) => {
+    tw(line, { s: [0.9, 1] }, t, 420, E.spring(0.45));
+    tw($("#hi-face"), { s: [0.84, 1] }, t, 460, E.spring(0.42));
+  });
+}
+
+// ---------------------------------------------------------------- 2: anything with a name gets a face.
+{
+  const T = CUTS[1];
+  const wall = $("#wall");
+  for (let i = 0; i < 144; i++) {
+    const c = i % 16;
+    const r = Math.floor(i / 16);
+    const cell = add(wall, `<div>${pipkin(i < CROWD.length ? CROWD[i] : "user_" + (1000 + i * 37))}</div>`);
+    const delay = Math.hypot(c - 7.5, (r - 4) * 1.2) * 34 + rnd("wall", "d" + i) * 110;
+    tw(cell, { s: [0, 1] }, T + 120 + delay, 560, E.spring(0.5));
+  }
+  tw(wall, { s: [1.12, 1] }, T, 2600, E.soft);
+  stamp($("#claim div"), T + 520, 0.7);
+}
+
+// ---------------------------------------------------------------- 3: same input. same avatar. forever.
+{
+  const T = CUTS[2];
+  const s = $("#p3 .in");
+  $("#p3").style.background = wash(HERO);
+  const lines = $$(".big", s);
+  const beats = [T + 180, T + 820, T + 1460];
+  lines.forEach((l, i) => {
+    stamp(l, beats[i]);
+    if (i < 2) tw(l, { o: 0 }, beats[i + 1], 1, E.lin);
+  });
+  // One face, then three, then a row that runs off both edges.
+  const xs = [0, -450, 450, -830, 830, -1120, 1120];
+  const ds = [450, 380, 380, 310, 310, 240, 240];
+  const faces = xs.map((x, i) => spot(s, 960 + x, 610, ds[i], HERO));
+  faces.forEach((f, i) => {
+    const beat = beats[i === 0 ? 0 : i < 3 ? 1 : 2] + (i > 2 ? (i > 4 ? 90 : 30) : 0);
+    pop(f.wrap, beat, { dur: 620, from: 0.2 });
+    // Identical faces move as one: a wave, then a blink together.
+    f.h.hop(beats[2] + 420 + Math.abs(xs[i]) * 0.22, 54, 380).blink(beats[0] + 420, beats[2] + 1250);
+  });
+  const code = $("#p3-code div");
+  stamp(code, beats[0] + 120, 0.7);
+  tw(code, { o: 0 }, beats[2] + 300, 120, E.lin);
+  stamp($("#p3-proof div"), beats[2] + 420, 0.7);
+}
+
+// ---------------------------------------------------------------- 4: they breed.
+{
+  const T = CUTS[3];
+  const s = $("#p4 .in");
+  $("#p4").style.background = oklch(0.915, 0.05, genome("rosa×priya#1").genes.hue);
+  stamp($(".big", s), T + 160);
+  breedAct(s, T + 120, { a: "rosa", b: "priya", w: 1920, h: 1080, cx: 960, py: 450, pd: 310, half: 265, kids: 4, ky: 800, kd: 250, kstep: 330, tags: false });
+  stamp($(".chip div", s), T + 900, 0.7);
+}
+
+// ---------------------------------------------------------------- 5: they fuse.
+{
+  const T = CUTS[4];
+  const s = $("#p5 .in");
+  stamp($(".big", s), T + 160);
+  const team = ["zoe", "omar", "iris", "lena", "theo", "juno", "ezra"];
+  fuseAct(s, $("#melt"), T, { team, ring: 3.85, cells: 320, scale: 30, cy: 0, zoom: 1.68, born: (i) => T + 240 + i * 70, go: T + 1320, to: CUTS[5] + 600 });
+  stamp($(".chip div", s), T + 2250, 0.7);
+}
+
+// ---------------------------------------------------------------- 6: they have moods.
+{
+  const T = CUTS[5];
+  const s = $("#p6 .in");
+  $("#p6").style.background = wash(HERO);
+  $("#close").style.background = palette(genome(HERO).genes).tint;
+  const h = hero($("#close .pk"), HERO);
+  const moods = [[T + 140, "happy"], [T + 700, "sleepy"], [T + 1240, "grumpy"], [T + 1780, "smug"]];
+  moods.forEach(([t, m]) => h.mood(t, m, t > T + 200));
+  const word = $(".word", s);
+  word.style.color = deep(HERO);
+  on((t) => {
+    const mood = latest([[-1e9, "happy"], ...moods], t)[1];
+    word.textContent = mood + ".";
+    $("#mood-code").textContent = `{ mood: "${mood}" }`;
+  });
+  moods.forEach(([t]) => tw(word, { s: [0.86, 1] }, t, 460, E.spring(0.42)));
+  stamp($("#close"), T + 140, 0.8);
+  stamp($(".say", s), T + 200, 0.9);
+  stamp($(".chip div", s), T + 320, 0.7);
+}
+
+// ---------------------------------------------------------------- 7: npm i pipkin
+{
+  const T = CUTS[6];
+  const s = $("#p7 .in");
+  $("#cmd").textContent = CFG.install;
+  $("#facts").textContent = `zero dependencies · ${CFG.kb} KB gzipped`;
+  stamp($("#mark"), T + 240, 0.8);
+  rise($("#line"), T + 460, { d: 30, dur: 560 });
+  stamp($("#p7 .chip div"), T + 680, 0.7);
+  rise($("#facts"), T + 900, { d: 20, dur: 500 });
+  // A row of them peeks over the bottom edge.
+  const row = $("#row");
+  const names = ["theo", "omar", "lena", "zoe", "iris", "juno", "ezra", "priya", "basil", "cleo", "ines", "rosa", "kofi"];
+  names.forEach((n, i) => {
+    const x = 960 + (i - 6) * 152 - 105;
+    const cell = add(row, `<div class="pk" style="left:${x}px">${pipkin(n, { animate: true })}</div>`);
+    const delay = Math.abs(i - 6) * 55 + rnd("row", "d" + i) * 90;
+    tw(cell, { y: [240, -22] }, T + 420 + delay, 300, E.soft);
+    tw(cell, { y: 0 }, T + 720 + delay, 480, E.spring(0.45));
+  });
+}
+
+const DURATION = END;
+const POSTER = 19400;
+</script>

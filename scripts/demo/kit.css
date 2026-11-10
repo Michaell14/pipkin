@@ -1,0 +1,34 @@
+/* Shared look for the demo videos: the docs site's tokens, on a fixed 1920 x 1080 stage. */
+:root {
+  --bg: #f3f5fb;
+  --ink: #141a33;
+  --muted: #545b73;
+  --card: #ffffff;
+  --line: #dde2ee;
+  --tile: #eef1fa;
+  --navy-2: #1f2747;
+  --navy-3: #2e3866;
+  --pale: #c3c9dd;
+  --font: "Gabarito", sans-serif;
+  --mono: "DM Mono", monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+#stage, .scene { position: absolute; inset: 0; overflow: hidden; }
+svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* A directed pipkin keeps its pivot groups but takes its motion from the timeline. */
+.manual .pipkin * { animation: none !important; }
+.mono { font-family: var(--mono); }
+/* Words that rise out of a mask. */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.08em 0.04em 0.16em; margin: -0.08em -0.04em -0.16em; }
+.w > span { display: inline-block; }
+
+/* Parts shared by the acts in kit.js. */
+.pk { position: absolute; }
+.tag { position: absolute; font-family: var(--mono); font-size: 32px; color: var(--tag, var(--muted)); text-align: center; white-space: nowrap; }
+.tree { position: absolute; inset: 0; }
+.tree path { fill: none; stroke: var(--branch, #cfd5e6); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--draw, 0)); }
+.times { position: absolute; width: 100px; margin: -50px 0 0 -50px; font-size: 84px; font-weight: 600; line-height: 100px; text-align: center; color: var(--times, #aab1c8); }
+.spark { position: absolute; width: 0; height: 0; }
+.spark span { position: absolute; left: -5px; top: -30px; width: 10px; height: 30px; border-radius: 5px; }

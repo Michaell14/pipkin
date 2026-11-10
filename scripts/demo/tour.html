@@ -1,0 +1,291 @@
+<!-- The tour: light, in the site's own look. Type a name, see it everywhere, breed, fuse, moods. -->
+<style>
+h1 { margin: 0; font-size: 104px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; }
+.cap { position: absolute; left: 0; right: 0; top: 70px; text-align: center; }
+.cap .code { margin-top: 18px; font-family: var(--mono); font-size: 40px; color: var(--muted); white-space: pre; }
+.cap .code b { font-weight: 400; color: var(--ink); }
+#brand { position: absolute; left: 128px; top: 96px; z-index: 5; display: flex; align-items: center; gap: 14px; font-size: 46px; font-weight: 800; letter-spacing: -0.03em; }
+#brand .logo { width: 62px; height: 62px; }
+
+/* 1: type a name */
+#s1 h1 { position: absolute; left: 128px; top: 258px; font-size: 108px; }
+#field { position: absolute; left: 128px; top: 566px; width: 940px; height: 136px; display: flex; align-items: center; padding: 0 44px; border-radius: 34px; background: #fff; box-shadow: 0 30px 60px -30px rgba(20, 26, 51, 0.3), 0 0 0 2px var(--line); font-family: var(--mono); font-size: 56px; white-space: pre; }
+#field .p { color: #9aa1b9; }
+#caret { display: inline-block; width: 5px; height: 68px; margin: 0 2px; border-radius: 3px; background: var(--ink); }
+#kinds { position: absolute; left: 128px; top: 746px; display: flex; gap: 12px; }
+.kind { position: relative; padding: 13px 30px; border-radius: 999px; font-size: 38px; font-weight: 600; color: var(--muted); }
+.kind::before { content: ""; position: absolute; inset: 0; border-radius: 999px; background: var(--ink); opacity: var(--on, 0); }
+.kind span { position: relative; }
+#face { left: 1196px; top: 206px; width: 600px; height: 600px; }
+#says { position: absolute; left: 1196px; top: 832px; width: 600px; font-size: 40px; font-weight: 600; color: var(--muted); text-align: center; }
+
+/* 2: the same face everywhere */
+#app { position: absolute; left: 170px; top: 236px; width: 1580px; height: 668px; display: grid; grid-template-columns: 470px 1fr; border-radius: 48px; background: #fff; box-shadow: 0 50px 90px -50px rgba(20, 26, 51, 0.45), 0 0 0 2px rgba(20, 26, 51, 0.06); }
+#side { padding: 40px 38px; border-right: 2px solid var(--line); }
+#side .kicker { margin: 0 0 16px 6px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.08em; color: var(--muted); }
+.row { display: flex; align-items: center; gap: 24px; height: 134px; padding: 0 6px; }
+.av { position: relative; flex: none; width: var(--d, 100px); height: var(--d, 100px); }
+.row b { display: block; font-size: 46px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; }
+.row i { display: block; font-size: 30px; font-style: normal; color: var(--muted); }
+#main { display: flex; flex-direction: column; }
+#bar { display: flex; align-items: center; justify-content: space-between; height: 148px; padding: 0 50px; border-bottom: 2px solid var(--line); font-size: 50px; font-weight: 800; letter-spacing: -0.025em; }
+#stack { display: flex; align-items: center; }
+#stack .av { --d: 92px; margin-left: -24px; border-radius: 50%; box-shadow: 0 0 0 6px #fff; }
+#msgs { display: flex; flex-direction: column; gap: 44px; padding: 46px 50px; }
+.msg { display: flex; gap: 40px; }
+.msg .av { --d: 132px; }
+.msg b { font-size: 46px; font-weight: 700; letter-spacing: -0.015em; }
+.msg i { margin-left: 16px; font-size: 30px; font-style: normal; color: var(--muted); }
+.bars { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; }
+.bars span { display: block; height: 26px; border-radius: 13px; background: #e6e9f3; }
+.ring { position: absolute; inset: -12px; border-radius: 50%; box-shadow: 0 0 0 7px var(--ink); }
+#proof { position: absolute; left: 0; right: 0; top: 862px; display: flex; justify-content: center; }
+#proof div { padding: 22px 52px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 54px; font-weight: 700; letter-spacing: -0.02em; box-shadow: 0 24px 40px -20px rgba(20, 26, 51, 0.6); }
+
+/* 4: fuse */
+#melt { position: absolute; left: 180px; top: 290px; width: 1560px; height: 780px; }
+
+/* 5: moods, in close-up */
+#moody { position: absolute; left: 660px; top: 268px; width: 600px; height: 600px; overflow: hidden; border-radius: 34%; }
+#moody .pk { left: -150px; top: -110px; width: 900px; height: 900px; }
+#mood { position: absolute; left: 0; right: 0; top: 836px; display: flex; justify-content: center; }
+#mood div { min-width: 340px; padding: 18px 48px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 50px; text-align: center; box-shadow: 0 24px 40px -20px rgba(20, 26, 51, 0.6); }
+
+/* 6: the end card */
+#grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); padding: 10px; }
+.cell { display: grid; place-items: center; overflow: hidden; }
+.cell div { width: 128px; height: 128px; }
+#card { grid-column: 3 / 10; grid-row: 2 / 6; margin: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; border-radius: 52px; background: #fff; box-shadow: 0 50px 90px -44px rgba(20, 26, 51, 0.4), 0 0 0 2px rgba(20, 26, 51, 0.06); }
+#mark { display: flex; align-items: center; gap: 22px; font-size: 132px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+#mark .logo { width: 128px; height: 128px; }
+#line { font-size: 68px; font-weight: 700; letter-spacing: -0.025em; }
+#cmd { margin-top: 10px; padding: 20px 50px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 48px; }
+#facts { font-size: 34px; font-weight: 500; color: var(--muted); }
+</style>
+
+<div id="stage">
+  <section class="scene" id="s1">
+    <div id="brand"><span class="logo"></span><span class="name"></span></div>
+    <h1>Anything with a name<br>gets a face.</h1>
+    <div id="field"><span>pipkin</span><span class="p">("</span><span id="typed"></span><span id="caret"></span><span class="p">")</span></div>
+    <div id="kinds"><div class="kind"><span>email</span></div><div class="kind"><span>username</span></div><div class="kind"><span>id</span></div><div class="kind"><span>anything</span></div></div>
+    <div class="pk" id="face"></div>
+    <div id="says"></div>
+  </section>
+
+  <section class="scene" id="s2">
+    <div class="cap"><h1>Same input, same avatar. Forever.</h1></div>
+    <div id="app">
+      <div id="side"><div class="kicker">MEMBERS</div></div>
+      <div id="main">
+        <div id="bar"><span># design-crew</span><div id="stack"></div></div>
+        <div id="msgs"></div>
+      </div>
+    </div>
+    <div id="proof"><div>No storage. No uploads.</div></div>
+  </section>
+
+  <section class="scene" id="s3">
+    <div class="cap"><h1>Breed two.</h1><div class="code">breed(<b>"rosa"</b>, <b>"priya"</b>)</div></div>
+  </section>
+
+  <section class="scene" id="s4">
+    <div class="cap"><h1>Fuse a team.</h1><div class="code" id="fusecode"></div></div>
+    <div id="melt"></div>
+  </section>
+
+  <section class="scene" id="s5">
+    <div class="cap"><h1>Set a mood.</h1><div class="code">pipkin(<b>"maya@acme.co"</b>, { mood })</div></div>
+    <div id="moody"><div class="pk"></div></div>
+    <div id="mood"><div></div></div>
+  </section>
+
+  <section class="scene" id="s6">
+    <div id="grid">
+      <div id="card">
+        <div id="mark"><span class="logo"></span><span class="name"></span></div>
+        <div id="line">There's one for everyone.</div>
+        <div id="cmd"></div>
+        <div id="facts"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const HERO = "maya@acme.co";
+for (const logo of $$(".logo")) logo.innerHTML = pipkin("maya");
+for (const name of $$(".name")) name.textContent = CFG.brand;
+
+// A sleeping grey blob stands in until there is a name.
+const GHOST = "\u0000ghost";
+const ghost = (o) => {
+  const c = palette(genome("ruby").genes);
+  return pipkin("ruby", { ...o, mood: "sleepy" }).replaceAll(c.body, "#c9cfe2").replaceAll(c.tint, "#e6e9f3").replaceAll(c.ink, "#5d6582");
+};
+
+// ---------------------------------------------------------------- 1: anything with a name gets a face
+const T1 = 0;
+{
+  const s = $("#s1");
+  scene(s, T1, T1 + 4600);
+  const keys = keystrokes(HERO, T1 + 420, { cps: 10.5, seed: "tour" });
+  const typedDone = keys[keys.length - 1];
+  // After the email: a username, an id, and something that is not a person at all.
+  const pastes = [[typedDone + 1050, "@theo"], [typedDone + 1620, "user_48213"], [typedDone + 2190, "office printer"]];
+  const textAt = (t) => {
+    let text = HERO.slice(0, typedAt(keys, t));
+    for (const [at, value] of pastes) if (t >= at) text = value;
+    return text;
+  };
+  const face = hero($("#face"), GHOST, { background: "squircle", render: (who, o) => (who === GHOST ? ghost(o) : pipkin(who, o)) });
+  keys.forEach((k, i) => face.name(k, HERO.slice(0, i + 1)));
+  pastes.forEach(([at, value]) => face.name(at, value));
+  face.hop(typedDone + 260, 46).blink(typedDone + 760, pastes[0][0] + 300, pastes[1][0] + 330, pastes[2][0] + 280, pastes[2][0] + 800);
+  face.twitch(pastes[2][0] + 520);
+  const typed = $("#typed");
+  const caret = $("#caret");
+  const says = $("#says");
+  $$(".kind", s).forEach((k, i) => {
+    const from = [keys[0], pastes[0][0], pastes[1][0], pastes[2][0]][i];
+    const to = [pastes[0][0], pastes[1][0], pastes[2][0], 1e9][i];
+    tw(k, { on: [0, 1] }, from, 160, E.soft);
+    if (to < 1e9) tw(k, { on: 0 }, to, 160, E.soft);
+    on((t) => (k.style.color = t >= from + 60 && t < to + 60 ? "#fff" : ""));
+  });
+  on((t) => {
+    if (t < T1 || t > T1 + 4600) return;
+    const text = textAt(t);
+    typed.textContent = text;
+    typed.style.color = text ? oklch(0.52, 0.13, genome(text).genes.hue) : "";
+    const busy = t >= keys[0] - 80 && t <= typedDone + 250;
+    caret.style.opacity = busy || Math.floor((t - typedDone) / 420) % 2 === 0 ? 1 : 0;
+    says.textContent = text ? describe(text) : "no name yet";
+  });
+  // Each paste lands with a small bump of the field.
+  const field = $("#field");
+  pastes.forEach(([at]) => {
+    tw(field, { s: [1, 1.025] }, at, 70, E.soft);
+    tw(field, { s: 1 }, at + 70, 380, E.spring(0.45));
+  });
+  const out = T1 + 4250;
+  headlineOut(words($("#s1 h1")), out);
+  leave([$("#brand"), field, $("#kinds")], out + 20, { d: 30, gap: 30 });
+  unpop([$("#face")], out + 60);
+  leave([says], out, { d: 20 });
+}
+
+// ---------------------------------------------------------------- 2: same input, same avatar
+const T2 = 4480;
+{
+  const s = $("#s2");
+  scene(s, T2, T2 + 3350);
+  const people = [[HERO, "maya", "Online"], ["omar", "omar", "Online"], ["lena", "lena", "Focusing", "determined"], ["cleo", "cleo", "Away", "sleepy"]];
+  const av = (seed, mood) => `<div class="av">${pipkin(seed, { background: "circle", mood })}</div>`;
+  const rows = people.map(([seed, name, status, mood]) => add($("#side"), `<div class="row">${av(seed, mood)}<div><b>${name}</b><i>${status}</i></div></div>`));
+  const stack = [HERO, "omar", "lena", "cleo"].map((seed) => add($("#stack"), av(seed)));
+  const msgs = [["omar", "omar", "10:02", [80, 48]], [HERO, "maya", "10:04", [62, 34]]].map(([seed, name, time, bars]) =>
+    add($("#msgs"), `<div class="msg">${av(seed)}<div style="flex:1"><b>${name}</b><i>${time}</i><div class="bars">${bars.map((w) => `<span style="width:${w}%"></span>`).join("")}</div></div></div>`),
+  );
+  const hw = headline($(".cap h1", s), T2 + 60);
+  rise($("#app"), T2 + 120, { d: 90, dur: 800 });
+  rise(rows, T2 + 380, { d: 26, gap: 80, dur: 520 });
+  pop(stack, T2 + 520, { gap: 80, dur: 520 });
+  msgs.forEach((m, i) => {
+    rise(m, T2 + 800 + i * 380, { d: 30, dur: 520 });
+    pop($(".av", m), T2 + 800 + i * 380, { dur: 620, from: 0.2 });
+  });
+  // The same name drew the same face in three places: ring them together.
+  const same = [$(".av", rows[0]), stack[0], $(".av", msgs[1])];
+  const beat = T2 + 1780;
+  same.forEach((a) => {
+    const ring = add(a, `<div class="ring"></div>`);
+    tw(ring, { o: [0, 1] }, beat, 140, E.lin);
+    tw(ring, { s: [1.5, 1] }, beat, 520, E.spring(0.55));
+    tw(a, { s: [1, 1.22] }, beat, 130, E.soft);
+    tw(a, { s: 1 }, beat + 130, 600, E.spring(0.4));
+  });
+  pop($("#proof div"), T2 + 2140, { dur: 700, from: 0.6, z: 0.48 });
+  const out = T2 + 3020;
+  headlineOut(hw, out);
+  leave($("#app"), out + 30, { d: 50 });
+  unpop($("#proof div"), out);
+}
+
+// ---------------------------------------------------------------- 3: breed two
+const T3 = 7800;
+{
+  const s = $("#s3");
+  scene(s, T3, T3 + 3850);
+  const hw = headline($(".cap h1", s), T3);
+  rise($(".cap .code", s), T3 + 140, { d: 24, dur: 500 });
+  const act = breedAct(s, T3, { a: "rosa", b: "priya", w: 1920, h: 1080, cx: 960, py: 448, pd: 300, half: 250, kids: 4, ky: 830, kd: 250, kstep: 320 });
+  const out = T3 + 3500;
+  headlineOut(hw, out);
+  leave($(".cap .code", s), out, { d: -16 });
+  act.out(out);
+}
+
+// ---------------------------------------------------------------- 4: fuse a team
+const T4 = 11560;
+{
+  const s = $("#s4");
+  scene(s, T4, T4 + 3900);
+  const team = ["zoe", "omar", "iris", "lena", "theo"];
+  $("#fusecode").innerHTML = `fuse([${team.map((n) => `<b>"${n}"</b>`).join(", ")}])`;
+  const hw = headline($(".cap h1", s), T4);
+  rise($(".cap .code", s), T4 + 140, { d: 24, dur: 500 });
+  const act = fuseAct(s, $("#melt"), T4, { team, to: T4 + 3900 });
+  const out = T4 + 3560;
+  headlineOut(hw, out);
+  leave($(".cap .code", s), out, { d: -16 });
+  act.out(out);
+}
+
+// ---------------------------------------------------------------- 5: set a mood
+const T5 = 15380;
+{
+  const s = $("#s5");
+  scene(s, T5, T5 + 2500);
+  const hw = headline($(".cap h1", s), T5);
+  rise($(".cap .code", s), T5 + 140, { d: 24, dur: 500 });
+  const tile = $("#moody");
+  tile.style.background = palette(genome(HERO).genes).tint;
+  const h = hero($(".pk", tile), HERO);
+  pop(tile, T5 + 120, { dur: 700 });
+  pop($("#mood div"), T5 + 260, { dur: 600, from: 0.6 });
+  const moods = [[T5 + 560, "happy"], [T5 + 940, "sleepy"], [T5 + 1320, "grumpy"], [T5 + 1700, "smug"]];
+  moods.forEach(([t, m]) => h.mood(t, m));
+  const label = $("#mood div");
+  on((t) => (label.textContent = `"${latest([[-1e9, "neutral"], ...moods], t)[1]}"`));
+  moods.forEach(([t]) => {
+    tw(label, { s: 1.07 }, t, 60, E.soft);
+    tw(label, { s: 1 }, t + 60, 300, E.spring(0.5));
+  });
+  h.blink(T5 + 380);
+  const out = T5 + 2130;
+  headlineOut(hw, out);
+  leave($(".cap .code", s), out, { d: -16 });
+  unpop([tile, $("#mood div")], out + 20, { gap: 40 });
+}
+
+// ---------------------------------------------------------------- 6: there's one for everyone
+const T6 = 17580;
+{
+  const s = $("#s6");
+  scene(s, T6, 1e9);
+  $("#cmd").textContent = CFG.install;
+  $("#facts").textContent = `Zero dependencies · ${CFG.kb} KB gzipped`;
+  crowdAct($("#grid"), T6, { cols: 11, rows: 6, hole: [2, 1, 8, 4], names: CROWD });
+  const card = $("#card");
+  tw(card, { o: [0, 1] }, T6 + 200, 260, E.soft);
+  tw(card, { y: [60, 0], s: [0.94, 1] }, T6 + 200, 800, E.spring(0.62, 11));
+  pop($("#mark"), T6 + 420, { dur: 700, from: 0.7 });
+  rise($("#line"), T6 + 560, { d: 26, dur: 560 });
+  pop($("#cmd"), T6 + 760, { dur: 700, from: 0.6 });
+  rise($("#facts"), T6 + 960, { d: 18, dur: 500 });
+}
+
+const DURATION = 20500;
+const POSTER = 19600;
+</script>

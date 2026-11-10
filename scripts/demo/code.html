@@ -1,0 +1,304 @@
+<!-- The code cut: dark, an editor on the left, and every line you type plays out on the right. -->
+<style>
+body { background: #141a33; color: #fff; --tag: #8f98bd; --branch: #303a68; --times: #5c668f; }
+h1 { margin: 0; font-size: 104px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; }
+#brand { position: absolute; left: 84px; top: 46px; display: flex; align-items: center; gap: 14px; font-size: 46px; font-weight: 800; letter-spacing: -0.03em; }
+#brand .logo { width: 62px; height: 62px; }
+
+#editor { position: absolute; left: 80px; top: 136px; width: 900px; height: 884px; border-radius: 40px; background: #1f2747; box-shadow: 0 60px 100px -50px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.04); overflow: hidden; }
+#tabs { display: flex; align-items: center; gap: 12px; height: 84px; padding: 0 36px; border-bottom: 2px solid #2a335c; }
+#tabs i { width: 18px; height: 18px; border-radius: 50%; background: #3a4576; }
+#tabs span { margin-left: 18px; font-family: var(--mono); font-size: 28px; color: #8f98bd; }
+#code { padding: 28px 44px; font-family: var(--mono); font-size: 44px; line-height: 62px; white-space: pre; }
+.ln { height: 62px; }
+.kw { color: #f6a8c8; }
+.fn { color: #a9b8ff; }
+.s { color: #86e3c3; }
+.p { color: #7d88b3; }
+.c { color: #6c769f; }
+.caret { display: inline-block; width: 4px; height: 50px; margin: 0 1px -9px; border-radius: 2px; background: #fff; }
+
+#caps { position: absolute; left: 1020px; top: 62px; width: 860px; height: 170px; }
+#caps h1 { position: absolute; left: -40px; right: -40px; top: 0; font-size: 84px; text-align: center; }
+#st { position: absolute; left: 1020px; top: 236px; width: 860px; height: 780px; }
+#face { left: 160px; top: 90px; width: 540px; height: 540px; }
+#melt { position: absolute; left: 40px; top: -10px; width: 780px; height: 780px; }
+#moody { left: 140px; top: 70px; width: 580px; height: 580px; }
+
+/* Same input, same avatar */
+#same .tag { font-size: 36px; }
+#same .eq { position: absolute; top: 470px; width: 100px; margin-left: -50px; font-size: 96px; font-weight: 600; line-height: 100px; text-align: center; color: #5c668f; }
+#same h1 { position: absolute; left: 0; right: 0; top: 118px; text-align: center; }
+#proof { position: absolute; left: 0; right: 0; top: 836px; display: flex; justify-content: center; }
+#proof div { padding: 22px 52px; border-radius: 999px; background: #fff; color: var(--ink); font-size: 54px; font-weight: 700; letter-spacing: -0.02em; }
+
+/* End card */
+#grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); padding: 10px; }
+.cell { display: grid; place-items: center; overflow: hidden; }
+.cell div { width: 128px; height: 128px; }
+#card { grid-column: 3 / 10; grid-row: 2 / 6; margin: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; border-radius: 52px; background: #1f2747; box-shadow: 0 60px 100px -40px rgba(0, 0, 0, 0.65), inset 0 0 0 2px rgba(255, 255, 255, 0.05); }
+#mark { display: flex; align-items: center; gap: 22px; font-size: 132px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+#mark .logo { width: 128px; height: 128px; }
+#line { font-size: 68px; font-weight: 700; letter-spacing: -0.025em; }
+#cmd { margin-top: 10px; padding: 20px 50px; border-radius: 999px; background: #fff; color: var(--ink); font-family: var(--mono); font-size: 48px; }
+#facts { font-size: 34px; font-weight: 500; color: #9aa3c7; }
+</style>
+
+<div id="stage">
+  <section class="scene" id="work">
+    <div id="brand"><span class="logo"></span><span class="name"></span></div>
+    <div id="editor">
+      <div id="tabs"><i></i><i></i><i></i><span>avatars.js</span></div>
+      <div id="code"></div>
+    </div>
+    <div id="caps">
+      <h1>Anything with a name<br>gets a face.</h1>
+      <h1>Breed two.</h1>
+      <h1>Fuse a team.</h1>
+      <h1>Set a mood.</h1>
+    </div>
+    <div id="st">
+      <div class="pk" id="face"></div>
+      <div id="family" style="position:absolute;inset:0"></div>
+      <div id="melt"></div>
+      <div class="pk" id="moody"></div>
+    </div>
+  </section>
+
+  <section class="scene" id="same">
+    <h1>Same input, same avatar. Forever.</h1>
+    <div id="proof"><div>No storage. No uploads.</div></div>
+  </section>
+
+  <section class="scene" id="end">
+    <div id="grid">
+      <div id="card">
+        <div id="mark"><span class="logo"></span><span class="name"></span></div>
+        <div id="line">There's one for everyone.</div>
+        <div id="cmd"></div>
+        <div id="facts"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const HERO = "maya@acme.co";
+for (const logo of $$(".logo")) logo.innerHTML = pipkin("maya");
+for (const name of $$(".name")) name.textContent = CFG.brand;
+
+const GHOST = "\u0000ghost";
+const ghost = (o) => {
+  const c = palette(genome("ruby").genes);
+  return pipkin("ruby", { ...o, mood: "sleepy" }).replaceAll(c.body, "#3b4677").replaceAll(c.ink, "#8f98bd");
+};
+
+// ---------------------------------------------------------------- the editor
+// Each line has a text that may change over time; `keys` are the times its characters appear.
+const highlight = (src, tint) =>
+  src.replace(/("[^"]*"?)|(\/\/.*$)|\b(import|from)\b|([A-Za-z_]\w*)(?=\()|([{}()\[\],;:])|([&<>])/g, (m, str, com, kw, fn, p) =>
+    str ? `<span class="s"${tint ? ` style="color:${tint}"` : ""}>${esc(str)}</span>` : com ? `<span class="c">${esc(com)}</span>` : kw ? `<span class="kw">${kw}</span>` : fn ? `<span class="fn">${fn}</span>` : p ? `<span class="p">${p}</span>` : esc(m),
+  );
+const LINES = [];
+const code = $("#code");
+function line(text, block) {
+  const node = add(code, `<div class="ln"></div>`);
+  const ln = { node, texts: [[-1e9, text]], keys: null, block, tint: null };
+  LINES.push(ln);
+  return ln;
+}
+/** Type the given lines one after another; returns when each character lands, per line. */
+function typeLines(lines, t0, cps, seed) {
+  let t = t0;
+  for (const ln of lines) {
+    const text = ln.texts[0][1];
+    const lead = text.length - text.trimStart().length;
+    const keys = keystrokes(text.slice(lead), t, { cps, seed: seed + LINES.indexOf(ln), jitter: 0.4 });
+    ln.keys = [...Array(lead).fill(t), ...keys];
+    t = keys[keys.length - 1] + 1000 / cps + 60;
+  }
+  return t;
+}
+const BLOCKS = []; // [from, to): which block the caret is in
+on((t) => {
+  const active = latest(BLOCKS, t)[1];
+  let caretLine = null;
+  for (const ln of LINES) if (ln.keys && ln.block === active && ln.keys[0] <= t) caretLine = ln;
+  if (!caretLine) caretLine = LINES.find((ln) => ln.block === active && ln.keys);
+  for (const ln of LINES) {
+    const text = latest(ln.texts, t)[1];
+    const shown = ln.keys ? text.slice(0, typedAt(ln.keys, t) + Math.max(0, text.length - ln.keys.length) * (typedAt(ln.keys, t) >= ln.keys.length ? 1 : 0)) : text;
+    let html = highlight(shown, ln.tint?.(t));
+    if (ln === caretLine) {
+      const last = ln.keys[ln.keys.length - 1];
+      const typing = t >= ln.keys[0] - 60 && t <= last + 220;
+      if (typing || Math.floor((t - last) / 420) % 2 === 0) html += `<span class="caret"></span>`;
+    }
+    ln.node.innerHTML = html;
+  }
+});
+const dim = (block, from, to) => {
+  for (const ln of LINES.filter((l) => l.block === block)) {
+    tw(ln.node, { o: [0.42, 1] }, from, 200, E.soft);
+    if (to != null) tw(ln.node, { o: 0.42 }, to, 300, E.soft);
+  }
+};
+
+const L = {
+  imp1: line("import { pipkin, breed, fuse }", "imp"),
+  imp2: line('  from "pipkin";', "imp"),
+  gap0: line("", "imp"),
+  one: line(`pipkin("${HERO}")`, "one"),
+  says: line("", "one"),
+  breed: line('breed("rosa", "priya")', "breed"),
+  gap2: line("", "breed"),
+  fuse1: line('fuse(["zoe", "omar", "iris",', "fuse"),
+  fuse2: line('      "lena", "theo"])', "fuse"),
+  gap3: line("", "fuse"),
+  mood1: line(`pipkin("${HERO}",`, "mood"),
+  mood2: line('  { mood: "happy" })', "mood"),
+};
+for (const ln of [L.imp1, L.imp2]) tw(ln.node, { o: [0.42, 0.42] }, 0, 1);
+const caps = $$("#caps h1");
+const capWords = caps.map((c) => words(c));
+const capIn = (i, t) => {
+  const px = parseFloat(getComputedStyle(caps[i]).fontSize);
+  capWords[i].forEach((w, j) => tw(w, { y: [px * 1.25, 0] }, t + j * 50, 700, E.out));
+};
+const capOut = (i, t) => headlineOut(capWords[i], t, { gap: 16, dur: 260 });
+// Captions 2 to 4 wait below their masks; the first is up from the first frame.
+[1, 2, 3].forEach((i) => capWords[i].forEach((w) => tw(w, { y: [200, 200] }, 0, 1)));
+
+// ---------------------------------------------------------------- 1: a name gets a face
+const T1 = 0;
+const T2 = 3700;
+{
+  typeLines([L.one], T1 + 380, 15, "one");
+  const keys = L.one.keys;
+  const open = 'pipkin("'.length;
+  const done = keys[keys.length - 1];
+  const swaps = [[done + 900, "@theo"], [done + 1480, "user_48213"]];
+  swaps.forEach(([t, v]) => L.one.texts.push([t, `pipkin("${v}")`]));
+  BLOCKS.push([-1e9, "one"]);
+  dim("one", -1e9, T2);
+  const nameAt = (t) => {
+    let n = HERO.slice(0, clamp(typedAt(keys, t) - open, 0, HERO.length));
+    for (const [at, v] of swaps) if (t >= at) n = v;
+    return n;
+  };
+  L.one.tint = (t) => (nameAt(t) ? oklch(0.84, 0.1, genome(nameAt(t)).genes.hue) : null);
+  L.says.texts.push([keys[open], ""]);
+  on((t) => {
+    const n = nameAt(t);
+    L.says.node.innerHTML = t < T2 + 200 && n && t > done + 120 ? highlight(`// ${describe(n)}`) : "";
+  });
+  tw(L.says.node, { o: [0, 1] }, done + 120, 260, E.soft);
+  tw(L.says.node, { o: 0.42 }, T2, 300, E.soft);
+  const face = hero($("#face"), GHOST, { render: (who, o) => (who === GHOST ? ghost(o) : pipkin(who, o)) });
+  for (let i = 0; i < HERO.length; i++) face.name(keys[open + i], HERO.slice(0, i + 1));
+  swaps.forEach(([t, v]) => face.name(t, v));
+  face.hop(done + 240, 46).blink(done + 700, swaps[0][0] + 300, swaps[1][0] + 320, swaps[1][0] + 900);
+  capOut(0, T2 - 260);
+  unpop($("#face"), T2 - 240);
+}
+
+// ---------------------------------------------------------------- 2: breed two
+const T3 = 7450;
+{
+  const end = typeLines([L.breed], T2 + 60, 26, "breed");
+  BLOCKS.push([T2, "breed"]);
+  dim("breed", T2, T3);
+  capIn(1, T2 + 40);
+  const k = L.breed.keys;
+  const act = breedAct($("#family"), T2, { a: "rosa", b: "priya", w: 860, h: 780, cx: 430, py: 196, pd: 270, half: 205, kids: 3, ky: 560, kd: 236, kstep: 272, inA: k['breed("rosa"'.length - 1], inB: k['breed("rosa", "priya"'.length - 1], bump: end + 620 });
+  capOut(1, T3 - 260);
+  act.out(T3 - 300);
+}
+
+// ---------------------------------------------------------------- 3: fuse a team
+const T4 = 11500;
+{
+  const team = ["zoe", "omar", "iris", "lena", "theo"];
+  const end = typeLines([L.fuse1, L.fuse2], T3 + 60, 40, "fuse");
+  BLOCKS.push([T3, "fuse"]);
+  dim("fuse", T3, T4);
+  capIn(2, T3 + 40);
+  // Each member appears as their name is typed.
+  const landed = (n) => {
+    for (const ln of [L.fuse1, L.fuse2]) {
+      const at = ln.texts[0][1].indexOf(`"${n}"`);
+      if (at >= 0) return ln.keys[at + n.length + 1];
+    }
+  };
+  const act = fuseAct($("#st"), $("#melt"), T3, { team, ring: 3.05, cells: 300, scale: 30, cy: -0.1, zoom: 1.7, born: (i, n) => landed(n), go: end + 420, from: T3 - 100, to: T4 + 100 });
+  capOut(2, T4 - 260);
+  act.out(T4 - 300);
+}
+
+// ---------------------------------------------------------------- 4: set a mood
+const T5 = 15050;
+{
+  const end = typeLines([L.mood1, L.mood2], T4 + 60, 44, "mood");
+  BLOCKS.push([T4, "mood"]);
+  dim("mood", T4, null);
+  capIn(3, T4 + 40);
+  const h = hero($("#moody"), HERO);
+  pop($("#moody"), L.mood1.keys[L.mood1.keys.length - 2], { dur: 700 });
+  const moods = [[end - 80, "happy"], [end + 520, "sleepy"], [end + 1080, "grumpy"], [end + 1640, "smug"]];
+  moods.forEach(([t, m]) => {
+    h.mood(t, m);
+    L.mood2.texts.push([t, `  { mood: "${m}" })`]);
+  });
+  L.mood2.tint = () => "#ffd58a";
+  h.blink(end - 400);
+  capOut(3, T5 - 240);
+  unpop($("#moody"), T5 - 260);
+  // The whole workspace clears for the last two beats.
+  leave([$("#editor"), $("#brand")], T5 - 260, { d: -40, dur: 300 });
+}
+scene($("#work"), 0, T5 + 80);
+
+// ---------------------------------------------------------------- 5: same input, same avatar
+const T6 = 17500;
+{
+  const s = $("#same");
+  scene(s, T5, T6 + 80);
+  const hw = headline($("h1", s), T5 + 40);
+  const when = ["today", "next deploy", "in ten years"];
+  const xs = [470, 960, 1450];
+  const three = xs.map((x, i) => spot(s, x, 520, 330, HERO, when[i]));
+  three.forEach((p, i) => {
+    pop(p.wrap, T5 + 260 + i * 260, { dur: 700 });
+    rise(p.tag, T5 + 420 + i * 260, { d: 14, dur: 380 });
+    // Identical faces do everything together.
+    p.h.blink(T5 + 1280).hop(T5 + 1500, 44).blink(T5 + 2150);
+  });
+  const eqs = [715, 1205].map((x) => add(s, `<div class="eq" style="left:${x}px">=</div>`));
+  pop(eqs, T5 + 420, { gap: 260, dur: 500 });
+  pop($("#proof div"), T5 + 1180, { dur: 700, from: 0.6, z: 0.48 });
+  const out = T6 - 280;
+  headlineOut(hw, out);
+  unpop([...three.map((p) => p.wrap), $("#proof div")], out, { gap: 30 });
+  leave([...three.map((p) => p.tag), ...eqs], out, { d: 0, dur: 180 });
+}
+
+// ---------------------------------------------------------------- 6: there's one for everyone
+{
+  const s = $("#end");
+  scene(s, T6 - 120, 1e9);
+  const T = T6 - 120;
+  $("#cmd").textContent = CFG.install;
+  $("#facts").textContent = `Zero dependencies · ${CFG.kb} KB gzipped`;
+  crowdAct($("#grid"), T, { cols: 11, rows: 6, hole: [2, 1, 8, 4], names: CROWD });
+  const card = $("#card");
+  tw(card, { o: [0, 1] }, T + 200, 260, E.soft);
+  tw(card, { y: [60, 0], s: [0.94, 1] }, T + 200, 800, E.spring(0.62, 11));
+  pop($("#mark"), T + 420, { dur: 700, from: 0.7 });
+  rise($("#line"), T + 560, { d: 26, dur: 560 });
+  pop($("#cmd"), T + 760, { dur: 700, from: 0.6 });
+  rise($("#facts"), T + 960, { d: 18, dur: 500 });
+}
+
+const DURATION = 20400;
+const POSTER = 19600;
+</script>
