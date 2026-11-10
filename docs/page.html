@@ -190,46 +190,69 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: var(--ink); color: #fff; cursor: pointer; }
 .reply .btn-send { min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 
-/* Stick them anywhere */
-.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 16px; }
-.card { display: flex; flex-direction: column; gap: 18px; padding: 24px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); min-width: 0; }
-.card h3 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
-.comment { display: flex; gap: 12px; }
+/* Stick them anywhere: a bento of four cells. Fuse and the team switcher share the big one,
+   comments and cursors share a canvas, and breed and moods get a small cell each. */
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "fuse fuse live live" "fuse fuse breed moods"; grid-auto-rows: minmax(300px, auto); gap: 16px; }
+.cell { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 18px; border-radius: 28px; background: var(--card); box-shadow: var(--ring); }
+.cell .art { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 200px; border-radius: 20px; background: var(--tile); overflow: hidden; }
+.cell-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 0 6px 4px; }
+.cell-foot h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.cell-fuse { grid-area: fuse; }
+.cell-fuse .art { min-height: 320px; }
+.cell-live { grid-area: live; }
+.cell-live .art { min-height: 240px; }
+.cell-breed { grid-area: breed; }
+.cell-moods { grid-area: moods; }
+.teams { display: flex; flex-wrap: wrap; gap: 8px; }
+.team { flex: 1 1 150px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border: 2px solid var(--line-soft); border-radius: 16px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; transition: background-color 0.15s ease; }
+.team:hover { background: var(--soft); }
+.team[aria-pressed="true"] { border-color: var(--ink); }
+.cell .row { display: flex; align-items: center; gap: 8px; }
+.cell .op { font-size: 22px; font-weight: 800; color: #9aa3c4; }
+/* Moods: one pipkin stepping through all eight, with the option that makes each. */
+.mood-cycle { position: relative; width: 120px; height: 120px; }
+.mood-cycle > *, .mood-chips > * { position: absolute; opacity: 0; animation: mood-step 4.8s step-end infinite; }
+.mood-cycle > * { inset: 0; }
+.mood-chips { position: relative; width: 100%; height: 34px; }
+.mood-chips > * { left: 50%; top: 0; translate: -50% 0; background: #fff; white-space: nowrap; }
+@keyframes mood-step { 0% { opacity: 1; } 12.5%, 100% { opacity: 0; } }
+/* Comments pinned on the canvas, with the reply box; live cursors drift around them. */
+.comment { display: flex; gap: 10px; }
 .comment b { display: block; font-size: 14px; font-weight: 600; }
-.comment p { margin: 2px 0 0; font-size: 15px; line-height: 1.45; }
-.canvas { position: relative; flex: 1 1 auto; min-height: 268px; border-radius: 18px; background-color: var(--soft); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
+.comment p { margin: 2px 0 0; font-size: 14px; line-height: 1.4; }
+.pin { position: absolute; left: 5%; top: 50%; z-index: 2; width: min(300px, 90%); display: flex; flex-direction: column; gap: 12px; padding: 0 14px 14px; border-radius: 18px; background: #fff; box-shadow: 0 20px 40px -24px rgba(20, 26, 51, 0.4), var(--ring); translate: 0 -50%; cursor: auto; }
+/* Older comments scroll up under a soft fade instead of being cut mid-line. */
+.comments { display: flex; flex-direction: column; gap: 12px; max-height: 126px; padding-top: 14px; overflow-y: auto; -webkit-mask-image: linear-gradient(transparent, #000 14px); mask-image: linear-gradient(transparent, #000 14px); }
+.pin .reply { margin: 0; }
+.pin .reply input { height: 36px; font-size: 14px; }
+.pin .reply .btn-send { min-height: 32px; padding: 0 12px; font-size: 13px; }
+.canvas { background-color: var(--soft); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 18px 18px; }
 .cursor { position: absolute; display: flex; align-items: flex-start; gap: 4px; }
 .cursor .label { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 3px 10px 3px 3px; border-radius: 999px; background: var(--c); color: var(--ink); font-size: 13px; font-weight: 600; }
 .cursor .label .av { border-radius: 50%; background: #fff; }
-/* Your own cursor: hidden until a mouse enters the box, then it replaces the system pointer. */
+/* Your own cursor: hidden until a mouse enters the box, then it replaces the system pointer
+   (except over the pinned comments, where you need a normal pointer to type). */
 .cursor.me { left: 0; top: 0; z-index: 3; display: none; pointer-events: none; }
 .canvas.has-me { cursor: none; }
 .canvas.has-me .cursor.me { display: flex; }
-.c1 { left: 12%; top: 16%; animation: drift1 11s ease-in-out infinite; }
-.c2 { left: 52%; top: 44%; animation: drift2 13s ease-in-out infinite; }
-.c3 { left: 20%; top: 68%; animation: drift3 12s ease-in-out infinite; }
+.canvas.has-me:has(.pin:hover) .cursor.me { display: none; }
+.c1 { left: 60%; top: 16%; animation: drift1 11s ease-in-out infinite; }
+.c2 { left: 70%; top: 58%; animation: drift2 13s ease-in-out infinite; }
 @keyframes drift1 { 0%, 100% { transform: translate(0, 0); } 35% { transform: translate(56px, 26px); } 70% { transform: translate(22px, -10px); } }
 @keyframes drift2 { 0%, 100% { transform: translate(0, 0); } 40% { transform: translate(-64px, -30px); } 75% { transform: translate(-18px, 16px); } }
-@keyframes drift3 { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(40px, -24px); } 65% { transform: translate(92px, 0); } }
-.teams { display: flex; flex-direction: column; gap: 10px; }
-.team { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 8px 12px; border: 2px solid var(--line-soft); border-radius: 18px; background: #fff; color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: background-color 0.15s ease; }
-.team:hover { background: #e9ecf6; }
-.team[aria-pressed="true"] { border-color: var(--ink); background: var(--soft); }
-.team .names { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; }
-.team .names b { font-size: 15px; font-weight: 600; }
-.team .check { visibility: hidden; }
-.team[aria-pressed="true"] .check { visibility: visible; }
-.card .chip { margin-top: auto; }
-
-/* Feature tiles */
-.feature { gap: 18px; padding: 28px; }
-.feature .art { height: 236px; border-radius: 20px; background: var(--tile); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
-.feature .row { display: flex; align-items: center; gap: 10px; }
-.feature .op { font-size: 26px; font-weight: 800; color: var(--muted); }
-.feature .moods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-content: center; justify-items: center; gap: 12px; padding: 24px; }
-.feature h3 { font-size: 30px; line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; }
-.feature p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
-.feature p code { color: var(--ink); }
+@media (max-width: 1100px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "fuse fuse" "live live" "breed moods"; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: minmax(0, 1fr); grid-template-areas: "fuse" "live" "breed" "moods"; grid-auto-rows: auto; }
+  .cell-fuse .art { min-height: 260px; }
+  .cell-fuse .art .av { --s: 220px !important; }
+  .cell-live .art { min-height: 360px; }
+  .pin { top: 16px; translate: none; }
+  .c1 { left: 40%; top: auto; bottom: 70px; }
+  .c2 { left: 34%; top: auto; bottom: 14px; }
+  .team { flex: 1 1 0; flex-direction: column; gap: 6px; padding: 10px 6px; font-size: 13px; text-align: center; }
+}
 
 /* Docs */
 .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(560px, 100%), 1fr)); gap: 16px; align-items: start; }
@@ -330,7 +353,8 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .f0, .f1, .f2, .f3, .f4, .f5, .c1, .c2, .c3, .bubble, .new { animation: none; }
+  .f0, .f1, .f2, .f3, .f4, .f5, .c1, .c2, .bubble, .new, .mood-cycle > *, .mood-chips > * { animation: none; }
+  .mood-cycle > :nth-child(2), .mood-chips > :nth-child(2) { opacity: 1; }
   .zz { animation: none; opacity: 1; }
 }
 </style>
@@ -480,69 +504,50 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
   <section class="wrap section" id="anywhere">
     <div class="section-head">
       <h2>Stick them anywhere.</h2>
-      <p>The same SVG string works as a comment avatar, a live cursor or a team badge. A fused team gets an avatar of its own.</p>
+      <p>Comments, cursors and team badges, plus the tricks: breed two, fuse a team, change the mood.</p>
     </div>
-    <div class="grid3">
-      <article class="card">
-        <h3>Comments</h3>
-        <div class="comments" id="comments" aria-live="polite">
-          <div class="comment"><span class="av" data-pipkin="juno"></span><div><b>juno</b><p>Love the new empty state.</p></div></div>
-          <div class="comment"><span class="av" data-pipkin="ines"></span><div><b>ines</b><p>Shipping it after lunch.</p></div></div>
-          <div class="comment"><span class="av" data-pipkin="kofi"></span><div><b>kofi</b><p>Can we keep the bunny?</p></div></div>
+    <div class="bento">
+      <article class="cell cell-fuse">
+        <div class="art"><span class="av" id="team-big" data-fuse="zoe,priya,noah,ava" data-anim style="--s: 300px" role="img" aria-label="Design crew: zoe, priya, noah and ava fused into one pipkin"></span></div>
+        <div class="teams" role="group" aria-label="Pick a team">
+          <button class="team" type="button" aria-pressed="true" data-team="zoe,priya,noah,ava" data-label="Design crew"><span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 40px"></span>Design crew</button>
+          <button class="team" type="button" aria-pressed="false" data-team="omar,lena,kofi,jun,sam" data-label="Platform"><span class="av" data-fuse="omar,lena,kofi,jun,sam" style="--s: 40px"></span>Platform</button>
+          <button class="team" type="button" aria-pressed="false" data-team="maya,theo" data-label="Founders"><span class="av" data-fuse="maya,theo" style="--s: 40px"></span>Founders</button>
         </div>
-        <form class="reply" id="reply-form" onsubmit="return false">
-          <label class="sr-only" for="reply-msg">Reply</label>
-          <input id="reply-msg" type="text" placeholder="Reply" maxlength="280" autocomplete="off">
-          <button class="btn-send" type="submit">Send</button>
-        </form>
+        <div class="cell-foot"><h3>Fuse a team into a badge</h3><code class="chip" id="team-code">fuse(["zoe", "priya", "noah", "ava"])</code></div>
       </article>
-      <article class="card">
-        <h3>Live cursors</h3>
-        <div class="canvas" aria-label="Three live cursors: zoe, kofi and ines" role="img">
-          <div class="cursor c1" style="--c: #ea92b9"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#ea92b9" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="zoe" style="--s: 22px"></span>zoe</span></div>
-          <div class="cursor c2" style="--c: #51c2f8"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#51c2f8" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="kofi" style="--s: 22px"></span>kofi</span></div>
-          <div class="cursor me" id="my-cursor" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" style="fill: var(--c)" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" style="--s: 22px"></span><span class="me-name">you</span></span></div>
-          <div class="cursor c3" style="--c: #d8aaff"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#d8aaff" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="ines" style="--s: 22px"></span>ines</span></div>
-        </div>
-      </article>
-      <article class="card">
-        <h3>Switch team</h3>
-        <div class="teams">
-          <button class="team" type="button" aria-pressed="true" data-team="zoe,priya,noah,ava"><span class="av" data-fuse="zoe,priya,noah,ava" style="--s: 52px"></span><span class="names"><b>Design crew</b><span class="small">zoe, priya, noah, ava</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-          <button class="team" type="button" aria-pressed="false" data-team="omar,lena,kofi,jun,sam"><span class="av" data-fuse="omar,lena,kofi,jun,sam" style="--s: 52px"></span><span class="names"><b>Platform</b><span class="small">omar, lena, kofi, jun, sam</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-          <button class="team" type="button" aria-pressed="false" data-team="maya,theo"><span class="av" data-fuse="maya,theo" style="--s: 52px"></span><span class="names"><b>Founders</b><span class="small">maya, theo</span></span><svg class="check" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-        </div>
-        <code class="chip" id="team-code">fuse(["zoe", "priya", "noah", "ava"])</code>
-      </article>
-    </div>
-  </section>
-
-  <section class="wrap section" aria-label="Breed, fuse and moods">
-    <div class="grid3">
-      <article class="card feature">
-        <div class="art">
-          <div class="row">
-            <span class="av" data-pipkin="maya" style="--s: 72px" role="img" aria-label="maya"></span>
-            <span class="op" aria-hidden="true">×</span>
-            <span class="av" data-pipkin="theo" style="--s: 72px" role="img" aria-label="theo"></span>
+      <article class="cell cell-live">
+        <div class="art canvas">
+          <div class="pin">
+            <div class="comments" id="comments" aria-live="polite">
+              <div class="comment"><span class="av" data-pipkin="juno" style="--s: 32px"></span><div><b>juno</b><p>Love the new empty state.</p></div></div>
+              <div class="comment"><span class="av" data-pipkin="kofi" style="--s: 32px"></span><div><b>kofi</b><p>Can we keep the bunny?</p></div></div>
+            </div>
+            <form class="reply" id="reply-form" onsubmit="return false">
+              <label class="sr-only" for="reply-msg">Reply</label>
+              <input id="reply-msg" type="text" placeholder="Reply" maxlength="280" autocomplete="off">
+              <button class="btn-send" type="submit">Send</button>
+            </form>
           </div>
+          <div class="cursor c1" style="--c: #ea92b9" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#ea92b9" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="zoe" style="--s: 22px"></span>zoe</span></div>
+          <div class="cursor c2" style="--c: #d8aaff" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" fill="#d8aaff" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" data-pipkin="ines" style="--s: 22px"></span>ines</span></div>
+          <div class="cursor me" id="my-cursor" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 3l7 18 2.6-7.4L21 11Z" style="fill: var(--c)" stroke="#141a33" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="label"><span class="av" style="--s: 22px"></span><span class="me-name">You</span></span></div>
+        </div>
+        <div class="cell-foot"><h3>Comments and cursors</h3><code class="chip">pipkin(user.id)</code></div>
+      </article>
+      <article class="cell cell-breed">
+        <div class="art">
+          <div class="row"><span class="av" data-pipkin="maya" style="--s: 64px" role="img" aria-label="maya"></span><span class="op" aria-hidden="true">×</span><span class="av" data-pipkin="theo" style="--s: 64px" role="img" aria-label="theo"></span></div>
           <div class="row" id="litter"></div>
         </div>
-        <h3>Breed any two.</h3>
-        <p>Kids take their traits from both parents, and their lineage is their id. <code>maya×theo#1</code> works as a name anywhere.</p>
-        <code class="chip">breed("maya", "theo")</code>
+        <div class="cell-foot"><h3>Breed any two</h3></div>
       </article>
-      <article class="card feature">
-        <div class="art"><span class="av" data-fuse="omar,lena,kofi,jun,sam" data-anim style="--s: 196px" role="img" aria-label="omar, lena, kofi, jun and sam fused into one pipkin"></span></div>
-        <h3>Fuse a whole team.</h3>
-        <p>Up to nine members melt into one body. Each keeps their colour, their ears and one eye.</p>
-        <code class="chip">fuse(["omar", "lena", "kofi", "jun", "sam"])</code>
-      </article>
-      <article class="card feature">
-        <div class="art moods" id="moods"></div>
-        <h3>Eight moods.</h3>
-        <p>All done with eyelids, so a pipkin is still itself when it's grumpy.</p>
-        <code class="chip">pipkin("zoe", { mood: "smug" })</code>
+      <article class="cell cell-moods">
+        <div class="art">
+          <div class="mood-cycle" id="moods" role="img" aria-label="zoe in eight moods"></div>
+          <div class="mood-chips" id="mood-chips" aria-hidden="true"></div>
+        </div>
+        <div class="cell-foot"><h3>Eight moods</h3></div>
       </article>
     </div>
   </section>
@@ -625,10 +630,13 @@ function hydrate(el) {
 $("#litter").innerHTML = [0, 1, 2, 3]
   .map((k) => {
     const kid = PIPKIN.breed("maya", "theo", { child: k });
-    return `<span class="av" style="--s: 54px" role="img" aria-label="${kid.id}, ${PIPKIN.describe(kid)}">${PIPKIN.pipkin(kid)}</span>`;
+    return `<span class="av" style="--s: 44px" role="img" aria-label="${kid.id}, ${PIPKIN.describe(kid)}">${PIPKIN.pipkin(kid)}</span>`;
   })
   .join("");
-$("#moods").innerHTML = PIPKIN.MOODS.map((m) => `<span class="av" data-pipkin="zoe" data-mood="${m}" style="--s: 60px" role="img" aria-label="zoe, ${m}"></span>`).join("");
+// One pipkin steps through every mood, 0.6 s each, with the option that makes it underneath.
+$("#moods").innerHTML = PIPKIN.MOODS.map((m, k) => `<span class="av" data-pipkin="zoe" data-mood="${m}" style="--s: 120px; animation-delay: ${k * 600}ms"></span>`).join("");
+$("#mood-chips").innerHTML = PIPKIN.MOODS.map((m, k) => `<code class="chip" style="animation-delay: ${k * 600}ms">{ mood: "${m}" }</code>`).join("");
+$("#moods").setAttribute("aria-label", `zoe in ${PIPKIN.MOODS.length} moods: ${PIPKIN.MOODS.join(", ")}`);
 $$("[data-pipkin], [data-fuse]").forEach(hydrate);
 $("#favicon").href = PIPKIN.pipkinUri("maya", { background: "circle" });
 $("#species").textContent = String(PIPKIN.TRAITS.species.values.length);
@@ -952,11 +960,16 @@ intro();
   setTimeout(() => whenIdle(batch), 2800);
 })();
 
-// Team switcher.
+// Team switcher: the big pipkin re-fuses with the team you pick.
 for (const btn of $$(".team")) {
   btn.addEventListener("click", () => {
+    const members = btn.dataset.team.split(",");
     for (const other of $$(".team")) other.setAttribute("aria-pressed", String(other === btn));
-    $("#team-code").textContent = `fuse([${quote(btn.dataset.team.split(","))}])`;
+    $("#team-code").textContent = `fuse([${quote(members)}])`;
+    const big = $("#team-big");
+    big.dataset.fuse = btn.dataset.team;
+    big.setAttribute("aria-label", `${btn.dataset.label}: ${members.slice(0, -1).join(", ")} and ${members.at(-1)} fused into one pipkin`);
+    hydrate(big);
   });
 }
 
@@ -1074,10 +1087,10 @@ send($("#chat-form"), $("#chat-msg"), $("#messages"), (name, text) => {
   join(name);
   return entry("li", "new", name, 44, text, clock());
 });
-send($("#reply-form"), $("#reply-msg"), $("#comments"), (name, text) => entry("div", "comment new", name, 40, text));
+send($("#reply-form"), $("#reply-msg"), $("#comments"), (name, text) => entry("div", "comment new", name, 32, text));
 setPlaceholders();
 
-// Inside the "Live cursors" box, a mouse pointer becomes your own labelled cursor.
+// Inside the comments and cursors canvas, a mouse pointer becomes your own labelled cursor.
 const canvas = $(".canvas");
 const myCursor = $("#my-cursor");
 function place(event) {
