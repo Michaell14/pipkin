@@ -903,7 +903,8 @@ function intro() {
     )
     .finished.then(() => blob.remove());
   // As it bursts, each pipkin pops up out of its own square (the square clips it until it is out),
-  // nearest to the card first, with a little jitter so it doesn't look mechanical.
+  // nearest to the card first, with a little jitter so it doesn't look mechanical. The pop-up adds
+  // to the idle float instead of replacing it, so when it ends there is no jump to pick the float up.
   for (const b of crowd) {
     if (!b.offsetParent) continue;
     const r = b.getBoundingClientRect();
@@ -916,6 +917,7 @@ function intro() {
         delay: 1180 + dist * 0.5 + Math.random() * 200,
         easing: "cubic-bezier(.3,1.25,.5,1)",
         fill: "backwards",
+        composite: "add",
       })
       .finished.then(done, done);
   }
@@ -930,14 +932,25 @@ function intro() {
 }
 intro();
 
-// Measured, not claimed: the average time to draw one pipkin here.
-setTimeout(() => {
+// Measured, not claimed: the average time to draw one pipkin here. It is timed a few draws at a
+// time while the page is idle, starting after the load animation, so it never holds up a frame.
+(() => {
   const runs = 300;
-  const t0 = performance.now();
-  for (let i = 0; i < runs; i++) PIPKIN.pipkin(`guest-${i}@example.com`);
-  const ms = (performance.now() - t0) / runs;
-  $("#speed").textContent = ms < 0.1 ? `${ms.toFixed(2)} ms` : ms < 10 ? `${ms.toFixed(1)} ms` : `${Math.round(ms)} ms`;
-}, 2000); // after the load animation, so the timing loop can't make it stutter
+  let drawn = 0;
+  let spent = 0;
+  const whenIdle = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ timeRemaining: () => 8 }), 50));
+  const batch = (deadline) => {
+    while (drawn < runs && deadline.timeRemaining() > 3) {
+      const t0 = performance.now();
+      for (let i = 0; i < 4 && drawn < runs; i++, drawn++) PIPKIN.pipkin(`guest-${drawn}@example.com`);
+      spent += performance.now() - t0;
+    }
+    if (drawn < runs) return whenIdle(batch);
+    const ms = spent / runs;
+    $("#speed").textContent = ms < 0.1 ? `${ms.toFixed(2)} ms` : ms < 10 ? `${ms.toFixed(1)} ms` : `${Math.round(ms)} ms`;
+  };
+  setTimeout(() => whenIdle(batch), 2800);
+})();
 
 // Team switcher.
 for (const btn of $$(".team")) {
