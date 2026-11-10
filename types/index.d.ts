@@ -14,7 +14,7 @@ export interface PipkinOptions {
   background?: Background;
   /** Eye state. "neutral" (the default) uses the kit's own eyes. */
   mood?: Mood;
-  /** Idle motion. Needs pipkin/motion.css on the page, or embedMotion. "hover" plays only while hovered. */
+  /** Idle motion. Needs pipkins/motion.css on the page, or embedMotion. "hover" plays only while hovered. */
   animate?: boolean | "hover";
   /** Put the motion CSS inside the SVG, so it animates on its own (also as an <img>). */
   embedMotion?: boolean;

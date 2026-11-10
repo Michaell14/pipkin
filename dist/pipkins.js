@@ -1,4 +1,4 @@
-// pipkin 0.1.0: deterministic animal avatars that breed and fuse. MIT licence.
+// pipkins 0.1.0: deterministic animal avatars that breed and fuse. MIT licence.
 
 // ---- hash.js
 // Hashing. Every trait is addressed by (seed, key), so adding a trait later never
@@ -803,11 +803,11 @@ const SQUIRCLE = "M50 0C88 0 100 12 100 50S88 100 50 100 0 88 0 50 12 0 50 0Z";
 
 function check(options) {
   const o = options ?? {};
-  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkin: mood must be one of ${MOODS.join(", ")}`);
+  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkins: mood must be one of ${MOODS.join(", ")}`);
   if (o.background != null && o.background !== false && !BACKGROUNDS.includes(o.background))
-    throw new TypeError(`pipkin: background must be ${BACKGROUNDS.join(", ")} or false`);
-  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkin: animate must be true, false or "hover"`);
-  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkin: size must be a positive number");
+    throw new TypeError(`pipkins: background must be ${BACKGROUNDS.join(", ")} or false`);
+  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkins: animate must be true, false or "hover"`);
+  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkins: size must be a positive number");
   return o;
 }
 
@@ -933,10 +933,10 @@ function draw(list, options) {
 }
 
 // ---- index.js
-// pipkin: deterministic animal avatars that breed and fuse. Zero dependencies.
+// pipkins: deterministic animal avatars that breed and fuse. Zero dependencies.
 //
 //   pipkin("maya@acme.co")                       '<svg …>' one pipkin
-//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkin/motion.css)
+//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkins/motion.css)
 //   breed("maya", "theo", { child: 1 }).id       "maya×theo#1", and pipkin("maya×theo#1") draws that child
 //   fuse(["maya", "theo", "zoe"])                one pipkin made of all three, in any order
 //
@@ -957,7 +957,7 @@ function fuse(seeds, options) {
     byId.set(g.id, g);
   }
   const list = [...byId.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)).slice(0, MAX_MEMBERS);
-  if (!list.length) throw new TypeError("pipkin: fuse() needs at least one name");
+  if (!list.length) throw new TypeError("pipkins: fuse() needs at least one name");
   return draw(list, options);
 }
 

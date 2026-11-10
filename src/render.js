@@ -89,11 +89,11 @@ const SQUIRCLE = "M50 0C88 0 100 12 100 50S88 100 50 100 0 88 0 50 12 0 50 0Z";
 
 function check(options) {
   const o = options ?? {};
-  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkin: mood must be one of ${MOODS.join(", ")}`);
+  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkins: mood must be one of ${MOODS.join(", ")}`);
   if (o.background != null && o.background !== false && !BACKGROUNDS.includes(o.background))
-    throw new TypeError(`pipkin: background must be ${BACKGROUNDS.join(", ")} or false`);
-  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkin: animate must be true, false or "hover"`);
-  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkin: size must be a positive number");
+    throw new TypeError(`pipkins: background must be ${BACKGROUNDS.join(", ")} or false`);
+  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkins: animate must be true, false or "hover"`);
+  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkins: size must be a positive number");
   return o;
 }
 

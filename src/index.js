@@ -1,7 +1,7 @@
-// pipkin: deterministic animal avatars that breed and fuse. Zero dependencies.
+// pipkins: deterministic animal avatars that breed and fuse. Zero dependencies.
 //
 //   pipkin("maya@acme.co")                       '<svg …>' one pipkin
-//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkin/motion.css)
+//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkins/motion.css)
 //   breed("maya", "theo", { child: 1 }).id       "maya×theo#1", and pipkin("maya×theo#1") draws that child
 //   fuse(["maya", "theo", "zoe"])                one pipkin made of all three, in any order
 //
@@ -29,7 +29,7 @@ export function fuse(seeds, options) {
     byId.set(g.id, g);
   }
   const list = [...byId.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)).slice(0, MAX_MEMBERS);
-  if (!list.length) throw new TypeError("pipkin: fuse() needs at least one name");
+  if (!list.length) throw new TypeError("pipkins: fuse() needs at least one name");
   return draw(list, options);
 }
 

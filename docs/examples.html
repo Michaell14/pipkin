@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Examples · pipkin</title>
-<meta name="description" content="Components you can build with pipkin: facepiles, mentions, hover cards, presence, team switchers, empty states and more. Each is one line of code.">
+<title>Examples · pipkins</title>
+<meta name="description" content="Components you can build with pipkins: facepiles, mentions, hover cards, presence, team switchers, empty states and more. Each is one line of code.">
 <meta name="theme-color" content="#F3F5FB">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="pipkin">
+<meta property="og:site_name" content="pipkins">
 <meta property="og:url" content="/examples">
-<meta property="og:title" content="pipkin examples">
+<meta property="og:title" content="pipkins examples">
 <meta property="og:description" content="Facepiles, mentions, hover cards, presence, team switchers, empty states and more, each in one line of code.">
-<meta property="og:image" content="/og/pipkin.png">
+<meta property="og:image" content="/og/pipkins.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="/og/pipkin.png">
+<meta name="twitter:image" content="/og/pipkins.png">
 <link rel="icon" id="favicon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=swap">
-<style>/* pipkin motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
+<style>/* pipkins motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
 .pipkin .pipkin-bob,.pipkin .pipkin-breathe,.pipkin .pipkin-ear,.pipkin .pipkin-eye{transform-box:view-box;transform-origin:0 0}
 .pipkin .pipkin-bob{animation:pipkin-bob var(--pipkin-bob,4.4s) ease-in-out var(--pipkin-delay,0s) infinite}
 .pipkin .pipkin-breathe{animation:pipkin-breathe var(--pipkin-breathe,3.8s) ease-in-out var(--pipkin-delay,0s) infinite}
@@ -36,7 +36,7 @@
 @media (prefers-reduced-motion:reduce){.pipkin *{animation:none!important}}
 </style>
 <style>
-/* Examples: a filterable wall of components built with pipkin. Every avatar is drawn by the
+/* Examples: a filterable wall of components built with pipkins. Every avatar is drawn by the
    library in the browser, the same way as on the home page. */
 :root {
   --bg: #f3f5fb;
@@ -204,20 +204,20 @@ p { margin: 0; }
 <body>
 
 <header class="wrap top">
-  <a class="brand" href="index.html"><span class="av" data-pipkin="maya" style="--s: 36px"></span>pipkin</a>
+  <a class="brand" href="index.html"><span class="av" data-pipkin="maya" style="--s: 36px"></span>pipkins</a>
   <nav class="nav" aria-label="Main">
     <a href="index.html#features">Features</a>
     <a href="index.html#docs">Docs</a>
     <a href="examples.html" aria-current="page">Examples</a>
-    <a href="https://www.npmjs.com/package/pipkin">npm</a>
-    <a href="https://github.com/Michaell14/pipkin">GitHub</a>
+    <a href="https://www.npmjs.com/package/pipkins">npm</a>
+    <a href="https://github.com/Michaell14/pipkins">GitHub</a>
   </nav>
 </header>
 
 <main>
   <section class="wrap intro">
     <h1>Examples</h1>
-    <p>Components you can build with pipkin. Each one is a few lines: copy the call and pass your own ids.</p>
+    <p>Components you can build with pipkins. Each one is a few lines: copy the call and pass your own ids.</p>
   </section>
 
   <section class="wrap" aria-label="Examples">
@@ -363,8 +363,8 @@ pipkin(user.id, { size: 20, mood: user.mood })" data-copy-label="the Hover card 
 <p class="sr-only" id="copy-status" role="status"></p>
 
 <footer class="wrap foot">
-  <span class="brandline"><span class="av" data-pipkin="maya" style="--s: 28px"></span>pipkin 0.1.0 is MIT licensed.</span>
-  <a href="https://github.com/Michaell14/pipkin">Source on GitHub</a>
+  <span class="brandline"><span class="av" data-pipkin="maya" style="--s: 28px"></span>pipkins 0.1.0 is MIT licensed.</span>
+  <a href="https://github.com/Michaell14/pipkins">Source on GitHub</a>
 </footer>
 
 <script type="module">
@@ -1172,11 +1172,11 @@ const SQUIRCLE = "M50 0C88 0 100 12 100 50S88 100 50 100 0 88 0 50 12 0 50 0Z";
 
 function check(options) {
   const o = options ?? {};
-  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkin: mood must be one of ${MOODS.join(", ")}`);
+  if (o.mood != null && !MOODS.includes(o.mood)) throw new TypeError(`pipkins: mood must be one of ${MOODS.join(", ")}`);
   if (o.background != null && o.background !== false && !BACKGROUNDS.includes(o.background))
-    throw new TypeError(`pipkin: background must be ${BACKGROUNDS.join(", ")} or false`);
-  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkin: animate must be true, false or "hover"`);
-  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkin: size must be a positive number");
+    throw new TypeError(`pipkins: background must be ${BACKGROUNDS.join(", ")} or false`);
+  if (o.animate != null && o.animate !== false && o.animate !== true && o.animate !== "hover") throw new TypeError(`pipkins: animate must be true, false or "hover"`);
+  if (o.size != null && !(Number(o.size) > 0)) throw new TypeError("pipkins: size must be a positive number");
   return o;
 }
 
@@ -1302,10 +1302,10 @@ function draw(list, options) {
 }
 
 // ---- index.js
-// pipkin: deterministic animal avatars that breed and fuse. Zero dependencies.
+// pipkins: deterministic animal avatars that breed and fuse. Zero dependencies.
 //
 //   pipkin("maya@acme.co")                       '<svg …>' one pipkin
-//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkin/motion.css)
+//   pipkin("maya@acme.co", { animate: true })    the same pipkin, with idle motion (load pipkins/motion.css)
 //   breed("maya", "theo", { child: 1 }).id       "maya×theo#1", and pipkin("maya×theo#1") draws that child
 //   fuse(["maya", "theo", "zoe"])                one pipkin made of all three, in any order
 //
@@ -1326,7 +1326,7 @@ function fuse(seeds, options) {
     byId.set(g.id, g);
   }
   const list = [...byId.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)).slice(0, MAX_MEMBERS);
-  if (!list.length) throw new TypeError("pipkin: fuse() needs at least one name");
+  if (!list.length) throw new TypeError("pipkins: fuse() needs at least one name");
   return draw(list, options);
 }
 

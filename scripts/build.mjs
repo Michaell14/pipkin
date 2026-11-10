@@ -1,4 +1,4 @@
-// Build dist/pipkin.js (one ES module, no imports), docs/index.html (the docs page) and
+// Build dist/pipkins.js (one ES module, no imports), docs/index.html (the docs page) and
 // docs/examples.html (the examples page), each page with the library inlined so it runs anywhere
 // as a single file.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -18,28 +18,28 @@ for (const name of ORDER) {
   body += `\n// ---- ${name}.js\n${src}`;
 }
 const version = JSON.parse(read("package.json")).version;
-const banner = `// pipkin ${version}: deterministic animal avatars that breed and fuse. MIT licence.\n`;
+const banner = `// pipkins ${version}: deterministic animal avatars that breed and fuse. MIT licence.\n`;
 mkdirSync(new URL("dist/", root), { recursive: true });
 const dist = `${banner}${body}\nexport { ${PUBLIC.join(", ")} };\n`;
-writeFileSync(new URL("dist/pipkin.js", root), dist);
-console.log(`dist/pipkin.js      ${(dist.length / 1024).toFixed(1)} KB, ${(gzipSync(dist).length / 1024).toFixed(1)} KB gzipped`);
+writeFileSync(new URL("dist/pipkins.js", root), dist);
+console.log(`dist/pipkins.js     ${(dist.length / 1024).toFixed(1)} KB, ${(gzipSync(dist).length / 1024).toFixed(1)} KB gzipped`);
 
 // Minified copy for CDNs, if esbuild is installed (it is a dev dependency only).
 let shipped = dist;
 try {
   const { transform } = await import("esbuild");
   const { code } = await transform(dist, { minify: true, format: "esm", target: "es2020" });
-  writeFileSync(new URL("dist/pipkin.min.js", root), banner + code);
+  writeFileSync(new URL("dist/pipkins.min.js", root), banner + code);
   shipped = banner + code;
-  console.log(`dist/pipkin.min.js  ${(shipped.length / 1024).toFixed(1)} KB, ${(gzipSync(shipped).length / 1024).toFixed(1)} KB gzipped`);
+  console.log(`dist/pipkins.min.js ${(shipped.length / 1024).toFixed(1)} KB, ${(gzipSync(shipped).length / 1024).toFixed(1)} KB gzipped`);
 } catch {
-  console.log("esbuild not installed: skipped dist/pipkin.min.js (run npm install)");
+  console.log("esbuild not installed: skipped dist/pipkins.min.js (run npm install)");
 }
 
 // Docs page: inline the library (without the export line) into the page's module script.
 // motion.css is generated from motion.js so the two can never drift apart.
 const { MOTION_CSS } = await import(new URL("src/motion.js", root).href);
-writeFileSync(new URL("src/motion.css", root), "/* pipkin motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */\n" + MOTION_CSS);
+writeFileSync(new URL("src/motion.css", root), "/* pipkins motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */\n" + MOTION_CSS);
 
 const inline = `${body}\nconst PIPKIN = { ${PUBLIC.join(", ")} };`;
 const motionCss = read("src/motion.css");

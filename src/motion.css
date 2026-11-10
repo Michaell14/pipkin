@@ -1,4 +1,4 @@
-/* pipkin motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
+/* pipkins motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
 .pipkin .pipkin-bob,.pipkin .pipkin-breathe,.pipkin .pipkin-ear,.pipkin .pipkin-eye{transform-box:view-box;transform-origin:0 0}
 .pipkin .pipkin-bob{animation:pipkin-bob var(--pipkin-bob,4.4s) ease-in-out var(--pipkin-delay,0s) infinite}
 .pipkin .pipkin-breathe{animation:pipkin-breathe var(--pipkin-breathe,3.8s) ease-in-out var(--pipkin-delay,0s) infinite}

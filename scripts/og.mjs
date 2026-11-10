@@ -1,4 +1,4 @@
-// Render the share preview: docs/og/pipkin.mp4 (og:video) and docs/og/pipkin.png (og:image).
+// Render the share preview: docs/og/pipkins.mp4 (og:video) and docs/og/pipkins.png (og:image).
 // The card replays the site's load animation: a fused pipkin bursts, the crowd pops up out of
 // its squares and the title card rises. Every frame is stepped exactly, so the loop is seamless.
 // Needs Playwright with Chromium (npx playwright install chromium) and ffmpeg on the PATH.
@@ -68,7 +68,7 @@ svg { display: block; width: 100%; height: 100%; }
 @keyframes card { 0%, 27% { opacity: 0; transform: translateY(18px); } 35%, 92% { opacity: 1; transform: none; } 98%, 100% { opacity: 0; transform: none; } }
 </style></head><body>
 <div class="grid">
-<div class="card"><div class="brand"><span class="logo">${pipkin("maya")}</span>pipkin</div><div class="line">There's one for everyone.</div><div class="cmd">npm i pipkin</div></div>
+<div class="card"><div class="brand"><span class="logo">${pipkin("maya")}</span>pipkins</div><div class="line">There's one for everyone.</div><div class="cmd">npm i pipkins</div></div>
 ${crowd.join("\n")}
 </div>
 <div class="blob">${fuse(FRIENDS, { animate: true })}</div>
@@ -82,7 +82,7 @@ await page.evaluate(() => document.fonts.ready);
 await page.evaluate(() => document.getAnimations().forEach((a) => a.pause()));
 const seek = (t) => page.evaluate((t) => document.getAnimations().forEach((a) => (a.currentTime = t)), t);
 
-const video = new URL("pipkin.mp4", out).pathname;
+const video = new URL("pipkins.mp4", out).pathname;
 const ffmpeg = spawn("ffmpeg", ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(FPS), "-i", "-", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", video], { stdio: ["pipe", "inherit", "inherit"] });
 const encoded = new Promise((resolve, reject) => {
   ffmpeg.on("error", reject);
@@ -97,11 +97,11 @@ for (let f = 0; f < frames; f++) {
 ffmpeg.stdin.end();
 await encoded;
 
-const still = new URL("pipkin.png", out).pathname;
+const still = new URL("pipkins.png", out).pathname;
 await seek(STILL);
 await page.screenshot({ path: still, type: "png" });
 await browser.close();
 
 const kb = (p) => (statSync(p).size / 1024).toFixed(0);
-console.log(`docs/og/pipkin.mp4  ${frames} frames, ${kb(video)} KB`);
-console.log(`docs/og/pipkin.png  ${kb(still)} KB`);
+console.log(`docs/og/pipkins.mp4  ${frames} frames, ${kb(video)} KB`);
+console.log(`docs/og/pipkins.png  ${kb(still)} KB`);

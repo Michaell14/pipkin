@@ -1,21 +1,21 @@
 {
-  "name": "pipkin",
+  "name": "pipkins",
   "version": "0.1.0",
   "description": "Deterministic animal avatars that breed and fuse. Zero dependencies.",
-  "homepage": "https://github.com/Michaell14/pipkin#readme",
+  "homepage": "https://github.com/Michaell14/pipkins#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Michaell14/pipkin.git"
+    "url": "git+https://github.com/Michaell14/pipkins.git"
   },
   "bugs": {
-    "url": "https://github.com/Michaell14/pipkin/issues"
+    "url": "https://github.com/Michaell14/pipkins/issues"
   },
   "type": "module",
   "main": "./src/index.js",
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
-  "unpkg": "./dist/pipkin.min.js",
-  "jsdelivr": "./dist/pipkin.min.js",
+  "unpkg": "./dist/pipkins.min.js",
+  "jsdelivr": "./dist/pipkins.min.js",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -51,6 +51,7 @@
     "svg",
     "generative",
     "animal",
+    "pipkins",
     "pipkin"
   ],
   "license": "MIT",

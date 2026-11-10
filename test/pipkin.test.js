@@ -150,7 +150,7 @@ test("helpers", () => {
 
 test("the dist bundle draws exactly what the source draws", async (t) => {
   const { existsSync } = await import("node:fs");
-  const url = new URL("../dist/pipkin.js", import.meta.url);
+  const url = new URL("../dist/pipkins.js", import.meta.url);
   if (!existsSync(url)) return t.skip("run npm run build first");
   const dist = await import(url.href);
   for (const n of ["maya", "theo", "日本語", "maya×theo#1"]) assert.equal(dist.pipkin(n), pipkin(n));

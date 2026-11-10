@@ -1,9 +1,9 @@
-# pipkin
+# pipkins
 
 Deterministic animal avatars that breed and fuse. Zero dependencies, about 2 KB of SVG per avatar.
 
 ```js
-import { pipkin } from "pipkin";
+import { pipkin } from "pipkins";
 
 avatar.innerHTML = pipkin(user.email, { size: 40, background: "circle" });
 ```
@@ -17,13 +17,15 @@ Every name gets a **pipkin**: a small flat animal (cat, fox, bear, mouse, bunny,
 ## Install
 
 ```sh
-npm install pipkin
+npm install pipkins
 ```
+
+It used to be published as `pipkin`; that package is deprecated in favour of this one.
 
 It is plain ES modules with TypeScript types: no build step and no dependencies. Without a bundler, import it from a CDN:
 
 ```js
-import { pipkin } from "https://cdn.jsdelivr.net/npm/pipkin@0/dist/pipkin.min.js";
+import { pipkin } from "https://cdn.jsdelivr.net/npm/pipkins@0/dist/pipkins.min.js";
 ```
 
 ## Usage
@@ -103,7 +105,7 @@ Members are sorted, placed in a ring and traced as one metaball body with a clea
 Animation needs the SVG inline in the page and the motion styles loaded once:
 
 ```js
-import "pipkin/motion.css";
+import "pipkins/motion.css";
 el.innerHTML = pipkin(user.id, { animate: true });
 ```
 
@@ -137,7 +139,7 @@ Moods double as states: switch `mood` to `"sleepy"` for away, `"determined"` for
 
 ## Size
 
-`dist/pipkin.min.js` is about 8.4 KB gzipped, with no dependencies. A static pipkin is about 2 KB of SVG; a fused group of nine is under 12 KB.
+`dist/pipkins.min.js` is about 8.4 KB gzipped, with no dependencies. A static pipkin is about 2 KB of SVG; a fused group of nine is under 12 KB.
 
 ## Development
 
