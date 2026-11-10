@@ -54,6 +54,19 @@ test("fusing ignores order and duplicates", () => {
   assert.throws(() => fuse([]), TypeError);
 });
 
+test("a draw is not affected by the draws before it", () => {
+  // The renderer reuses its working buffers, so the same draw must come out the same whatever ran last.
+  const solo = names(12, "solo");
+  const sizes = [2, 5, 9];
+  const first = solo.map((n) => pipkin(n));
+  const groups = sizes.map((n) => fuse(names(n, "mix")));
+  for (const n of [9, 3, 6]) fuse(names(n, "other"));
+  assert.deepEqual([...solo].reverse().map((n) => pipkin(n)).reverse(), first);
+  assert.deepEqual([...sizes].reverse().map((n) => fuse(names(n, "mix"))).reverse(), groups);
+  assert.throws(() => pipkin("maya", { mood: "hangry" }), TypeError);
+  assert.deepEqual(solo.map((n) => pipkin(n)), first);
+});
+
 test("eyes clear 6.8:1 against every body colour", () => {
   let worst = Infinity;
   for (let hue = 0; hue < 360; hue += 1)

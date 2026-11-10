@@ -451,168 +451,258 @@ function buildScene(list) {
 
 // ---------------------------------------------------------------- raster → outline paths
 
+// The fields are sampled on a lattice and their iso-lines traced with marching squares. Only the
+// cells a line passes through need exact values, so every sample is first labelled inside or
+// outside (cheap), and the signed distances are worked out at the corners of crossing cells alone.
+// A label is the sign the exact value would have, and the values are computed the same way as
+// for a full distance field, so the paths are the ones tracing that whole field would give.
+const W = GRID + 1; // samples per side
+const CELLS = W * W;
+const STEP = 100 / GRID;
+
+// Scratch space, made on first use and reused: drawing is synchronous, so one set is enough.
+let scratch = null;
+const buffers = () =>
+  (scratch ??= {
+    F: new Float32Array(CELLS), // the body's field
+    label: new Uint8Array(CELLS), // 0 outside; m + 1 inside member m's part
+    val: new Float32Array(CELLS), // exact values at the corners of crossing cells
+    known: new Uint8Array(CELLS), // which of `val` are filled in
+    slot: new Int32Array(2 * CELLS).fill(-1), // lattice edge → the point on it
+    own: [], // groups only: one ownership field per member,
+    top1: null, // the strongest of them at each sample,
+    top2: null, // the runner-up,
+    arg: null, // and whose the strongest is
+  });
+
 /**
- * Trace balls (viewBox units, each with an owner `m`) into the body outline and, for a group,
- * one patch per member separated by a gap of `seam` × 2 units.
+ * Trace balls (viewBox units, each with an owner `m`) into the body outline for one pipkin, or
+ * for a group into one patch per member, separated by a gap of `seam` × 2 units (`seam` > 0).
  */
 function bodyPaths(balls, n, seam) {
-  const W = GRID + 1;
-  const step = 100 / GRID;
-  const size = W * W;
-  const F = new Float32Array(size);
-  splat(F, balls, REACH, W, step, null);
-  const D = toDistance(F, W, step, ISO);
-  if (n === 1) return { outline: trace(D, W, step), patches: null };
-  const own = Array.from({ length: n }, () => new Float32Array(size));
-  splat(null, balls, OWN_REACH, W, step, own);
-  const top1 = new Float32Array(size);
-  const top2 = new Float32Array(size);
-  const arg = new Int8Array(size).fill(-1);
-  for (let k = 0; k < size; k++)
-    for (let m = 0; m < n; m++) {
-      const v = own[m][k];
+  const B = buffers();
+  const { F, label } = B;
+  F.fill(0);
+  label.fill(0);
+  splat(F, null, balls, REACH);
+  if (n === 1) {
+    const box = [W, -1, W, -1];
+    for (let j = 0, k = 0; j < W; j++)
+      for (let i = 0; i < W; i++, k++)
+        if (F[k] >= ISO) {
+          label[k] = 1;
+          grow(box, i, j);
+        }
+    return { outline: trace(B, 1, box, (k, i, j) => bodyDistance(F, k, i, j)), patches: null };
+  }
+  const own = B.own;
+  while (own.length < n) own.push(new Float32Array(CELLS));
+  for (let m = 0; m < n; m++) own[m].fill(0);
+  splat(null, own, balls, OWN_REACH);
+  const top1 = (B.top1 ??= new Float32Array(CELLS)).fill(0);
+  const top2 = (B.top2 ??= new Float32Array(CELLS)).fill(0);
+  const arg = (B.arg ??= new Int8Array(CELLS)).fill(-1);
+  for (let m = 0; m < n; m++) {
+    const O = own[m];
+    for (let k = 0; k < CELLS; k++) {
+      const v = O[k];
       if (v > top1[k]) {
         top2[k] = top1[k];
         top1[k] = v;
         arg[k] = m;
       } else if (v > top2[k]) top2[k] = v;
     }
-  const O = new Float32Array(size);
-  const S = new Float32Array(size);
+  }
+  // A sample is in a member's patch when it is inside the body and that member leads there by
+  // more than the seam. Only the strongest owner can, so each sample needs one test.
+  const boxes = Array.from({ length: n }, () => [W, -1, W, -1]);
+  for (let j = 0, k = 0; j < W; j++)
+    for (let i = 0; i < W; i++, k++) {
+      const m = arg[k];
+      if (m < 0 || !(F[k] >= ISO)) continue;
+      if (leadDistance(own[m], top1, top2, arg, m, k, i, j) - seam >= 0) {
+        label[k] = m + 1;
+        grow(boxes[m], i, j);
+      }
+    }
   const patches = [];
   for (let m = 0; m < n; m++) {
-    for (let k = 0; k < size; k++) O[k] = own[m][k] - (arg[k] === m ? top2[k] : top1[k]);
-    const Od = toDistance(O, W, step, 0);
-    for (let k = 0; k < size; k++) S[k] = Math.min(D[k], Od[k] - seam);
-    patches.push(trace(S, W, step));
+    const O = own[m];
+    patches.push(trace(B, m + 1, boxes[m], (k, i, j) => Math.fround(Math.min(bodyDistance(F, k, i, j), leadDistance(O, top1, top2, arg, m, k, i, j) - seam))));
   }
-  return { outline: trace(D, W, step), patches };
+  return { outline: null, patches };
 }
 
-function splat(F, balls, reach, W, step, perOwner) {
+// Add each ball's field, (1 − d²/R²)³ within R = r × reach, to F or to its owner's own field.
+function splat(F, own, balls, reach) {
   const N = W - 1;
   for (const b of balls) {
+    const out = own ? own[b.m] : F;
     const R = b.r * reach;
     const R2 = R * R;
-    const i0 = Math.max(0, Math.floor((b.x - R) / step));
-    const i1 = Math.min(N, Math.ceil((b.x + R) / step));
-    const j0 = Math.max(0, Math.floor((b.y - R) / step));
-    const j1 = Math.min(N, Math.ceil((b.y + R) / step));
+    const i0 = Math.max(0, Math.floor((b.x - R) / STEP));
+    const i1 = Math.min(N, Math.ceil((b.x + R) / STEP));
+    const j0 = Math.max(0, Math.floor((b.y - R) / STEP));
+    const j1 = Math.min(N, Math.ceil((b.y + R) / STEP));
     for (let j = j0; j <= j1; j++) {
-      const dy = j * step - b.y;
+      const dy = j * STEP - b.y;
       for (let i = i0; i <= i1; i++) {
-        const dx = i * step - b.x;
+        const dx = i * STEP - b.x;
         const d2 = dx * dx + dy * dy;
         if (d2 < R2) {
           const w = 1 - d2 / R2;
-          const v = w * w * w;
-          if (F) F[j * W + i] += v;
-          if (perOwner) perOwner[b.m][j * W + i] += v;
+          out[j * W + i] += w * w * w;
         }
       }
     }
   }
 }
 
-// First-order signed distance to the iso-line, (V - iso) / |∇V|, in viewBox units.
-function toDistance(V, W, step, iso) {
-  const out = new Float32Array(W * W);
-  for (let j = 0; j < W; j++)
-    for (let i = 0; i < W; i++) {
-      const k = j * W + i;
-      const l = i > 0 ? V[k - 1] : V[k];
-      const r = i < W - 1 ? V[k + 1] : V[k];
-      const u = j > 0 ? V[k - W] : V[k];
-      const d = j < W - 1 ? V[k + W] : V[k];
-      const gx = (r - l) / ((i > 0 && i < W - 1 ? 2 : 1) * step);
-      const gy = (d - u) / ((j > 0 && j < W - 1 ? 2 : 1) * step);
-      const v = (V[k] - iso) / Math.max(Math.hypot(gx, gy), 1e-5);
-      out[k] = v > 50 ? 50 : v < -50 ? -50 : v;
-    }
-  return out;
+function grow(box, i, j) {
+  if (i < box[0]) box[0] = i;
+  if (i > box[1]) box[1] = i;
+  if (j < box[2]) box[2] = j;
+  if (j > box[3]) box[3] = j;
 }
 
-// Marching squares → closed loops of points.
-function march(V, W, step) {
+// First-order signed distance to the iso-line at one sample, (v − iso) / |∇v|, in viewBox units
+// and as a 32-bit float. l, r, u and d are the neighbouring samples (the sample itself at an edge).
+function distance(v, l, r, u, d, i, j, iso) {
+  const gx = (r - l) / ((i > 0 && i < W - 1 ? 2 : 1) * STEP);
+  const gy = (d - u) / ((j > 0 && j < W - 1 ? 2 : 1) * STEP);
+  const out = (v - iso) / Math.max(Math.hypot(gx, gy), 1e-5);
+  return Math.fround(out > 50 ? 50 : out < -50 ? -50 : out);
+}
+
+// Distance to the body's edge.
+const bodyDistance = (F, k, i, j) => distance(F[k], i > 0 ? F[k - 1] : F[k], i < W - 1 ? F[k + 1] : F[k], j > 0 ? F[k - W] : F[k], j < W - 1 ? F[k + W] : F[k], i, j, ISO);
+
+// How far member m's own field leads the strongest other one, and the distance to where it stops leading.
+const lead = (O, top1, top2, arg, m, k) => Math.fround(O[k] - (arg[k] === m ? top2[k] : top1[k]));
+function leadDistance(O, top1, top2, arg, m, k, i, j) {
+  const v = lead(O, top1, top2, arg, m, k);
+  const l = i > 0 ? lead(O, top1, top2, arg, m, k - 1) : v;
+  const r = i < W - 1 ? lead(O, top1, top2, arg, m, k + 1) : v;
+  const u = j > 0 ? lead(O, top1, top2, arg, m, k - W) : v;
+  const d = j < W - 1 ? lead(O, top1, top2, arg, m, k + W) : v;
+  return distance(v, l, r, u, d, i, j, 0);
+}
+
+// Marching squares around the samples labelled `want` (all of them within `box`), written as
+// smoothed closed paths. `valueAt` gives a sample's exact field value; it is asked only about
+// the corners of cells the line crosses.
+function trace(B, want, box, valueAt) {
+  const { label, val, known, slot } = B;
   const N = W - 1;
-  const pts = new Map();
-  const adj = new Map();
-  const H = (i, j) => j * W + i;
-  const Vk = (i, j) => W * W + j * W + i;
-  const put = (key, x, y) => {
-    if (!pts.has(key)) pts.set(key, [x, y]);
-    return key;
+  const pts = []; // points on the line, in the order they are first met
+  const edges = []; // the lattice edge each point sits on
+  const nb0 = []; // each point's neighbours along the line
+  const nb1 = [];
+  const touched = [];
+  const value = (k, i, j) => {
+    if (!known[k]) {
+      val[k] = valueAt(k, i, j);
+      known[k] = 1;
+      touched.push(k);
+    }
+    return val[k];
+  };
+  const put = (edge, x, y) => {
+    let p = slot[edge];
+    if (p < 0) {
+      p = slot[edge] = pts.length;
+      pts.push([x, y]);
+      edges.push(edge);
+      nb0.push(-1);
+      nb1.push(-1);
+    }
+    return p;
   };
   const link = (a, b) => {
-    if (!adj.has(a)) adj.set(a, []);
-    if (!adj.has(b)) adj.set(b, []);
-    adj.get(a).push(b);
-    adj.get(b).push(a);
+    if (nb0[a] < 0) nb0[a] = b;
+    else if (nb1[a] < 0) nb1[a] = b;
+    if (nb0[b] < 0) nb0[b] = a;
+    else if (nb1[b] < 0) nb1[b] = a;
   };
-  for (let j = 0; j < N; j++)
-    for (let i = 0; i < N; i++) {
-      const v0 = V[j * W + i];
-      const v1 = V[j * W + i + 1];
-      const v2 = V[(j + 1) * W + i + 1];
-      const v3 = V[(j + 1) * W + i];
-      const c = (v0 >= 0 ? 8 : 0) | (v1 >= 0 ? 4 : 0) | (v2 >= 0 ? 2 : 0) | (v3 >= 0 ? 1 : 0);
-      if (c === 0 || c === 15) continue;
-      const x0 = i * step;
-      const y0 = j * step;
-      const T = () => put(H(i, j), x0 + (step * v0) / (v0 - v1), y0);
-      const B = () => put(H(i, j + 1), x0 + (step * v3) / (v3 - v2), y0 + step);
-      const L = () => put(Vk(i, j), x0, y0 + (step * v0) / (v0 - v3));
-      const R = () => put(Vk(i + 1, j), x0 + step, y0 + (step * v1) / (v1 - v2));
-      const mid = (v0 + v1 + v2 + v3) / 4 >= 0;
-      switch (c) {
-        case 1: case 14: link(L(), B()); break;
-        case 2: case 13: link(B(), R()); break;
-        case 3: case 12: link(L(), R()); break;
-        case 4: case 11: link(T(), R()); break;
-        case 6: case 9: link(T(), B()); break;
-        case 7: case 8: link(T(), L()); break;
-        case 5:
-          if (mid) { link(T(), L()); link(B(), R()); } else { link(T(), R()); link(L(), B()); }
-          break;
-        case 10:
-          if (mid) { link(T(), R()); link(L(), B()); } else { link(T(), L()); link(B(), R()); }
-          break;
-      }
-    }
-  const loops = [];
-  const seen = new Set();
-  for (const start of adj.keys()) {
-    if (seen.has(start)) continue;
-    const loop = [];
-    let prev = -1;
-    let cur = start;
-    while (cur !== undefined && !seen.has(cur)) {
-      seen.add(cur);
-      loop.push(pts.get(cur));
-      const nb = adj.get(cur);
-      const next = nb[0] !== prev ? nb[0] : nb[1];
-      prev = cur;
-      cur = next;
-    }
-    if (loop.length > 3) loops.push(loop);
-  }
-  return loops;
-}
-
-function trace(V, W, step) {
+  // The cell being visited: its corner column and row, its top-left corner, and its corner values
+  // clockwise from there. Horizontal lattice edges are numbered from 0, vertical ones from CELLS.
+  let i = 0;
+  let j = 0;
+  let x0 = 0;
+  let y0 = 0;
+  let v0 = 0;
+  let v1 = 0;
+  let v2 = 0;
+  let v3 = 0;
+  const T = () => put(j * W + i, x0 + (STEP * v0) / (v0 - v1), y0);
+  const Bo = () => put((j + 1) * W + i, x0 + (STEP * v3) / (v3 - v2), y0 + STEP);
+  const L = () => put(CELLS + j * W + i, x0, y0 + (STEP * v0) / (v0 - v3));
+  const R = () => put(CELLS + j * W + i + 1, x0 + STEP, y0 + (STEP * v1) / (v1 - v2));
+  const iEnd = Math.min(N - 1, box[1]);
+  const jEnd = Math.min(N - 1, box[3]);
   let d = "";
-  for (const loop of march(V, W, step)) {
-    let area = 0;
-    for (let i = 0; i < loop.length; i++) {
-      const p = loop[i];
-      const q = loop[(i + 1) % loop.length];
-      area += p[0] * q[1] - q[0] * p[1];
+  try {
+    for (j = Math.max(0, box[2] - 1); j <= jEnd; j++)
+      for (i = Math.max(0, box[0] - 1); i <= iEnd; i++) {
+        const k = j * W + i;
+        const c = (label[k] === want ? 8 : 0) | (label[k + 1] === want ? 4 : 0) | (label[k + W + 1] === want ? 2 : 0) | (label[k + W] === want ? 1 : 0);
+        if (c === 0 || c === 15) continue;
+        v0 = value(k, i, j);
+        v1 = value(k + 1, i + 1, j);
+        v2 = value(k + W + 1, i + 1, j + 1);
+        v3 = value(k + W, i, j + 1);
+        x0 = i * STEP;
+        y0 = j * STEP;
+        const mid = (v0 + v1 + v2 + v3) / 4 >= 0;
+        switch (c) {
+          case 1: case 14: link(L(), Bo()); break;
+          case 2: case 13: link(Bo(), R()); break;
+          case 3: case 12: link(L(), R()); break;
+          case 4: case 11: link(T(), R()); break;
+          case 6: case 9: link(T(), Bo()); break;
+          case 7: case 8: link(T(), L()); break;
+          case 5:
+            if (mid) { link(T(), L()); link(Bo(), R()); } else { link(T(), R()); link(L(), Bo()); }
+            break;
+          case 10:
+            if (mid) { link(T(), R()); link(L(), Bo()); } else { link(T(), L()); link(Bo(), R()); }
+            break;
+        }
+      }
+    // Walk the points into closed loops and write each one out.
+    const seen = new Uint8Array(pts.length);
+    for (let start = 0; start < pts.length; start++) {
+      if (seen[start]) continue;
+      const loop = [];
+      let prev = -1;
+      let cur = start;
+      while (cur >= 0 && !seen[cur]) {
+        seen[cur] = 1;
+        loop.push(pts[cur]);
+        const next = nb0[cur] !== prev ? nb0[cur] : nb1[cur];
+        prev = cur;
+        cur = next;
+      }
+      if (loop.length > 3) d += loopPath(loop);
     }
-    if (Math.abs(area) < 3) continue;
-    const pts = simplifyLoop(loop, 0.16);
-    if (pts.length >= 3) d += smoothPath(pts);
+  } finally {
+    // The scratch space goes back clean, whatever happened.
+    for (const k of touched) known[k] = 0;
+    for (const edge of edges) slot[edge] = -1;
   }
   return d;
+}
+
+function loopPath(loop) {
+  let area = 0;
+  for (let i = 0; i < loop.length; i++) {
+    const p = loop[i];
+    const q = loop[(i + 1) % loop.length];
+    area += p[0] * q[1] - q[0] * p[1];
+  }
+  if (Math.abs(area) < 3) return "";
+  const pts = simplifyLoop(loop, 0.16);
+  return pts.length >= 3 ? smoothPath(pts) : "";
 }
 
 function simplifyLoop(loop, eps) {

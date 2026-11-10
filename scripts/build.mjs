@@ -43,15 +43,37 @@ writeFileSync(new URL("src/motion.css", root), "/* pipkins motion: idle life for
 
 const inline = `${body}\nconst PIPKIN = { ${PUBLIC.join(", ")} };`;
 const motionCss = read("src/motion.css");
+// On Vercel the site sits at the root of its domain and the pages are served at clean URLs (see
+// vercel.json). A link that ends in .html costs a redirect on every click there, so the pages link
+// to each other, and to their fonts, from the root. Anywhere else those links stay relative and
+// keep their file names, so the pages still work from a folder or any static host.
+const rooted = Boolean(process.env.VERCEL);
+const links = (html) =>
+  rooted ? html.replace(/href="([\w-]+)\.html(#[\w-]*)?"/g, (_, page, hash = "") => `href="/${page === "index" ? "" : page}${hash}"`).replace(/href="fonts\//g, 'href="/fonts/') : html;
+// The pages' fonts are the files in docs/fonts/ (the ones Google Fonts serves, with the same
+// unicode ranges), so nothing is fetched from another origin before the first paint.
+const LATIN = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
+const LATIN_EXT = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF";
+const FONTS = [
+  ["Gabarito", "400 900", "gabarito-v9"],
+  ["DM Mono", "400", "dm-mono-v16-400"],
+  ["DM Mono", "500", "dm-mono-v16-500"],
+];
+const fontCss = FONTS.flatMap(([family, weight, file]) =>
+  [["latin-ext", LATIN_EXT], ["latin", LATIN]].map(
+    ([subset, range]) => `@font-face { font-family: "${family}"; font-style: normal; font-weight: ${weight}; font-display: swap; src: url(${rooted ? "/" : ""}fonts/${file}-${subset}.woff2) format("woff2"); unicode-range: ${range}; }`,
+  ),
+).join("\n");
 // Share-preview tags need absolute URLs. On Vercel the production domain comes from its system
 // environment variables; set SITE_URL (like https://example.com) to override. With neither, the
 // tags fall back to root-relative paths.
 const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 const site = (process.env.SITE_URL || (vercel ? `https://${vercel}` : "")).replace(/\/+$/, "");
 const fill = (source) =>
-  read(source)
+  links(read(source))
     .replace(/__SITE__/g, site)
     .replace("/*PIPKIN-LIBRARY*/", () => inline)
+    .replace("/*PIPKIN-FONTS*/", () => fontCss)
     .replace("/*PIPKIN-MOTION*/", () => motionCss)
     .replace(/__VERSION__/g, version)
     .replace(/__GZIP__/g, (gzipSync(shipped).length / 1024).toFixed(1));

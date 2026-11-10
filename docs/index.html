@@ -29,9 +29,16 @@
 <!-- Hide the hero card until the load animation takes over, so it never flashes. Skipped under reduced motion. -->
 <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro");</script>
 <link rel="icon" id="favicon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=swap">
+<!-- The fonts are served from here (docs/fonts/), and the ones the hero needs start loading at once. -->
+<link rel="preload" href="fonts/gabarito-v9-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dm-mono-v16-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dm-mono-v16-500-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Gabarito"; font-style: normal; font-weight: 400 900; font-display: swap; src: url(fonts/gabarito-v9-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Gabarito"; font-style: normal; font-weight: 400 900; font-display: swap; src: url(fonts/gabarito-v9-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/dm-mono-v16-400-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/dm-mono-v16-400-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/dm-mono-v16-500-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/dm-mono-v16-500-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }</style>
 <style>/* pipkins motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */
 .pipkin .pipkin-bob,.pipkin .pipkin-breathe,.pipkin .pipkin-ear,.pipkin .pipkin-eye{transform-box:view-box;transform-origin:0 0}
 .pipkin .pipkin-bob{animation:pipkin-bob var(--pipkin-bob,4.4s) ease-in-out var(--pipkin-delay,0s) infinite}
@@ -112,6 +119,9 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 /* Hero: the crowd flows around the card */
 .crowd { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding-top: 8px; }
 .hero-card { grid-column: 4 / 10; grid-row: 2 / 6; position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 15vw, 220px); align-items: center; gap: 28px; padding: 36px; border-radius: 32px; background: var(--card); box-shadow: 0 30px 60px -28px rgba(20, 26, 51, 0.35), var(--ring); }
+/* Until the script adds the crowd, one empty square per row holds that row open, so the hero is
+   its full height from the first paint and nothing below it jumps when everyone arrives. */
+.strut { grid-column: 1; aspect-ratio: 1 / 1; }
 .hero-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .hero h1 { font-size: clamp(36px, 3.6vw, 54px); line-height: 0.98; }
 .lede { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
@@ -128,7 +138,11 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .pk { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 26px; background: transparent; cursor: pointer; transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease; }
 .pk:hover { background: #fff; transform: translateY(-2px); }
 .pk[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 2px var(--ink); }
+/* .f floats, and .up inside it is what pops up in the load animation. They are two elements so that
+   each has one animation of its own: Chrome only hands an animation to the compositor when no other
+   one (even a finished one) sits on the same element, and otherwise restyles the crowd every frame. */
 .pk .f { display: block; width: 76%; height: 76%; }
+.pk .up { display: block; width: 100%; height: 100%; }
 .tag { position: absolute; left: 50%; bottom: -6px; z-index: 2; transform: translate(-50%, 4px); padding: 3px 8px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; line-height: 1.3; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; }
 .pk:hover .tag, .pk:focus-visible .tag { opacity: 1; transform: translate(-50%, 0); }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-7px) rotate(var(--tilt, 0deg)); } }
@@ -394,6 +408,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
 <main id="top">
   <section class="wrap hero" aria-label="Meet the crowd">
     <div class="crowd" id="crowd">
+      <i class="strut" style="grid-row: 1"></i><i class="strut md-hide" style="grid-row: 2"></i><i class="strut" style="grid-row: 3"></i><i class="strut" style="grid-row: 4"></i><i class="strut" style="grid-row: 5"></i><i class="strut sm-hide" style="grid-row: 6"></i>
       <div class="hero-card">
         <div class="hero-copy">
           <h1>There's one for everyone.</h1>
@@ -411,7 +426,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
           <div class="tile" id="tile" role="img" aria-label="theo"></div>
           <figcaption>
             <code class="call" id="call">pipkin("theo")</code>
-            <span class="desc" id="desc" aria-live="polite"></span>
+            <span class="desc" id="desc" aria-live="polite">&nbsp;</span>
           </figcaption>
         </figure>
       </div>
@@ -435,7 +450,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
     <div class="panel">
       <div class="copy">
         <h2>Get yours in one line.</h2>
-        <p>No dependencies and about 8.4 KB gzipped. Each pipkin is an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
+        <p>No dependencies and about 8.9 KB gzipped. Each pipkin is an SVG string, so it works in React, Vue, Svelte or a plain template.</p>
       </div>
       <div class="side">
         <span class="kicker">Install</span>
@@ -1082,168 +1097,258 @@ function buildScene(list) {
 
 // ---------------------------------------------------------------- raster → outline paths
 
+// The fields are sampled on a lattice and their iso-lines traced with marching squares. Only the
+// cells a line passes through need exact values, so every sample is first labelled inside or
+// outside (cheap), and the signed distances are worked out at the corners of crossing cells alone.
+// A label is the sign the exact value would have, and the values are computed the same way as
+// for a full distance field, so the paths are the ones tracing that whole field would give.
+const W = GRID + 1; // samples per side
+const CELLS = W * W;
+const STEP = 100 / GRID;
+
+// Scratch space, made on first use and reused: drawing is synchronous, so one set is enough.
+let scratch = null;
+const buffers = () =>
+  (scratch ??= {
+    F: new Float32Array(CELLS), // the body's field
+    label: new Uint8Array(CELLS), // 0 outside; m + 1 inside member m's part
+    val: new Float32Array(CELLS), // exact values at the corners of crossing cells
+    known: new Uint8Array(CELLS), // which of `val` are filled in
+    slot: new Int32Array(2 * CELLS).fill(-1), // lattice edge → the point on it
+    own: [], // groups only: one ownership field per member,
+    top1: null, // the strongest of them at each sample,
+    top2: null, // the runner-up,
+    arg: null, // and whose the strongest is
+  });
+
 /**
- * Trace balls (viewBox units, each with an owner `m`) into the body outline and, for a group,
- * one patch per member separated by a gap of `seam` × 2 units.
+ * Trace balls (viewBox units, each with an owner `m`) into the body outline for one pipkin, or
+ * for a group into one patch per member, separated by a gap of `seam` × 2 units (`seam` > 0).
  */
 function bodyPaths(balls, n, seam) {
-  const W = GRID + 1;
-  const step = 100 / GRID;
-  const size = W * W;
-  const F = new Float32Array(size);
-  splat(F, balls, REACH, W, step, null);
-  const D = toDistance(F, W, step, ISO);
-  if (n === 1) return { outline: trace(D, W, step), patches: null };
-  const own = Array.from({ length: n }, () => new Float32Array(size));
-  splat(null, balls, OWN_REACH, W, step, own);
-  const top1 = new Float32Array(size);
-  const top2 = new Float32Array(size);
-  const arg = new Int8Array(size).fill(-1);
-  for (let k = 0; k < size; k++)
-    for (let m = 0; m < n; m++) {
-      const v = own[m][k];
+  const B = buffers();
+  const { F, label } = B;
+  F.fill(0);
+  label.fill(0);
+  splat(F, null, balls, REACH);
+  if (n === 1) {
+    const box = [W, -1, W, -1];
+    for (let j = 0, k = 0; j < W; j++)
+      for (let i = 0; i < W; i++, k++)
+        if (F[k] >= ISO) {
+          label[k] = 1;
+          grow(box, i, j);
+        }
+    return { outline: trace(B, 1, box, (k, i, j) => bodyDistance(F, k, i, j)), patches: null };
+  }
+  const own = B.own;
+  while (own.length < n) own.push(new Float32Array(CELLS));
+  for (let m = 0; m < n; m++) own[m].fill(0);
+  splat(null, own, balls, OWN_REACH);
+  const top1 = (B.top1 ??= new Float32Array(CELLS)).fill(0);
+  const top2 = (B.top2 ??= new Float32Array(CELLS)).fill(0);
+  const arg = (B.arg ??= new Int8Array(CELLS)).fill(-1);
+  for (let m = 0; m < n; m++) {
+    const O = own[m];
+    for (let k = 0; k < CELLS; k++) {
+      const v = O[k];
       if (v > top1[k]) {
         top2[k] = top1[k];
         top1[k] = v;
         arg[k] = m;
       } else if (v > top2[k]) top2[k] = v;
     }
-  const O = new Float32Array(size);
-  const S = new Float32Array(size);
+  }
+  // A sample is in a member's patch when it is inside the body and that member leads there by
+  // more than the seam. Only the strongest owner can, so each sample needs one test.
+  const boxes = Array.from({ length: n }, () => [W, -1, W, -1]);
+  for (let j = 0, k = 0; j < W; j++)
+    for (let i = 0; i < W; i++, k++) {
+      const m = arg[k];
+      if (m < 0 || !(F[k] >= ISO)) continue;
+      if (leadDistance(own[m], top1, top2, arg, m, k, i, j) - seam >= 0) {
+        label[k] = m + 1;
+        grow(boxes[m], i, j);
+      }
+    }
   const patches = [];
   for (let m = 0; m < n; m++) {
-    for (let k = 0; k < size; k++) O[k] = own[m][k] - (arg[k] === m ? top2[k] : top1[k]);
-    const Od = toDistance(O, W, step, 0);
-    for (let k = 0; k < size; k++) S[k] = Math.min(D[k], Od[k] - seam);
-    patches.push(trace(S, W, step));
+    const O = own[m];
+    patches.push(trace(B, m + 1, boxes[m], (k, i, j) => Math.fround(Math.min(bodyDistance(F, k, i, j), leadDistance(O, top1, top2, arg, m, k, i, j) - seam))));
   }
-  return { outline: trace(D, W, step), patches };
+  return { outline: null, patches };
 }
 
-function splat(F, balls, reach, W, step, perOwner) {
+// Add each ball's field, (1 − d²/R²)³ within R = r × reach, to F or to its owner's own field.
+function splat(F, own, balls, reach) {
   const N = W - 1;
   for (const b of balls) {
+    const out = own ? own[b.m] : F;
     const R = b.r * reach;
     const R2 = R * R;
-    const i0 = Math.max(0, Math.floor((b.x - R) / step));
-    const i1 = Math.min(N, Math.ceil((b.x + R) / step));
-    const j0 = Math.max(0, Math.floor((b.y - R) / step));
-    const j1 = Math.min(N, Math.ceil((b.y + R) / step));
+    const i0 = Math.max(0, Math.floor((b.x - R) / STEP));
+    const i1 = Math.min(N, Math.ceil((b.x + R) / STEP));
+    const j0 = Math.max(0, Math.floor((b.y - R) / STEP));
+    const j1 = Math.min(N, Math.ceil((b.y + R) / STEP));
     for (let j = j0; j <= j1; j++) {
-      const dy = j * step - b.y;
+      const dy = j * STEP - b.y;
       for (let i = i0; i <= i1; i++) {
-        const dx = i * step - b.x;
+        const dx = i * STEP - b.x;
         const d2 = dx * dx + dy * dy;
         if (d2 < R2) {
           const w = 1 - d2 / R2;
-          const v = w * w * w;
-          if (F) F[j * W + i] += v;
-          if (perOwner) perOwner[b.m][j * W + i] += v;
+          out[j * W + i] += w * w * w;
         }
       }
     }
   }
 }
 
-// First-order signed distance to the iso-line, (V - iso) / |∇V|, in viewBox units.
-function toDistance(V, W, step, iso) {
-  const out = new Float32Array(W * W);
-  for (let j = 0; j < W; j++)
-    for (let i = 0; i < W; i++) {
-      const k = j * W + i;
-      const l = i > 0 ? V[k - 1] : V[k];
-      const r = i < W - 1 ? V[k + 1] : V[k];
-      const u = j > 0 ? V[k - W] : V[k];
-      const d = j < W - 1 ? V[k + W] : V[k];
-      const gx = (r - l) / ((i > 0 && i < W - 1 ? 2 : 1) * step);
-      const gy = (d - u) / ((j > 0 && j < W - 1 ? 2 : 1) * step);
-      const v = (V[k] - iso) / Math.max(Math.hypot(gx, gy), 1e-5);
-      out[k] = v > 50 ? 50 : v < -50 ? -50 : v;
-    }
-  return out;
+function grow(box, i, j) {
+  if (i < box[0]) box[0] = i;
+  if (i > box[1]) box[1] = i;
+  if (j < box[2]) box[2] = j;
+  if (j > box[3]) box[3] = j;
 }
 
-// Marching squares → closed loops of points.
-function march(V, W, step) {
+// First-order signed distance to the iso-line at one sample, (v − iso) / |∇v|, in viewBox units
+// and as a 32-bit float. l, r, u and d are the neighbouring samples (the sample itself at an edge).
+function distance(v, l, r, u, d, i, j, iso) {
+  const gx = (r - l) / ((i > 0 && i < W - 1 ? 2 : 1) * STEP);
+  const gy = (d - u) / ((j > 0 && j < W - 1 ? 2 : 1) * STEP);
+  const out = (v - iso) / Math.max(Math.hypot(gx, gy), 1e-5);
+  return Math.fround(out > 50 ? 50 : out < -50 ? -50 : out);
+}
+
+// Distance to the body's edge.
+const bodyDistance = (F, k, i, j) => distance(F[k], i > 0 ? F[k - 1] : F[k], i < W - 1 ? F[k + 1] : F[k], j > 0 ? F[k - W] : F[k], j < W - 1 ? F[k + W] : F[k], i, j, ISO);
+
+// How far member m's own field leads the strongest other one, and the distance to where it stops leading.
+const lead = (O, top1, top2, arg, m, k) => Math.fround(O[k] - (arg[k] === m ? top2[k] : top1[k]));
+function leadDistance(O, top1, top2, arg, m, k, i, j) {
+  const v = lead(O, top1, top2, arg, m, k);
+  const l = i > 0 ? lead(O, top1, top2, arg, m, k - 1) : v;
+  const r = i < W - 1 ? lead(O, top1, top2, arg, m, k + 1) : v;
+  const u = j > 0 ? lead(O, top1, top2, arg, m, k - W) : v;
+  const d = j < W - 1 ? lead(O, top1, top2, arg, m, k + W) : v;
+  return distance(v, l, r, u, d, i, j, 0);
+}
+
+// Marching squares around the samples labelled `want` (all of them within `box`), written as
+// smoothed closed paths. `valueAt` gives a sample's exact field value; it is asked only about
+// the corners of cells the line crosses.
+function trace(B, want, box, valueAt) {
+  const { label, val, known, slot } = B;
   const N = W - 1;
-  const pts = new Map();
-  const adj = new Map();
-  const H = (i, j) => j * W + i;
-  const Vk = (i, j) => W * W + j * W + i;
-  const put = (key, x, y) => {
-    if (!pts.has(key)) pts.set(key, [x, y]);
-    return key;
+  const pts = []; // points on the line, in the order they are first met
+  const edges = []; // the lattice edge each point sits on
+  const nb0 = []; // each point's neighbours along the line
+  const nb1 = [];
+  const touched = [];
+  const value = (k, i, j) => {
+    if (!known[k]) {
+      val[k] = valueAt(k, i, j);
+      known[k] = 1;
+      touched.push(k);
+    }
+    return val[k];
+  };
+  const put = (edge, x, y) => {
+    let p = slot[edge];
+    if (p < 0) {
+      p = slot[edge] = pts.length;
+      pts.push([x, y]);
+      edges.push(edge);
+      nb0.push(-1);
+      nb1.push(-1);
+    }
+    return p;
   };
   const link = (a, b) => {
-    if (!adj.has(a)) adj.set(a, []);
-    if (!adj.has(b)) adj.set(b, []);
-    adj.get(a).push(b);
-    adj.get(b).push(a);
+    if (nb0[a] < 0) nb0[a] = b;
+    else if (nb1[a] < 0) nb1[a] = b;
+    if (nb0[b] < 0) nb0[b] = a;
+    else if (nb1[b] < 0) nb1[b] = a;
   };
-  for (let j = 0; j < N; j++)
-    for (let i = 0; i < N; i++) {
-      const v0 = V[j * W + i];
-      const v1 = V[j * W + i + 1];
-      const v2 = V[(j + 1) * W + i + 1];
-      const v3 = V[(j + 1) * W + i];
-      const c = (v0 >= 0 ? 8 : 0) | (v1 >= 0 ? 4 : 0) | (v2 >= 0 ? 2 : 0) | (v3 >= 0 ? 1 : 0);
-      if (c === 0 || c === 15) continue;
-      const x0 = i * step;
-      const y0 = j * step;
-      const T = () => put(H(i, j), x0 + (step * v0) / (v0 - v1), y0);
-      const B = () => put(H(i, j + 1), x0 + (step * v3) / (v3 - v2), y0 + step);
-      const L = () => put(Vk(i, j), x0, y0 + (step * v0) / (v0 - v3));
-      const R = () => put(Vk(i + 1, j), x0 + step, y0 + (step * v1) / (v1 - v2));
-      const mid = (v0 + v1 + v2 + v3) / 4 >= 0;
-      switch (c) {
-        case 1: case 14: link(L(), B()); break;
-        case 2: case 13: link(B(), R()); break;
-        case 3: case 12: link(L(), R()); break;
-        case 4: case 11: link(T(), R()); break;
-        case 6: case 9: link(T(), B()); break;
-        case 7: case 8: link(T(), L()); break;
-        case 5:
-          if (mid) { link(T(), L()); link(B(), R()); } else { link(T(), R()); link(L(), B()); }
-          break;
-        case 10:
-          if (mid) { link(T(), R()); link(L(), B()); } else { link(T(), L()); link(B(), R()); }
-          break;
-      }
-    }
-  const loops = [];
-  const seen = new Set();
-  for (const start of adj.keys()) {
-    if (seen.has(start)) continue;
-    const loop = [];
-    let prev = -1;
-    let cur = start;
-    while (cur !== undefined && !seen.has(cur)) {
-      seen.add(cur);
-      loop.push(pts.get(cur));
-      const nb = adj.get(cur);
-      const next = nb[0] !== prev ? nb[0] : nb[1];
-      prev = cur;
-      cur = next;
-    }
-    if (loop.length > 3) loops.push(loop);
-  }
-  return loops;
-}
-
-function trace(V, W, step) {
+  // The cell being visited: its corner column and row, its top-left corner, and its corner values
+  // clockwise from there. Horizontal lattice edges are numbered from 0, vertical ones from CELLS.
+  let i = 0;
+  let j = 0;
+  let x0 = 0;
+  let y0 = 0;
+  let v0 = 0;
+  let v1 = 0;
+  let v2 = 0;
+  let v3 = 0;
+  const T = () => put(j * W + i, x0 + (STEP * v0) / (v0 - v1), y0);
+  const Bo = () => put((j + 1) * W + i, x0 + (STEP * v3) / (v3 - v2), y0 + STEP);
+  const L = () => put(CELLS + j * W + i, x0, y0 + (STEP * v0) / (v0 - v3));
+  const R = () => put(CELLS + j * W + i + 1, x0 + STEP, y0 + (STEP * v1) / (v1 - v2));
+  const iEnd = Math.min(N - 1, box[1]);
+  const jEnd = Math.min(N - 1, box[3]);
   let d = "";
-  for (const loop of march(V, W, step)) {
-    let area = 0;
-    for (let i = 0; i < loop.length; i++) {
-      const p = loop[i];
-      const q = loop[(i + 1) % loop.length];
-      area += p[0] * q[1] - q[0] * p[1];
+  try {
+    for (j = Math.max(0, box[2] - 1); j <= jEnd; j++)
+      for (i = Math.max(0, box[0] - 1); i <= iEnd; i++) {
+        const k = j * W + i;
+        const c = (label[k] === want ? 8 : 0) | (label[k + 1] === want ? 4 : 0) | (label[k + W + 1] === want ? 2 : 0) | (label[k + W] === want ? 1 : 0);
+        if (c === 0 || c === 15) continue;
+        v0 = value(k, i, j);
+        v1 = value(k + 1, i + 1, j);
+        v2 = value(k + W + 1, i + 1, j + 1);
+        v3 = value(k + W, i, j + 1);
+        x0 = i * STEP;
+        y0 = j * STEP;
+        const mid = (v0 + v1 + v2 + v3) / 4 >= 0;
+        switch (c) {
+          case 1: case 14: link(L(), Bo()); break;
+          case 2: case 13: link(Bo(), R()); break;
+          case 3: case 12: link(L(), R()); break;
+          case 4: case 11: link(T(), R()); break;
+          case 6: case 9: link(T(), Bo()); break;
+          case 7: case 8: link(T(), L()); break;
+          case 5:
+            if (mid) { link(T(), L()); link(Bo(), R()); } else { link(T(), R()); link(L(), Bo()); }
+            break;
+          case 10:
+            if (mid) { link(T(), R()); link(L(), Bo()); } else { link(T(), L()); link(Bo(), R()); }
+            break;
+        }
+      }
+    // Walk the points into closed loops and write each one out.
+    const seen = new Uint8Array(pts.length);
+    for (let start = 0; start < pts.length; start++) {
+      if (seen[start]) continue;
+      const loop = [];
+      let prev = -1;
+      let cur = start;
+      while (cur >= 0 && !seen[cur]) {
+        seen[cur] = 1;
+        loop.push(pts[cur]);
+        const next = nb0[cur] !== prev ? nb0[cur] : nb1[cur];
+        prev = cur;
+        cur = next;
+      }
+      if (loop.length > 3) d += loopPath(loop);
     }
-    if (Math.abs(area) < 3) continue;
-    const pts = simplifyLoop(loop, 0.16);
-    if (pts.length >= 3) d += smoothPath(pts);
+  } finally {
+    // The scratch space goes back clean, whatever happened.
+    for (const k of touched) known[k] = 0;
+    for (const edge of edges) slot[edge] = -1;
   }
   return d;
+}
+
+function loopPath(loop) {
+  let area = 0;
+  for (let i = 0; i < loop.length; i++) {
+    const p = loop[i];
+    const q = loop[(i + 1) % loop.length];
+    area += p[0] * q[1] - q[0] * p[1];
+  }
+  if (Math.abs(area) < 3) return "";
+  const pts = simplifyLoop(loop, 0.16);
+  return pts.length >= 3 ? smoothPath(pts) : "";
 }
 
 function simplifyLoop(loop, eps) {
@@ -1618,26 +1723,27 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const quote = (list) => list.map((n) => JSON.stringify(n)).join(", ");
 
 // Every placeholder avatar: data-pipkin="name" (or data-fuse="a,b,c"), plus data-mood, data-bg, data-anim.
+// The page shows some of them several times, so each distinct one is drawn once and reused.
+const drawings = new Map();
 function hydrate(el) {
-  const o = {};
-  if (el.dataset.mood) o.mood = el.dataset.mood;
-  if (el.dataset.bg) o.background = el.dataset.bg;
-  if ("anim" in el.dataset) o.animate = true;
-  el.innerHTML = el.dataset.fuse ? PIPKIN.fuse(el.dataset.fuse.split(","), o) : PIPKIN.pipkin(el.dataset.pipkin, o);
+  const { pipkin: name, fuse, mood, bg } = el.dataset;
+  const animate = "anim" in el.dataset;
+  const key = JSON.stringify([name, fuse, mood, bg, animate]);
+  let svg = drawings.get(key);
+  if (!svg) {
+    const o = {};
+    if (mood) o.mood = mood;
+    if (bg) o.background = bg;
+    if (animate) o.animate = true;
+    svg = fuse ? PIPKIN.fuse(fuse.split(","), o) : PIPKIN.pipkin(name, o);
+    drawings.set(key, svg);
+  }
+  el.innerHTML = svg;
 }
 
-// Breeding litter and the moods grid are built from the API, not written out by hand.
-$("#litter").innerHTML = [0, 1, 2, 3]
-  .map((k) => {
-    const kid = PIPKIN.breed("maya", "theo", { child: k });
-    return `<span class="av" style="--s: 44px" role="img" aria-label="${kid.id}, ${PIPKIN.describe(kid)}">${PIPKIN.pipkin(kid)}</span>`;
-  })
-  .join("");
-// One pipkin steps through every mood, 0.6 s each, with the option that makes it underneath.
-$("#moods").innerHTML = PIPKIN.MOODS.map((m, k) => `<span class="av" data-pipkin="zoe" data-mood="${m}" style="--s: 120px; animation-delay: ${k * 600}ms"></span>`).join("");
-$("#mood-chips").innerHTML = PIPKIN.MOODS.map((m, k) => `<code class="chip" style="animation-delay: ${k * 600}ms">{ mood: "${m}" }</code>`).join("");
-$("#moods").setAttribute("aria-label", `zoe in ${PIPKIN.MOODS.length} moods: ${PIPKIN.MOODS.join(", ")}`);
-$$("[data-pipkin], [data-fuse]").forEach(hydrate);
+// The first screen comes first: the header, then the crowd and the card. The rest of the page is
+// filled in further down, once the hero has been painted and its load animation is under way.
+hydrate($(".brand .av"));
 $("#favicon").href = PIPKIN.pipkinUri("maya", { background: "circle" });
 $("#species").textContent = String(PIPKIN.TRAITS.species.values.length);
 
@@ -1667,6 +1773,8 @@ let named = false;
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const queue = [...SAMPLES];
 let samplesShown = 0;
+// The crowd takes over from the empty squares that were holding its rows open.
+for (const strut of $$("#crowd .strut")) strut.remove();
 const crowd = Array.from({ length: SLOTS }, (_, i) => {
   const friend = friendAt.get(i);
   const name = friend || queue.shift();
@@ -1684,7 +1792,7 @@ const crowd = Array.from({ length: SLOTS }, (_, i) => {
   b.dataset.name = PIPKIN.normalize(name);
   b.setAttribute("aria-label", `${name}, ${PIPKIN.describe(name)}`);
   b.setAttribute("aria-pressed", "false");
-  b.innerHTML = `<span class="f f${i % 6}">${PIPKIN.pipkin(name, { animate: true })}</span><span class="tag" aria-hidden="true">${name}</span>`;
+  b.innerHTML = `<span class="f f${i % 6}"><span class="up">${PIPKIN.pipkin(name, { animate: true })}</span></span><span class="tag" aria-hidden="true">${name}</span>`;
   b.addEventListener("click", () => {
     input.value = name;
     named = true;
@@ -1697,11 +1805,23 @@ const crowd = Array.from({ length: SLOTS }, (_, i) => {
 
 // Easter eggs. Each friend does something different when clicked, or when their name is typed.
 const later = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const move = (el, frames, options) => (calm ? null : el.animate(frames, options));
+// While one of these plays over an element's idle float, Chrome animates both on the main thread,
+// and a finished one still counts. So each is cancelled as it ends (none of them fill), and the
+// element's other animations are re-timed in place, which hands them back to the compositor.
+const move = (el, frames, options) => {
+  if (calm) return null;
+  const anim = el.animate(frames, options);
+  const settle = () => {
+    anim.cancel();
+    for (const other of el.getAnimations()) other.currentTime = other.currentTime;
+  };
+  anim.finished.then(settle, () => {});
+  return anim;
+};
 const art = (btn) => btn.querySelector(".f");
 const face = (btn, mood) => {
   const name = btn.dataset.friend;
-  art(btn).innerHTML = PIPKIN.pipkin(name, mood ? { mood, animate: true } : { animate: true });
+  btn.querySelector(".up").innerHTML = PIPKIN.pipkin(name, mood ? { mood, animate: true } : { animate: true });
 };
 function say(btn, html, ms) {
   const el = document.createElement("span");
@@ -1721,9 +1841,11 @@ const EGGS = {
     face(btn, "happy");
     say(btn, "Hi, everyone!", 2200);
     const origin = btn.getBoundingClientRect();
-    for (const b of crowd) {
-      if (b === btn || !b.offsetParent) continue;
-      const r = b.getBoundingClientRect();
+    // Measure first, then move: starting an animation between measurements would restyle each time.
+    const others = crowd.filter((b) => b !== btn && b.offsetParent);
+    const boxes = others.map((b) => b.getBoundingClientRect());
+    for (const [k, b] of others.entries()) {
+      const r = boxes[k];
       move(b, [{ transform: "translateY(0)" }, { transform: "translateY(-16px)" }, { transform: "translateY(0)" }], {
         duration: 450,
         delay: Math.hypot(r.left - origin.left, r.top - origin.top) * 0.9,
@@ -1871,23 +1993,30 @@ input.addEventListener("input", () => {
 });
 show(input.value);
 
+// Is the hero on screen? Not if the page was opened scrolled down (a #link, or a restored position).
+const card = $(".hero-card");
+const cardBox = card.getBoundingClientRect();
+const heroOnScreen = cardBox.bottom >= 0 && cardBox.top <= innerHeight;
+
 // Load animation ("unfuse + peek"): a fused pipkin appears where the card is and bursts, and as it
 // does everyone pops up out of their own square, nearest first. Then the card and the stats rise
 // in. About 2.3 seconds in all.
 function intro() {
   const root = document.documentElement;
   if (!root.classList.contains("intro")) return;
-  const card = $(".hero-card");
   const grid = $("#crowd");
-  const at = card.getBoundingClientRect();
-  // Opened scrolled down (a #link, or a restored position)? Skip it.
-  if (at.bottom < 0 || at.top > innerHeight) {
+  const at = cardBox;
+  // Opened scrolled down? Skip it.
+  if (!heroOnScreen) {
     root.classList.remove("intro");
     return;
   }
   const cx = at.left + at.width / 2;
   const cy = at.top + at.height / 2;
   const frame = grid.getBoundingClientRect();
+  // Measure everyone before changing anything, so the page is laid out once, not once per pipkin.
+  const shown = crowd.filter((b) => b.offsetParent);
+  const boxes = shown.map((b) => b.getBoundingClientRect());
   const blob = document.createElement("div");
   blob.className = "intro-blob";
   blob.setAttribute("aria-hidden", "true");
@@ -1911,21 +2040,20 @@ function intro() {
     )
     .finished.then(() => blob.remove());
   // As it bursts, each pipkin pops up out of its own square (the square clips it until it is out),
-  // nearest to the card first, with a little jitter so it doesn't look mechanical. The pop-up adds
-  // to the idle float instead of replacing it, so when it ends there is no jump to pick the float up.
-  for (const b of crowd) {
-    if (!b.offsetParent) continue;
-    const r = b.getBoundingClientRect();
+  // nearest to the card first, with a little jitter so it doesn't look mechanical. The pop-up is on
+  // .up, inside the floating .f, so it adds to the idle float instead of replacing it: when it ends
+  // there is no jump to pick the float up, and both run on the compositor throughout.
+  for (const [k, b] of shown.entries()) {
+    const r = boxes[k];
     const dist = Math.hypot(cx - (r.left + r.width / 2), cy - (r.top + r.height / 2));
     const done = () => b.classList.remove("peeking");
     b.classList.add("peeking");
-    b.querySelector(".f")
+    b.querySelector(".up")
       .animate([{ transform: "translateY(135%)" }, { transform: "translateY(0)" }], {
         duration: 550,
         delay: 1180 + dist * 0.5 + Math.random() * 200,
         easing: "cubic-bezier(.3,1.25,.5,1)",
         fill: "backwards",
-        composite: "add",
       })
       .finished.then(done, done);
   }
@@ -1940,6 +2068,29 @@ function intro() {
 }
 intro();
 
+// The hero is drawn and moving. Give it a frame before filling in everything below it, so the
+// first screen isn't kept waiting for avatars that are still off screen. (Opened scrolled down,
+// the rest of the page is what's on screen, so it is filled in at once.)
+const painted = () =>
+  new Promise((resolve) => {
+    requestAnimationFrame(() => setTimeout(resolve));
+    setTimeout(resolve, 250); // a hidden tab has no frames
+  });
+if (heroOnScreen) await painted();
+
+// Breeding litter and the moods grid are built from the API, not written out by hand.
+$("#litter").innerHTML = [0, 1, 2, 3]
+  .map((k) => {
+    const kid = PIPKIN.breed("maya", "theo", { child: k });
+    return `<span class="av" style="--s: 44px" role="img" aria-label="${kid.id}, ${PIPKIN.describe(kid)}">${PIPKIN.pipkin(kid)}</span>`;
+  })
+  .join("");
+// One pipkin steps through every mood, 0.6 s each, with the option that makes it underneath.
+$("#moods").innerHTML = PIPKIN.MOODS.map((m, k) => `<span class="av" data-pipkin="zoe" data-mood="${m}" style="--s: 120px; animation-delay: ${k * 600}ms"></span>`).join("");
+$("#mood-chips").innerHTML = PIPKIN.MOODS.map((m, k) => `<code class="chip" style="animation-delay: ${k * 600}ms">{ mood: "${m}" }</code>`).join("");
+$("#moods").setAttribute("aria-label", `zoe in ${PIPKIN.MOODS.length} moods: ${PIPKIN.MOODS.join(", ")}`);
+for (const el of $$("[data-pipkin], [data-fuse]")) if (!el.firstChild) hydrate(el);
+
 // Measured, not claimed: the average time to draw one pipkin here. It is timed a few draws at a
 // time while the page is idle, starting after the load animation, so it never holds up a frame.
 (() => {
@@ -1948,7 +2099,9 @@ intro();
   let spent = 0;
   const whenIdle = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ timeRemaining: () => 8 }), 50));
   const batch = (deadline) => {
-    while (drawn < runs && deadline.timeRemaining() > 3) {
+    // An idle period can be 50 ms long, so each turn also stops after 12 ms of its own.
+    const begun = performance.now();
+    while (drawn < runs && deadline.timeRemaining() > 3 && performance.now() - begun < 12) {
       const t0 = performance.now();
       for (let i = 0; i < 4 && drawn < runs; i++, drawn++) PIPKIN.pipkin(`guest-${drawn}@example.com`);
       spent += performance.now() - t0;
