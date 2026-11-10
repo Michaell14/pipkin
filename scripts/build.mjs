@@ -1,5 +1,6 @@
-// Build dist/pipkin.js (one ES module, no imports) and docs/index.html (the docs page with the
-// library inlined, so it runs anywhere as a single file).
+// Build dist/pipkin.js (one ES module, no imports), docs/index.html (the docs page) and
+// docs/examples.html (the examples page), each page with the library inlined so it runs anywhere
+// as a single file.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 
@@ -40,7 +41,6 @@ try {
 const { MOTION_CSS } = await import(new URL("src/motion.js", root).href);
 writeFileSync(new URL("src/motion.css", root), "/* pipkin motion: idle life for animated pipkins. Load once per page. Generated from src/motion.js. */\n" + MOTION_CSS);
 
-const page = read("docs/page.html");
 const inline = `${body}\nconst PIPKIN = { ${PUBLIC.join(", ")} };`;
 const motionCss = read("src/motion.css");
 // Share-preview tags need absolute URLs. On Vercel the production domain comes from its system
@@ -48,13 +48,19 @@ const motionCss = read("src/motion.css");
 // tags fall back to root-relative paths.
 const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 const site = (process.env.SITE_URL || (vercel ? `https://${vercel}` : "")).replace(/\/+$/, "");
-const out = page
-  .replace(/__SITE__/g, site)
-  .replace("/*PIPKIN-LIBRARY*/", () => inline)
-  .replace("/*PIPKIN-MOTION*/", () => motionCss)
-  .replace(/__VERSION__/g, version)
-  .replace(/__GZIP__/g, (gzipSync(shipped).length / 1024).toFixed(1));
+const fill = (source) =>
+  read(source)
+    .replace(/__SITE__/g, site)
+    .replace("/*PIPKIN-LIBRARY*/", () => inline)
+    .replace("/*PIPKIN-MOTION*/", () => motionCss)
+    .replace(/__VERSION__/g, version)
+    .replace(/__GZIP__/g, (gzipSync(shipped).length / 1024).toFixed(1));
+const out = fill("docs/page.html");
 writeFileSync(new URL("docs/index.html", root), out);
+// The examples page is built the same way, from its own source.
+const examples = fill("docs/examples-page.html");
+writeFileSync(new URL("docs/examples.html", root), examples);
+console.log(`docs/examples.html  ${(examples.length / 1024).toFixed(1)} KB`);
 // The page is a full document; preview.html only adds the head tags when it is a fragment.
 const head = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
 writeFileSync(new URL("docs/preview.html", root), /^<!doctype/i.test(out) ? out : head + out);
