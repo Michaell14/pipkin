@@ -221,6 +221,10 @@ h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.03em; }
 .team { flex: 1 1 150px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border: 2px solid var(--line-soft); border-radius: 16px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; transition: background-color 0.15s ease; }
 .team:hover { background: var(--soft); }
 .team[aria-pressed="true"] { border-color: var(--ink); }
+/* Every team's code sits in the same box, sized by the longest, so switching never reflows. */
+.team-code { display: inline-grid; }
+.team-code > span { grid-area: 1 / 1; visibility: hidden; }
+.team-code > span.on { visibility: visible; }
 .cell .row { display: flex; align-items: center; gap: 8px; }
 .cell .op { font-size: 22px; font-weight: 800; color: #9aa3c4; }
 /* Moods: one pipkin stepping through all eight, with the option that makes each. */
@@ -528,7 +532,7 @@ pre.code { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(-
           <button class="team" type="button" aria-pressed="false" data-team="omar,lena,kofi,jun,sam" data-label="Platform"><span class="av" data-fuse="omar,lena,kofi,jun,sam" style="--s: 40px"></span>Platform</button>
           <button class="team" type="button" aria-pressed="false" data-team="maya,theo" data-label="Founders"><span class="av" data-fuse="maya,theo" style="--s: 40px"></span>Founders</button>
         </div>
-        <div class="cell-foot"><h3>Fuse a team into a badge</h3><code class="chip" id="team-code">fuse(["zoe", "priya", "noah", "ava"])</code></div>
+        <div class="cell-foot"><h3>Fuse a team into a badge</h3><code class="chip team-code" id="team-code"><span class="on">fuse(["zoe", "priya", "noah", "ava"])</span></code></div>
       </article>
       <article class="cell cell-live">
         <div class="art canvas">
@@ -1955,12 +1959,16 @@ intro();
   setTimeout(() => whenIdle(batch), 2800);
 })();
 
-// Team switcher: the big pipkin re-fuses with the team you pick.
-for (const btn of $$(".team")) {
+// Team switcher: the big pipkin re-fuses with the team you pick. Every team's code is in the box
+// at once (only the picked one visible), so the box keeps the size of the longest.
+$("#team-code").innerHTML = $$(".team")
+  .map((btn) => `<span${btn.getAttribute("aria-pressed") === "true" ? ' class="on"' : ""}>fuse([${quote(btn.dataset.team.split(","))}])</span>`)
+  .join("");
+for (const [i, btn] of $$(".team").entries()) {
   btn.addEventListener("click", () => {
     const members = btn.dataset.team.split(",");
     for (const other of $$(".team")) other.setAttribute("aria-pressed", String(other === btn));
-    $("#team-code").textContent = `fuse([${quote(members)}])`;
+    $$("#team-code > span").forEach((code, j) => code.classList.toggle("on", j === i));
     const big = $("#team-big");
     big.dataset.fuse = btn.dataset.team;
     big.setAttribute("aria-label", `${btn.dataset.label}: ${members.slice(0, -1).join(", ")} and ${members.at(-1)} fused into one pipkin`);
