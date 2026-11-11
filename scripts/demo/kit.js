@@ -286,6 +286,7 @@ function hero(host, name, opt = {}) {
     if (h.earR) h.earR.style.transform = `rotate(${earR.toFixed(2)}deg)`;
     if (h.body) h.body.style.transform = `scale(${(1 + q).toFixed(4)},${(1 - q).toFixed(4)})`;
     host.style.translate = `0 ${y.toFixed(2)}px`;
+    h.lift = -y;
   });
   return h;
 }
@@ -621,4 +622,70 @@ function crowdAct(grid, T, o) {
       n++;
     }
 }
+// ---------------------------------------------------------------- actor: a pipkin that walks
+
+const BACK = "\u0000back";
+// From behind, a pipkin is the same shape with no eyes.
+const stripEyes = (svg) => svg.replace(/<g transform="translate\([^)]*\)"><g class="pipkin-eye"[^>]*>.*?<\/g><\/g>/g, "");
+
+/**
+ * A directed pipkin of size d standing in `root` with its feet at (x, y). It hops from place to
+ * place (growing or shrinking as it comes nearer or goes), turns its back, and casts a shadow.
+ */
+function actor(root, name, d, x, y, o = {}) {
+  // Where the bottom of the body sits in the 100 x 100 drawing, so the feet land on the ground.
+  const foot = (Number(pipkin(name, { animate: true }).match(/class="pipkin-bob"><g transform="translate\(50 ([\d.]+)\)/)[1]) + 0.6) / 100;
+  const wrap = add(
+    root,
+    `<div class="actor"><div class="shade" style="left:${-0.3 * d}px;top:${-0.035 * d}px;width:${0.6 * d}px;height:${0.07 * d}px"></div><div class="pk" style="left:${-d / 2}px;top:${-d * foot}px;width:${d}px;height:${d}px"></div></div>`,
+  );
+  const h = hero(wrap.lastElementChild, name, { ...o, render: (who, opt) => (who.endsWith(BACK) ? stripEyes(pipkin(who.slice(0, -BACK.length), opt)) : pipkin(who, opt)) });
+  const a = { wrap, h, x, y, s: o.scale ?? 1 };
+  tw(wrap, { x: [x, x], y: [y, y], s: [a.s, a.s] }, -1e9, 1);
+  // The shadow shrinks while the pipkin is in the air, and stays flat on the ground when it leans or turns.
+  const shade = wrap.firstElementChild;
+  on((t) => {
+    const k = clamp(1 - (h.lift || 0) / (d * 0.5), 0.4, 1);
+    const tracks = TRACKS.get(wrap);
+    const lean = tracks.r ? valueAt(tracks.r, t) : 0;
+    const turn = tracks.sx ? valueAt(tracks.sx, t) : 1;
+    shade.style.transform = `scale(${(1 / turn).toFixed(3)},1) rotate(${(-lean).toFixed(2)}deg) scale(${k.toFixed(3)})`;
+    shade.style.opacity = (0.35 + 0.65 * k).toFixed(3);
+  });
+  /** Hop to a new place (and scale) in `hops` hops starting at t; returns when it lands. */
+  a.go = (t, to, { hops = 4, dur = 290, rest = 80, height = d * 0.15, tilt = 5 } = {}) => {
+    const from = { x: a.x, y: a.y, s: a.s };
+    const end = { ...from, ...to };
+    const dir = Math.sign(end.x - from.x);
+    for (let i = 0; i < hops; i++) {
+      const t0 = t + i * (dur + rest);
+      const at = (key, k) => mix(from[key], end[key], k / hops);
+      h.hop(t0, height, dur);
+      tw(wrap, { x: [at("x", i), at("x", i + 1)], y: [at("y", i), at("y", i + 1)], s: [at("s", i), at("s", i + 1)] }, t0, dur, E.lin);
+      // It leans into each hop and straightens as it lands.
+      if (dir && tilt) {
+        tw(wrap, { r: dir * tilt }, t0, dur * 0.35, E.soft);
+        tw(wrap, { r: 0 }, t0 + dur * 0.55, dur * 0.5, E.soft);
+      }
+    }
+    Object.assign(a, end);
+    return t + hops * (dur + rest) - rest;
+  };
+  /** Slide to a new place without hopping. */
+  a.slide = (t, to, dur = 400, ease = E.out) => {
+    const end = { x: a.x, y: a.y, s: a.s, ...to };
+    tw(wrap, { x: [a.x, end.x], y: [a.y, end.y], s: [a.s, end.s] }, t, dur, ease);
+    Object.assign(a, end);
+    return t + dur;
+  };
+  /** Spin round to show its back, or its face again. */
+  a.turn = (t, back) => {
+    tw(wrap, { sx: [1, 0.06] }, t, 110, E.in);
+    h.name(t + 110, back ? name + BACK : name, false);
+    tw(wrap, { sx: 1 }, t + 110, 190, E.out);
+    return t + 300;
+  };
+  return a;
+}
+
 const CROWD = ["theo", "omar", "lena", "juno", "zoe", "basil", "priya", "iris", "odin", "ines", "kofi", "ava", "rosa", "ezra", "mila", "otto", "sana", "leo", "ruby", "finn", "hugo", "nora", "tara", "max", "idris", "cleo", "felix", "kai", "mei", "noor", "ada", "linus", "grace", "alan", "sam", "alex", "jo", "@theo", "maya", "user_48213", "@maya", "7f3a-9c21", "may", "ma", "m", "maya@acme", "maya@a", "maya@ac"];

@@ -1,0 +1,41 @@
+<!-- hi, peeking: ears come up over the bottom edge, then eyes, then all of it; it says hi and ducks away. -->
+<style>
+#world { position: absolute; inset: 0; }
+#world .shade { display: none; }
+#hi { left: 1060px; right: auto; top: 300px; font-size: 440px; text-align: left; }
+</style>
+<div id="stage"><div id="world"></div><h1 class="big" id="hi">hi.</h1></div>
+<script>
+document.body.style.background = wash(HERO);
+const hi = $("#hi");
+hi.style.color = deep(HERO);
+// How far up it stands: all of it, eyes over the edge, ears only, or out of sight.
+const D = 900;
+const UP = 1030;
+const EYES = UP + D * 0.385;
+const EARS = UP + D * 0.65;
+const GONE = UP + D * 1.1;
+const a = actor($("#world"), HERO, D, 560, GONE);
+
+// Ears first, then a look around.
+a.slide(300, { y: EARS }, 520, E.out);
+a.h.twitch(840, "l").twitch(1100, "r");
+a.slide(1380, { y: EYES }, 420, E.out);
+a.h.look(1780, -2.2, 0, 180).look(2170, 2.2, 0, 220).look(2560, 0, 0, 160).blink(2780);
+// Up it comes.
+a.slide(3020, { y: UP }, 640, E.spring(0.5, 12));
+const hello = 3380;
+stamp(hi, hello, 0.7);
+a.h.hop(hello, 50, 300).twitch(hello + 360).blink(hello + 950).hop(hello + 1400, 36, 280).blink(hello + 1850);
+
+// It ducks, and its ears bob away along the edge.
+const bye = hello + 2100;
+tw(hi, { o: 0 }, bye, 140, E.lin);
+tw(hi, { s: 0.9 }, bye, 140, E.in);
+a.h.look(bye - 60, 2.4, 0, 180);
+a.slide(bye + 240, { y: EARS }, 300, E.in);
+const t = a.go(bye + 640, { x: 2480 }, { hops: 6, dur: 260, rest: 90, height: 80, tilt: 0 });
+
+const DURATION = Math.round(t + 700);
+const POSTER = hello + 800;
+</script>

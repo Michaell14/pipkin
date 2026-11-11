@@ -1,0 +1,45 @@
+<!-- hi, from far off: a pipkin hops up from the horizon, right up to the lens, says hi, turns and goes. -->
+<style>
+body { background: #141a33; --shade: rgba(0, 0, 0, 0.3); }
+#ground { position: absolute; left: 0; right: 0; top: 600px; bottom: 0; background: #1c2346; }
+#world { position: absolute; inset: 0; }
+#hi { left: 1400px; top: 96px; }
+</style>
+<div id="stage"><div id="ground"></div><div id="world"></div><div class="bubble" id="hi">hi</div></div>
+<script>
+const D = 460;
+const FAR = { x: 1230, y: 614, s: 0.2 };
+const NEAR = { x: 960, y: 950, s: 1 };
+const CLOSE = { x: 960, y: 1140, s: 3.2 };
+const hi = $("#hi");
+const a = actor($("#world"), "ezra", D, FAR.x, FAR.y, { scale: FAR.s });
+const stride = { dur: 270, rest: 60, height: D * 0.2, tilt: 0 };
+
+// A dot on the horizon hops nearer, and nearer.
+tw(a.wrap, { o: [0, 1] }, 150, 200, E.lin);
+let t = a.go(500, NEAR, { ...stride, hops: 6 });
+// Then right up to the lens.
+a.h.hop(t + 110, 60, 320);
+t = a.slide(t + 110, CLOSE, 580, E.spring(0.62, 10));
+a.h.blink(t + 40, t + 240).look(t + 480, -1.3, 0, 200).look(t + 790, 1.3, 0, 220).look(t + 1100, 0, 0, 160);
+
+const hello = t + 1300;
+pop(hi, hello, { dur: 620, from: 0.2 });
+a.h.hop(hello, 12, 280).twitch(hello + 360).blink(hello + 850);
+
+// It backs off, turns, and hops away the way a pipkin does.
+const bye = hello + 1450;
+unpop(hi, bye);
+t = a.slide(bye + 140, NEAR, 480, E.io);
+a.turn(bye + 380, true);
+t = a.go(t + 60, { x: 850, y: 800, s: 0.55 }, { ...stride, hops: 3 });
+// Half-way off it stops for a look back, and a hop goodbye.
+t = a.turn(t + 120, false);
+a.h.blink(t + 160).hop(t + 280, D * 0.24, 280);
+t = a.turn(t + 760, true);
+t = a.go(t + 40, { x: 740, y: 614, s: 0.18 }, { ...stride, hops: 4 });
+tw(a.wrap, { o: 0 }, t + 80, 200, E.lin);
+
+const DURATION = Math.round(t + 800);
+const POSTER = hello + 800;
+</script>

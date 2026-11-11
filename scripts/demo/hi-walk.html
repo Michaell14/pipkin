@@ -1,0 +1,48 @@
+<!-- hi, walking by: a pipkin hops in, spots the camera, comes close to say hi, and hops off. -->
+<style>
+#world { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#hi { left: 1250px; top: 84px; }
+</style>
+<div id="stage"><div id="world"></div><div class="bubble" id="hi">hi</div></div>
+<script>
+const GROUND = 800;
+const world = $("#world");
+const hi = $("#hi");
+const a = actor(world, "cleo", 470, -300, GROUND);
+// The camera can push in on its face and pull back out.
+const Z = 2.05;
+const zoom = (t, on, dur, ease) => tw(world, on ? { s: Z, x: 960 - 960 * Z, y: 540 - (GROUND - 200) * Z } : { s: 1, x: 0, y: 0 }, t, dur, ease);
+
+// In from the left, eyes on where it is going.
+a.h.look(0, 2.4, 0, 1);
+let t = a.go(350, { x: 960 }, { hops: 5 });
+// It stops, and notices us.
+a.h.look(t + 140, 0, 0, 160).blink(t + 420);
+zoom(t + 640, true, 700, E.spring(0.62, 10));
+a.h.hop(t + 600, 30, 280);
+a.h.look(t + 1380, -1.5, 0, 200).look(t + 1700, 1.5, 0, 220).look(t + 2020, 0, 0, 170).blink(t + 2190, t + 2380);
+
+const hello = t + 2560;
+pop(hi, hello, { dur: 620, from: 0.2 });
+a.h.hop(hello, 34, 300).twitch(hello + 380).blink(hello + 1200);
+tw(a.wrap, { r: 5 }, hello + 640, 260, E.io);
+tw(a.wrap, { r: -4 }, hello + 1040, 320, E.io);
+tw(a.wrap, { r: 0 }, hello + 1420, 240, E.io);
+
+// And off it goes.
+const bye = hello + 1750;
+unpop(hi, bye);
+zoom(bye + 60, false, 520, E.io);
+a.h.look(bye + 460, 2.4, 0, 200);
+t = a.go(bye + 700, { x: 2240 }, { hops: 5 });
+// One last look back round the edge of the frame.
+a.h.look(t + 100, -2.6, 0, 140);
+a.slide(t + 160, { x: 1880 }, 340, E.out);
+tw(a.wrap, { r: -13 }, t + 160, 340, E.out);
+a.h.blink(t + 640);
+a.slide(t + 950, { x: 2320 }, 240, E.in);
+tw(a.wrap, { r: 0 }, t + 950, 240, E.in);
+
+const DURATION = Math.round(t + 1500);
+const POSTER = hello + 900;
+</script>

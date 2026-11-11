@@ -32,3 +32,8 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .times { position: absolute; width: 100px; margin: -50px 0 0 -50px; font-size: 84px; font-weight: 600; line-height: 100px; text-align: center; color: var(--times, #aab1c8); }
 .spark { position: absolute; width: 0; height: 0; }
 .spark span { position: absolute; left: -5px; top: -30px; width: 10px; height: 30px; border-radius: 5px; }
+/* An actor is a point on the ground: the pipkin stands on it and its shadow lies round it. */
+.actor { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.shade { position: absolute; border-radius: 50%; background: var(--shade, rgba(20, 26, 51, 0.13)); }
+.bubble { position: absolute; padding: 22px 68px 42px; border-radius: 78px; background: #fff; color: var(--ink); font-size: 168px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; box-shadow: 0 34px 60px -34px rgba(20, 26, 51, 0.45); transform-origin: 10% 115%; }
+.bubble::after { content: ""; position: absolute; left: 60px; bottom: -24px; width: 62px; height: 62px; border-radius: 0 0 14px 0; background: #fff; transform: rotate(58deg) skewX(24deg); }
