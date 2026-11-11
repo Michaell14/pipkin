@@ -26,7 +26,7 @@ try {
 
 const root = new URL("../", import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), "utf8");
-const CUTS = ["tour", "code", "pop", "tour-pop", "pop-tour", "type-pop"];
+const CUTS = ["tour", "code", "pop", "tour-pop", "pop-tour", "type-pop", "teaser"];
 const W = 1920;
 const H = 1080;
 

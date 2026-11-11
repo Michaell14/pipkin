@@ -264,7 +264,8 @@ function hiScene(box, T, o = {}) {
   if (o.typed) {
     keys = keystrokes(HERO, T + 400, { cps: 10.5, seed: "hi" });
     const done = keys[keys.length - 1];
-    cuts = [[done + 980, "@theo"], [done + 1530, "user_48213"], [done + 2080, "7f3a-9c21"]];
+    // o.rest is the pause on the finished name, o.pace the time each name after it gets.
+    cuts = ["@theo", "user_48213", "7f3a-9c21"].map((name, i) => [done + (o.rest ?? 980) + i * (o.pace ?? 550), name]);
     cast = [[-1e9, GHOST], ...keys.map((k, i) => [k, HERO.slice(0, i + 1)]), ...cuts];
   } else {
     cuts = [[T + 820, HERO], [T + 1420, "@theo"], [T + 1900, "user_48213"], [T + 2270, "7f3a-9c21"]];
@@ -370,8 +371,10 @@ function popFuse(box, T, o = {}) {
   const code = add(box, `<div class="chip light"><div>fuse(team)</div></div>`).firstElementChild;
   stamp(big, T + 160);
   const team = ["zoe", "omar", "iris", "lena", "theo", "juno", "ezra"];
-  fuseAct(box, melt, T, { team, ring: 3.85, cells: 320, scale: 30, cy: 0, zoom: 1.68, born: (i) => T + 240 + i * 70, go: T + 1320, to: o.until ?? T + 4400 });
-  stamp(code, T + 2250, 0.7);
+  // o.go is how long after T they rush together, o.gap the time between arrivals.
+  const go = T + (o.go ?? 1320);
+  fuseAct(box, melt, T, { team, ring: 3.85, cells: 320, scale: 30, cy: 0, zoom: 1.68, born: (i) => T + 240 + i * (o.gap ?? 70), go, to: o.until ?? T + 4400 });
+  stamp(code, go + 930, 0.7);
 }
 
 /** they have moods. A close-up beside the mood in giant type. */

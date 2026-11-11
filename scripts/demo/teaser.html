@@ -1,0 +1,12 @@
+<!-- The teaser: ten seconds. A name typed live, the claim, one trick, the name. -->
+<div id="stage"></div>
+<script>
+const CUTS = [0, 3600, 5450, 7850, 1e9];
+hiScene(panel(CUTS[0], CUTS[1], { slide: false, bg: NAMELESS }), CUTS[0], { typed: true, rest: 720, pace: 430, until: CUTS[1] + 600 });
+wallScene(panel(CUTS[1], CUTS[2], { bg: "var(--bg)" }), CUTS[1]);
+popFuse(panel(CUTS[2], CUTS[3], { cls: "dark" }), CUTS[2], { go: 960, gap: 55, until: CUTS[3] + 600 });
+popEnd(panel(CUTS[3], CUTS[4], { cls: "dark" }), CUTS[3]);
+
+const DURATION = 10400;
+const POSTER = 9700;
+</script>
