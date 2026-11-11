@@ -1,0 +1,72 @@
+<!-- Teaser: eyes in the dark. One pair opens, then dozens; the lights flash on for a moment; dark again. -->
+<style>
+body { background: #0c1022; }
+#room { position: absolute; inset: 0; }
+#room .pk { position: absolute; }
+/* Eyes in the dark are bigger than eyes in the light. */
+.in-dark .pipkin-eye { scale: 1.75; }
+</style>
+<div id="stage"><section class="scene" id="room"></section></div>
+<script>
+const room = $("#room");
+// In the dark a pipkin is only its eyes, in a pale tint of its own colour.
+const DARK = "\u0000dark";
+const inTheDark = (name, o) => {
+  const c = palette(genome(name).genes);
+  return pipkin(name, o).replaceAll(c.body, "none").replaceAll(c.ink, c.tint).replace('class="pipkin"', 'class="pipkin in-dark"');
+};
+const render = (who, o) => (who.endsWith(DARK) ? inTheDark(who.slice(0, -DARK.length), o) : pipkin(who, o));
+
+// A crowd in four staggered rows, back row first so the front row stands in front.
+const crowd = [];
+for (let r = 0; r < 4; r++)
+  for (let c = 0; c < 8; c++) {
+    const i = r * 8 + c;
+    const d = 300 + rnd("eyes", "d" + i) * 50;
+    const x = c * 258 + (r % 2 ? 6 : 136) + (rnd("eyes", "x" + i) - 0.5) * 60;
+    const y = 130 + r * 250 + (rnd("eyes", "y" + i) - 0.5) * 50;
+    const name = CROWD[(i * 5 + 2) % CROWD.length];
+    const host = add(room, `<div class="pk" style="left:${x - d / 2}px;top:${y - d / 2}px;width:${d}px;height:${d}px"></div>`);
+    crowd.push({ name, h: hero(host, name + DARK, { render }), far: Math.hypot(x - 960, (y - 520) * 1.3) });
+  }
+
+// One pair of eyes near the middle, then a few, then all of them at once.
+const order = [...crowd].sort((a, b) => a.far - b.far);
+const first = order.shift();
+order.sort((a, b) => rnd(a.name, "eyes.order") - rnd(b.name, "eyes.order"));
+order.unshift(first);
+const ALL_OPEN = 4700;
+order.forEach((p, k) => {
+  const open = 800 + (ALL_OPEN - 800) * (Math.log(1 + k * 0.55) / Math.log(1 + (order.length - 1) * 0.55));
+  tw(p.h.v, { lid: [0, 1] }, open, 150, E.out);
+  p.open = open;
+  // Each blinks in its own time.
+  for (let b = open + 700 + rnd(p.name, "eyes.b") * 1400; b < 5000; b += 1300 + rnd(p.name, "eyes.g" + Math.round(b)) * 1500) p.h.blink(b);
+});
+first.h.blink(1300, 1560);
+
+// They all hear something, and look.
+crowd.forEach((p) => p.h.look(4950 + rnd(p.name, "eyes.l") * 160, 2.3, 0, 150).look(5330 + rnd(p.name, "eyes.r") * 120, 0, 0, 170));
+// The lights: a flicker, then on for a moment, then out.
+const LIGHTS = [[5560, 5620], [5720, 6170]];
+for (const [on_, off] of LIGHTS)
+  for (const p of crowd) {
+    p.h.name(on_, p.name, false);
+    p.h.name(off, p.name + DARK, false);
+  }
+const lit = (t) => LIGHTS.some(([a, b]) => t >= a && t < b);
+on((t) => (document.body.style.background = lit(t) ? "#f3f5fb" : "#0c1022"));
+// A blink together, and they close.
+const SHUT = 7250;
+crowd.forEach((p) => {
+  p.h.blink(6720);
+  tw(p.h.v, { lid: 0 }, SHUT + rnd(p.name, "eyes.s") * 320, 110, E.in);
+});
+const CUT = SHUT + 520;
+scene(room, 0, CUT);
+on((t) => t >= CUT && (document.body.style.background = "var(--ink)"));
+finale(CUT, "we see you.");
+
+const DURATION = CUT + 3000;
+const POSTER = 5900;
+</script>

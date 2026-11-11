@@ -26,7 +26,7 @@ try {
 
 const root = new URL("../", import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), "utf8");
-const CUTS = ["tour", "code", "pop", "tour-pop", "pop-tour", "type-pop", "teaser", "hi-walk", "hi-peek", "hi-far"];
+const CUTS = ["tour", "code", "pop", "tour-pop", "pop-tour", "type-pop", "teaser", "hi-walk", "hi-peek", "hi-far", "tease-yours", "tease-eyes", "tease-crowd", "tease-fuse", "tease-cursor"];
 const W = 1920;
 const H = 1080;
 
@@ -44,6 +44,8 @@ const outDir = flag("out", fileURLToPath(new URL("docs/demo/", root)));
 // What the end card says. The package on npm is "pipkin".
 const BRAND = flag("brand", "pipkin");
 const INSTALL = flag("install", `npm i ${BRAND}`);
+// What the teasers say in place of a date.
+const WHEN = flag("when", "soon.");
 
 // The library as one script with no imports or exports, so the pages can reach its internals.
 const library = ["hash", "genome", "color", "geometry", "motion", "render", "index"]
@@ -64,7 +66,7 @@ const shell = `<!doctype html><html><head><meta charset="utf-8">
 <style>${read("scripts/demo/kit.css")}</style>
 <style>${read("scripts/demo/scenes.css")}</style>
 </head><body>
-<script>const CFG = ${JSON.stringify({ brand: BRAND, install: INSTALL, kb: (gzip / 1024).toFixed(1) })};</script>
+<script>const CFG = ${JSON.stringify({ brand: BRAND, install: INSTALL, when: WHEN, kb: (gzip / 1024).toFixed(1) })};</script>
 <script>${library}</script>
 <script>${read("scripts/demo/kit.js")}</script>
 <script>${read("scripts/demo/scenes.js")}</script>

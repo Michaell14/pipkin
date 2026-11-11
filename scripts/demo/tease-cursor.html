@@ -1,0 +1,55 @@
+<!-- Teaser: an empty field with a blinking cursor, and pipkins leaning in from every edge to watch it. -->
+<style>
+#world { position: absolute; inset: 0; }
+#world .shade { display: none; }
+#field { position: absolute; left: 480px; top: 444px; width: 960px; height: 176px; display: flex; align-items: center; padding: 0 58px; border-radius: 46px; background: #fff; box-shadow: 0 40px 80px -40px rgba(20, 26, 51, 0.35), 0 0 0 2px var(--line); font-size: 88px; font-weight: 700; letter-spacing: -0.025em; white-space: pre; }
+#field i { display: inline-block; width: 7px; height: 100px; margin-left: 5px; border-radius: 4px; background: var(--ink); }
+#when { position: absolute; left: 0; right: 0; top: 664px; font-family: var(--mono); font-size: 72px; color: var(--muted); text-align: center; }
+</style>
+<div id="stage"><div id="world"></div><div id="field"><span></span><i></i></div><div id="when"></div></div>
+<script>
+const D = 400;
+// Where one waits out of sight, where it peeks from, and where it leans to when something happens.
+const EDGE = {
+  bottom: (at) => ({ r: 0, out: { x: at, y: 1080 + D }, peek: { x: at, y: 1080 + D * 0.3 }, lean: { x: at, y: 1080 + D * 0.17 } }),
+  top: (at) => ({ r: 180, out: { x: at, y: -D }, peek: { x: at, y: -D * 0.32 }, lean: { x: at, y: -D * 0.19 } }),
+  left: (at) => ({ r: 17, out: { x: -D * 0.6, y: at }, peek: { x: D * 0.15, y: at }, lean: { x: D * 0.27, y: at } }),
+  right: (at) => ({ r: -17, out: { x: 1920 + D * 0.6, y: at }, peek: { x: 1920 - D * 0.15, y: at }, lean: { x: 1920 - D * 0.27, y: at } }),
+};
+const WATCHERS = [["bottom", 960, "maya@acme.co"], ["left", 470, "cleo"], ["right", 900, "theo"], ["top", 520, "ezra"], ["bottom", 330, "lena"], ["right", 400, "omar"], ["top", 1400, "iris"], ["left", 930, "zoe"], ["bottom", 1590, "juno"], ["top", 960, "finn"]];
+const TYPE = 5200;
+const keys = keystrokes("your name", TYPE, { cps: 10, seed: "cursor" });
+const typed = keys[keys.length - 1];
+const watchers = WATCHERS.map(([side, at, name], i) => {
+  const e = EDGE[side](at);
+  const a = actor($("#world"), name, D, e.out.x, e.out.y);
+  tw(a.wrap, { r: [e.r, e.r] }, -1e9, 1);
+  // It looks at the field: the way there, turned into its own tilted frame.
+  const face = side === "bottom" ? [at, 1080] : side === "top" ? [at, 0] : side === "left" ? [0, at - D * 0.4] : [1920, at - D * 0.4];
+  const [dx, dy] = [960 - face[0], 532 - face[1]];
+  const len = Math.hypot(dx, dy);
+  const turn = (-e.r * Math.PI) / 180;
+  const gaze = [((dx * Math.cos(turn) - dy * Math.sin(turn)) / len) * 2.5, ((dx * Math.sin(turn) + dy * Math.cos(turn)) / len) * 2.5];
+  const t0 = 900 + i * 300;
+  a.slide(t0, e.peek, 560, E.spring(0.6, 11));
+  a.h.look(t0, gaze[0], gaze[1], 1).blink(t0 + 620, t0 + 1900 + ((i * 370) % 900));
+  if (i % 3 === 0) a.h.twitch(t0 + 1100);
+  // A word appears, and they all crane in.
+  a.slide(typed + 140 + ((i * 53) % 160), e.lean, 420, E.spring(0.5, 12));
+  a.h.blink(typed + 700 + ((i * 290) % 500)).twitch(typed + 420 + ((i * 170) % 300));
+  return a;
+});
+
+const word = $("#field span");
+const caret = $("#field i");
+on((t) => {
+  word.textContent = "your name".slice(0, typedAt(keys, t));
+  caret.style.opacity = (t > keys[0] - 100 && t < typed + 300) || Math.floor(t / 430) % 2 === 0 ? 1 : 0;
+});
+const when = $("#when");
+when.textContent = CFG.when;
+rise(when, typed + 900, { d: 24, dur: 560 });
+
+const DURATION = Math.round(typed + 3600);
+const POSTER = Math.round(typed + 2200);
+</script>

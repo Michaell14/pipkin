@@ -421,3 +421,17 @@ function popEnd(box, T) {
     tw(cell, { y: 0 }, T + 720 + delay, 480, E.spring(0.45));
   });
 }
+
+// ---------------------------------------------------------------- teasers
+
+/**
+ * A hard cut to the dark at T, then one line, and under it when (CFG.when, "soon." unless the
+ * renderer is given --when). With no line, when is the line.
+ */
+function finale(T, line) {
+  const box = add($("#stage"), `<section class="scene fin"><div><h1>${line ?? CFG.when}</h1>${line ? `<p>${CFG.when}</p>` : ""}</div></section>`);
+  scene(box, T, 1e9);
+  headline($("h1", box), T + 420, { gap: 80 });
+  if (line) rise($("p", box), T + 1350, { d: 20, dur: 520 });
+  return box;
+}

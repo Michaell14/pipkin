@@ -32,6 +32,10 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .times { position: absolute; width: 100px; margin: -50px 0 0 -50px; font-size: 84px; font-weight: 600; line-height: 100px; text-align: center; color: var(--times, #aab1c8); }
 .spark { position: absolute; width: 0; height: 0; }
 .spark span { position: absolute; left: -5px; top: -30px; width: 10px; height: 30px; border-radius: 5px; }
+/* The last frame of a teaser: one line on the dark, and when. */
+.fin { display: grid; place-items: center; background: var(--ink); color: #fff; text-align: center; }
+.fin h1 { margin: 0; font-size: 190px; font-weight: 900; letter-spacing: -0.045em; line-height: 1.05; }
+.fin p { margin: 40px 0 0; font-family: var(--mono); font-size: 62px; color: #8f98bd; }
 /* An actor is a point on the ground: the pipkin stands on it and its shadow lies round it. */
 .actor { position: absolute; left: 0; top: 0; width: 0; height: 0; }
 .shade { position: absolute; border-radius: 50%; background: var(--shade, rgba(20, 26, 51, 0.13)); }

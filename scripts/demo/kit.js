@@ -211,7 +211,8 @@ function hero(host, name, opt = {}) {
   host.classList.add("manual");
   const h = {
     host,
-    v: { gx: 0, gy: 0, sq: 0 },
+    // gx, gy: where it looks. sq: extra squash. lid: how far its eyes are open (tween it to 0 to shut them).
+    v: { gx: 0, gy: 0, sq: 0, lid: 1 },
     names: [[-1e9, name]],
     moods: [[-1e9, opt.mood || "neutral"]],
     blinks: [],
@@ -249,6 +250,7 @@ function hero(host, name, opt = {}) {
       const d = t - b;
       if (d >= 0 && d < 190) lid = Math.min(lid, d < 70 ? mix(1, 0.08, d / 70) : mix(0.08, 1, (d - 70) / 120));
     }
+    lid = Math.min(lid, h.v.lid);
     let q = amp * Math.sin(((t + phase) / period) * TAU) + h.v.sq;
     let y = 0;
     let earL = 0;

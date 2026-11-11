@@ -1,0 +1,54 @@
+<!-- Teaser: yours is waiting. A sleeping blob, the word "you", a spin through faces that slows… and cuts before it lands. -->
+<style>
+body { background: var(--ink); }
+#act { transform-origin: 960px 470px; }
+#pool { position: absolute; left: 570px; top: 40px; width: 780px; height: 780px; border-radius: 50%; }
+#face { left: 660px; top: 120px; width: 600px; height: 600px; }
+#you { position: absolute; left: 0; right: 0; top: 808px; height: 170px; color: #fff; font-size: 170px; font-weight: 900; letter-spacing: -0.045em; line-height: 170px; text-align: center; }
+#you i { display: inline-block; width: 11px; height: 124px; margin: 0 0 -8px 12px; border-radius: 6px; background: #fff; }
+</style>
+<div id="stage">
+  <section class="scene" id="act">
+    <div id="pool"></div>
+    <div class="pk" id="face"></div>
+    <div id="you"><span></span><i></i></div>
+  </section>
+</div>
+<script>
+const shot = $("#act");
+// On the dark stage the nameless blob is a dim blue, in a pool of slightly lighter dark.
+const face = hero($("#face"), GHOST, { render: (who, o) => (who === GHOST ? ghost(o, ["#3b4677", "#e6e9f3", "#8f98bd"]) : pipkin(who, o)) });
+const poolOf = (who) => (who === GHOST ? "#1c2346" : oklch(0.33, 0.07, genome(who).genes.hue));
+
+// "you", one letter at a time.
+const keys = [1300, 1640, 1960];
+const word = $("#you span");
+const caret = $("#you i");
+on((t) => {
+  word.textContent = "you".slice(0, typedAt(keys, t));
+  caret.style.opacity = (t > keys[0] - 100 && t < keys[2] + 300) || Math.floor(t / 420) % 2 === 0 ? 1 : 0;
+});
+
+// The spin: fast, then slower and slower, like a wheel about to stop.
+const SPIN = 2750;
+const gaps = [...Array(26).fill(55), 70, 85, 105, 130, 160, 200, 250, 310, 380, 460, 560];
+const cast = [[-1e9, GHOST]];
+let t = SPIN;
+gaps.forEach((gap, i) => {
+  const name = CROWD[(i * 7 + 3) % CROWD.length];
+  cast.push([t, name]);
+  face.name(t, name, gap >= 130);
+  t += gap;
+});
+// It never lands: the cut comes where the last face would have been.
+const CUT = t;
+face.squash(SPIN - 420, 0.12, 160, E.soft).squash(SPIN - 260, 0, 260, E.spring(0.4));
+const pool = $("#pool");
+on((t) => (pool.style.background = poolOf(latest(cast, t)[1])));
+tw(shot, { s: [1, 1.16] }, SPIN, CUT - SPIN, E.io);
+scene(shot, 0, CUT);
+finale(CUT, "yours is waiting.");
+
+const DURATION = CUT + 3300;
+const POSTER = CUT + 2600;
+</script>

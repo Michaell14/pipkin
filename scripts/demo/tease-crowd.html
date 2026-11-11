@@ -1,0 +1,52 @@
+<!-- Teaser: the crowd gathers. One hops in and looks at you; then two more; then a stampede. They blink together. -->
+<style>
+#world { position: absolute; inset: 0; }
+</style>
+<div id="stage"><section class="scene" id="shot"><div id="world"></div></section></div>
+<script>
+const world = $("#world");
+const D = 330;
+// Five rows, the back ones smaller and higher up, built back to front so the front row stands in front.
+const ROWS = [{ y: 430, s: 0.4, n: 12 }, { y: 530, s: 0.5, n: 10 }, { y: 650, s: 0.63, n: 8 }, { y: 800, s: 0.8, n: 7 }, { y: 990, s: 1, n: 5 }];
+const names = CROWD.filter((n) => n !== "cleo");
+const cast = [];
+ROWS.forEach((row, r) => {
+  for (let c = 0; c < row.n; c++) {
+    const front = r === ROWS.length - 1;
+    const lead = front && c === 2;
+    const x = (1920 * (c + 0.5)) / row.n + (lead ? 0 : (rnd("crowd", "x" + cast.length) - 0.5) * 50);
+    const fromLeft = lead || (front && c === 1) || (!(front && c === 3) && x < 960);
+    const start = fromLeft ? -240 * row.s : 1920 + 240 * row.s;
+    const name = lead ? "cleo" : names[(cast.length * 5 + 1) % names.length];
+    const a = actor(world, name, D, start, row.y + (lead ? 0 : (rnd("crowd", "y" + cast.length) - 0.5) * 24), { scale: row.s });
+    const hops = Math.max(2, Math.round(Math.abs(x - start) / (300 * row.s)));
+    cast.push({ a, x, dir: fromLeft ? 1 : -1, hops, lead, side: front && (c === 1 || c === 3), trip: hops * 270 - 40 });
+  }
+});
+const walkIn = (p, t0) => {
+  p.a.h.look(t0 - 80, p.dir * 2.4, 0, 1);
+  p.land = p.a.go(t0, { x: p.x }, { hops: p.hops, dur: 230, rest: 40 });
+  p.a.h.look(p.land + 110, 0, 0, 170);
+  return p.land;
+};
+
+// One, who has a look at you and then a look around.
+const lead = cast.find((p) => p.lead);
+walkIn(lead, 200);
+lead.a.h.blink(lead.land + 420).look(lead.land + 760, -2.4, 0, 180).look(lead.land + 1180, 2.4, 0, 220).look(lead.land + 1700, 0, 0, 180);
+// Two more.
+cast.filter((p) => p.side).forEach((p, i) => walkIn(p, lead.land + 620 + i * 190));
+// Then everyone. Those with the furthest to come land last.
+const rest = cast.filter((p) => !p.lead && !p.side).sort((a, b) => a.trip - b.trip);
+const RUSH = lead.land + 2300;
+rest.forEach((p, i) => walkIn(p, RUSH + i * 48 - p.trip + rest[0].trip));
+const here = Math.max(...cast.map((p) => p.land));
+// All together now: a blink, then a hop that ripples out from the middle.
+for (const p of cast) p.a.h.blink(here + 420).hop(here + 760 + Math.abs(p.x - 960) * 0.26, D * 0.2, 300).blink(here + 1750);
+const CUT = here + 2100;
+scene($("#shot"), 0, CUT);
+finale(CUT, "they're coming.");
+
+const DURATION = Math.round(CUT + 3000);
+const POSTER = Math.round(here + 300);
+</script>

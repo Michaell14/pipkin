@@ -152,7 +152,7 @@ npm run demo       # re-render the demo videos, docs/demo/ (needs Playwright and
 
 `npm run demo` renders six 20-second cuts and a 10-second `teaser` at 1080p60. Three are the originals: `tour` (light, the site's look), `code` (dark, an editor with each call playing out beside it) and `pop` (full-bleed colour and big type). Three blend `tour` and `pop`: `tour-pop` (the tour's script on colour panels), `pop-tour` (the pop opening and end card around the tour's walkthrough) and `type-pop` (the pop cut, opening on a name typed live).
 
-There are also three ten-second character pieces with no product in them, in which a pipkin turns up, says hi and leaves: `hi-walk`, `hi-peek` and `hi-far`.
+There are also three ten-second character pieces with no product in them, in which a pipkin turns up, says hi and leaves: `hi-walk`, `hi-peek` and `hi-far`. And five teasers for a launch, each ending on one line and a date: `tease-yours`, `tease-eyes`, `tease-crowd`, `tease-fuse` and `tease-cursor`. The date is "soon." unless you pass one: `npm run demo -- tease-yours --when="nov 20"`.
 
 Pass names to render only some (`npm run demo -- pop`), and `--stills=1.5,12` to write single frames instead of a video. Each cut is one short page in `scripts/demo/` that lines up scenes from `scripts/demo/scenes.js`, which is built on the small timeline kit in `scripts/demo/kit.js`.
 

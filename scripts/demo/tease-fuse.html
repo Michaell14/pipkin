@@ -1,0 +1,46 @@
+<!-- Teaser: something's coming together. Seven drift in from the edges, slowly, then snap into one creature that stares back. -->
+<style>
+body { background: var(--ink); }
+/* The drawing area is wider than the frame, so nothing is cut off where they wait at the edges. */
+#melt { position: absolute; left: -60px; top: -480px; width: 2040px; height: 2040px; }
+</style>
+<div id="stage"><section class="scene" id="shot"><div id="melt"></div></section></div>
+<script>
+const team = ["zoe", "omar", "iris", "lena", "theo", "juno", "ezra"];
+const melt = $("#melt");
+const fused = fusedPlaces(team);
+// They start on a wide ring, each out in the direction of the place it will take.
+const RING = 4.15;
+const apart = Object.fromEntries(
+  team.map((n) => {
+    const a = Math.hypot(fused[n].x, fused[n].y) < 0.05 ? Math.PI / 2 : Math.atan2(fused[n].y, fused[n].x);
+    return [n, { x: Math.cos(a) * RING, y: Math.sin(a) * RING * 0.9, s: 1, m: 0 }];
+  }),
+);
+// k: 0 apart, 1 fused. A long slow drift inwards, a pause, and then all at once.
+const SNAP = 4000;
+const k = { k: 0, m: 0 };
+tw(k, { k: [0, 0.4] }, 1500, 2200, E.io);
+tw(k, { k: 1.05 }, SNAP, 460, bez(0.7, 0, 0.6, 1));
+tw(k, { k: 1 }, SNAP + 460, 600, E.spring(0.4, 12));
+tw(k, { m: [0, 1] }, SNAP + 300, 520, E.io);
+const born = team.map((n, i) => 250 + i * 140);
+const grow = E.spring(0.55);
+const placesAt = (t) => {
+  const P = mixPlaces(apart, fused, trackAt(k, "k", t), trackAt(k, "m", t));
+  team.forEach((n, i) => (P[n].s *= Math.max(0.02, grow(clamp((t - born[i]) / 800)))));
+  return P;
+};
+// Its eyes blink round in turn, then all at once.
+const CUT = 7600;
+const blinks = Object.fromEntries(team.map((n, i) => [n, [born[i] + 950, 2500 + i * 210, SNAP + 1400 + i * 160, SNAP + 2750]]));
+melter(melt, team, placesAt, { scale: 30, cells: 384, cy: 0, from: 0, to: CUT + 100, blinks });
+tw(melt, { sx: [1, 1.07], sy: [1, 0.93] }, SNAP + 420, 110, E.soft);
+tw(melt, { sx: 1, sy: 1 }, SNAP + 530, 900, E.spring(0.3, 14));
+tw(melt, { s: [1, 1.12] }, SNAP + 600, CUT - SNAP - 600, E.soft);
+scene($("#shot"), 0, CUT);
+finale(CUT, "something's coming<br>together.");
+
+const DURATION = CUT + 3100;
+const POSTER = SNAP + 2200;
+</script>
