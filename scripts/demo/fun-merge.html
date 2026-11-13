@@ -1,0 +1,59 @@
+<!-- Short and sweet: one pipkin, then another jumps into it, and another, until seven are one. -->
+<style>
+/* The drawing area is wider than the frame, so nothing is cut off at its edges. */
+#melt { position: absolute; left: -60px; top: -520px; width: 2040px; height: 2040px; }
+.chip { top: 930px; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="melt"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const team = ["zoe", "omar", "iris", "lena", "theo", "juno", "ezra"];
+const melt = $("#melt");
+// LAYOUT[n] is where fuse() puts each of the first n. Alone, the first keeps both its eyes.
+const LAYOUT = [null, { [team[0]]: { x: 0, y: 0, s: 1, m: 0 } }];
+for (let n = 2; n <= team.length; n++) LAYOUT[n] = fusedPlaces(team.slice(0, n));
+// Each newcomer turns up at one side, then jumps in. The first is there from the start.
+const GAP = 1150;
+const AIR = 520;
+const side = (j) => ({ x: j % 2 ? -5 : 5, y: 0.9 });
+const shows = (j) => 500 + (j - 1) * GAP;
+const jumps = (j) => shows(j) + 480;
+const lands = (j) => (j ? jumps(j) + AIR : -1e9);
+const grow = E.spring(0.5);
+const settle = E.spring(0.45, 12);
+const placesAt = (t) => {
+  let n = 1;
+  while (n < team.length && lands(n) <= t) n++;
+  const P = {};
+  team.forEach((name, j) => {
+    if (j < n) {
+      // In the body: it shuffles over each time someone new lands.
+      const now = LAYOUT[n][name];
+      const was = j < n - 1 ? LAYOUT[n - 1][name] : now;
+      const k = settle(clamp((t - lands(n - 1)) / 520));
+      const merged = j === 0 ? clamp((t - lands(1)) / 360) : clamp((t - lands(j)) / 360);
+      P[name] = { x: mix(was.x, now.x, k), y: mix(was.y, now.y, k), s: mix(was.s, now.s, k), m: n === 1 ? 0 : merged };
+    } else {
+      // Until its turn it waits, tiny, below the bottom of the frame.
+      const from = t < shows(j) ? { x: side(j).x, y: 5.9 } : side(j);
+      const to = LAYOUT[j + 1][name];
+      const p = clamp((t - jumps(j)) / AIR);
+      const size = Math.max(0.002, grow(clamp((t - shows(j)) / 420)));
+      P[name] = { x: mix(from.x, to.x, p), y: mix(from.y, to.y, p) - 2.6 * 4 * p * (1 - p), s: size * mix(1, to.s, p), m: 0 };
+    }
+  });
+  return P;
+};
+const done = lands(team.length - 1);
+const blinks = Object.fromEntries(team.map((name, j) => [name, [j ? shows(j) + 330 : 250, lands(j) + 700 + ((j * 310) % 500), done + 600 + j * 110, done + 1700]]));
+melter(melt, team, placesAt, { scale: 30, cells: 384, cy: 0.5, blinks });
+// The body wobbles as each one lands.
+for (let j = 1; j < team.length; j++) {
+  tw(melt, { sx: [1, 1.06], sy: [1, 0.94] }, lands(j), 90, E.soft);
+  tw(melt, { sx: 1, sy: 1 }, lands(j) + 90, 620, E.spring(0.32, 14));
+}
+pop($("#cmd"), done + 500, { dur: 700, from: 0.5 });
+const DURATION = Math.round(done + 2600);
+const POSTER = Math.round(done + 1400);
+</script>
