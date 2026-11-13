@@ -1,0 +1,39 @@
+<!-- Short and sweet: four pipkins hop in and stack up into a tower. -->
+<style>
+#world { position: absolute; inset: 0; }
+.chip { top: 470px; left: 1100px; right: auto; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="world"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const D = 270;
+const GROUND = 980;
+const STEP = D * 0.56;
+const names = ["omar", "ezra", "lena", "maya@acme.co"];
+const tower = [];
+let t = 200;
+names.forEach((n, i) => {
+  const fromLeft = i % 2 === 0;
+  const a = actor($("#world"), n, D, fromLeft ? -200 : 2120, GROUND);
+  a.h.look(0, fromLeft ? 2.4 : -2.4, 0, 1);
+  if (i === 0) t = a.go(t, { x: 700 }, { hops: 3, dur: 250, rest: 50 });
+  else {
+    // Up beside the tower, then one big hop onto the top of it.
+    t = a.go(t, { x: fromLeft ? 380 : 1020 }, { hops: fromLeft ? 2 : 4, dur: 240, rest: 50 });
+    t = a.go(t + 90, { x: 700, y: GROUND - i * STEP }, { hops: 1, dur: 460, rest: 0, height: D * 0.55 });
+    // Everyone underneath feels it land.
+    for (const below of tower) below.h.squash(t, 0.11, 80, E.soft).squash(t + 80, 0, 420, E.spring(0.35));
+  }
+  a.h.look(t + 120, 0, 0, 180).blink(t + 400);
+  tower.push(a);
+  t += 260;
+});
+// The one on top has a look round; then they all blink at you.
+const crown = tower[tower.length - 1];
+crown.h.look(t + 200, -2.2, 0, 200).look(t + 600, 2.4, 0.4, 240).twitch(t + 900).look(t + 1150, 0, 0, 180);
+pop($("#cmd"), t + 700, { dur: 700, from: 0.5 });
+for (const a of tower) a.h.blink(t + 1500, t + 1720);
+const DURATION = Math.round(t + 2900);
+const POSTER = Math.round(t + 2000);
+</script>

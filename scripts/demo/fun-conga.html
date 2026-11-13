@@ -1,0 +1,25 @@
+<!-- Short and sweet: a conga line hops across the frame, and a small one hurries after it. -->
+<style>
+#world { position: absolute; inset: 0; }
+.chip { top: 330px; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="world"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const names = ["cleo", "theo", "ezra", "juno", "omar", "iris"];
+names.forEach((n, i) => {
+  const a = actor($("#world"), n, 260, -180 - i * 250, 800);
+  a.h.look(0, 2.4, 0, 1).blink(900 + i * 260, 2600 + i * 190);
+  a.go(150 + i * 110, { x: 3600 - i * 250 }, { hops: 14, dur: 250, rest: 60 });
+});
+// The small one is late.
+const small = actor($("#world"), "maya@acme.co", 260, -160, 800, { scale: 0.55 });
+small.h.look(0, 2.4, 0, 1);
+let t = small.go(2500, { x: 900 }, { hops: 7, dur: 170, rest: 30 });
+small.h.look(t + 80, 0, 0, 150).blink(t + 300, t + 520).look(t + 800, 2.4, 0, 150);
+t = small.go(t + 950, { x: 2150 }, { hops: 8, dur: 160, rest: 25 });
+pop($("#cmd"), 3300, { dur: 700, from: 0.5 });
+const DURATION = Math.round(t + 900);
+const POSTER = 3800;
+</script>

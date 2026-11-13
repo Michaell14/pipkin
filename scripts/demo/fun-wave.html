@@ -1,0 +1,22 @@
+<!-- Short and sweet: a row of pipkins does a stadium wave, there and back, then all jump. -->
+<style>
+#world { position: absolute; inset: 0; }
+.chip { top: 810px; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="world"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const names = ["cleo", "maya@acme.co", "ezra", "omar", "lena", "iris", "theo", "juno", "rosa"];
+const row = names.map((n, i) => actor($("#world"), n, 260, 160 + i * 200, 690));
+row.forEach((a, i) => {
+  const back = row.length - 1 - i;
+  a.h.hop(600 + i * 95, 120, 400).hop(2300 + back * 95, 120, 400).hop(4000, 150, 460);
+  a.h.blink(300 + ((i * 370) % 900), 1900 + ((i * 230) % 500), 3600, 5200 + ((i * 310) % 700));
+  // Each watches the wave come.
+  a.h.look(350, -2, 0, 200).look(600 + i * 95, 2, 0, 250).look(2300 + back * 95, -2, 0, 250).look(3700, 0, 0, 200);
+});
+pop($("#cmd"), 4380, { dur: 700, from: 0.5 });
+const DURATION = 6600;
+const POSTER = 5600;
+</script>
