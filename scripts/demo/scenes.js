@@ -435,3 +435,42 @@ function finale(T, line) {
   if (line) rise($("p", box), T + 1350, { d: 20, dur: 520 });
   return box;
 }
+
+/**
+ * One body that grows as the team joins it one at a time. o.path(j, u, to) says where newcomer j
+ * is on its way in, for u from 0 (it turns up) to 1 (it lands at `to`, its place in the body);
+ * o.gap is the time between arrivals and o.lead how long each one's way in takes. Returns when
+ * the last one lands.
+ */
+function mergeIn(melt, team, o) {
+  // LAYOUT[n] is where fuse() puts each of the first n. Alone, the first keeps both its eyes.
+  const LAYOUT = [null, { [team[0]]: { x: 0, y: 0, s: 1, m: 0 } }];
+  for (let n = 2; n <= team.length; n++) LAYOUT[n] = fusedPlaces(team.slice(0, n));
+  const shows = (j) => 500 + (j - 1) * o.gap;
+  const lands = (j) => (j ? shows(j) + o.lead : -1e9);
+  const settle = E.spring(0.45, 12);
+  const placesAt = (t) => {
+    let n = 1;
+    while (n < team.length && lands(n) <= t) n++;
+    const P = {};
+    team.forEach((name, j) => {
+      if (j < n) {
+        // In the body: it shuffles over each time someone new lands.
+        const now = LAYOUT[n][name];
+        const was = j < n - 1 ? LAYOUT[n - 1][name] : now;
+        const k = settle(clamp((t - lands(n - 1)) / 520));
+        P[name] = { x: mix(was.x, now.x, k), y: mix(was.y, now.y, k), s: mix(was.s, now.s, k), m: n === 1 ? 0 : clamp((t - lands(j || 1)) / 360) };
+      } else if (t < shows(j)) P[name] = { x: j % 2 ? -5 : 5, y: 5.9, s: 0.002, m: 0 }; // waiting, out of sight
+      else P[name] = { ...o.path(j, clamp((t - shows(j)) / o.lead), LAYOUT[j + 1][name]), m: 0 };
+    });
+    return P;
+  };
+  const done = lands(team.length - 1);
+  const blinks = Object.fromEntries(team.map((name, j) => [name, [j ? shows(j) + 420 : 250, lands(j) + 700 + ((j * 310) % 500), done + 600 + j * 110, done + 1700]]));
+  melter(melt, team, placesAt, { scale: 30, cells: 384, cy: 0.5, blinks });
+  for (let j = 1; j < team.length; j++) {
+    tw(melt, { sx: [1, 1.06], sy: [1, 0.94] }, lands(j), 90, E.soft);
+    tw(melt, { sx: 1, sy: 1 }, lands(j) + 90, 620, E.spring(0.32, 14));
+  }
+  return done;
+}

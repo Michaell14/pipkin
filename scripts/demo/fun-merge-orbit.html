@@ -1,0 +1,25 @@
+<!-- Short and sweet: each pipkin circles the body once, then spirals in and joins it. -->
+<style>
+#melt { position: absolute; left: -60px; top: -520px; width: 2040px; height: 2040px; }
+.chip { top: 930px; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="melt"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const done = mergeIn($("#melt"), ["zoe", "omar", "iris", "lena", "theo"], {
+  gap: 1350,
+  lead: 1800,
+  path(j, u, to) {
+    // Once round, alternately clockwise and anticlockwise, then in.
+    const dir = j % 2 ? -1 : 1;
+    const turn = (j % 2 ? Math.PI : 0) + dir * E.io(Math.min(1, u / 0.78)) * Math.PI * 2;
+    const ring = { x: Math.cos(turn) * 4.1, y: 0.25 + Math.sin(turn) * 2.75 };
+    const p = E.io(clamp((u - 0.74) / 0.26));
+    return { x: mix(ring.x, to.x, p), y: mix(ring.y, to.y, p), s: mix(0.72 * Math.min(1, u * 8), to.s, p) };
+  },
+});
+pop($("#cmd"), done + 500, { dur: 700, from: 0.5 });
+const DURATION = Math.round(done + 2500);
+const POSTER = Math.round(done + 1400);
+</script>

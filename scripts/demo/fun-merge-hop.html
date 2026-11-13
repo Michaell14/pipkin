@@ -1,0 +1,33 @@
+<!-- Short and sweet: each pipkin hops in from the side, bounces on the spot to work itself up, then leaps into the body. -->
+<style>
+#melt { position: absolute; left: -60px; top: -520px; width: 2040px; height: 2040px; }
+.chip { top: 930px; }
+.chip div { padding: 22px 60px; font-size: 60px; }
+</style>
+<div id="stage"><div id="melt"></div><div class="chip"><div id="cmd"></div></div></div>
+<script>
+$("#cmd").textContent = CFG.install;
+const GROUND = 0.9;
+const bounce = (p, height) => -height * 4 * p * (1 - p);
+const done = mergeIn($("#melt"), ["zoe", "omar", "iris", "lena", "theo"], {
+  gap: 1350,
+  lead: 1800,
+  path(j, u, to) {
+    const dir = j % 2 ? -1 : 1;
+    const s = Math.min(1, 0.3 + u * 6);
+    // Three hops in from the edge.
+    if (u < 0.42) {
+      const hop = (u / 0.42) * 3;
+      return { x: dir * mix(5.3, 3.5, Math.min(3, Math.floor(hop) + E.soft(hop % 1)) / 3), y: GROUND + bounce(hop % 1, 0.55), s };
+    }
+    // Two higher bounces on the spot.
+    if (u < 0.72) return { x: dir * 3.5, y: GROUND + bounce((((u - 0.42) / 0.3) * 2) % 1, 1.15), s: 1 };
+    // And the leap.
+    const p = (u - 0.72) / 0.28;
+    return { x: mix(dir * 3.5, to.x, p), y: mix(GROUND, to.y, p) + bounce(p, 2.7), s: mix(1, to.s, p) };
+  },
+});
+pop($("#cmd"), done + 500, { dur: 700, from: 0.5 });
+const DURATION = Math.round(done + 2500);
+const POSTER = Math.round(done + 1400);
+</script>
