@@ -1,0 +1,54 @@
+<!-- After the demo, all at once: four tiles, each playing one more thing a pipkin does, then the end card. -->
+<style>
+#bento { position: absolute; inset: 0; }
+.tile { position: absolute; width: 900px; height: 480px; overflow: hidden; border-radius: 48px; background: #fff; box-shadow: 0 40px 80px -50px rgba(20, 26, 51, 0.4), 0 0 0 2px rgba(20, 26, 51, 0.06); }
+.tile h2 { position: absolute; left: 40px; top: 26px; z-index: 3; margin: 0; font-size: 48px; font-weight: 800; letter-spacing: -0.03em; }
+.tile .melt { position: absolute; left: 210px; top: 10px; width: 480px; height: 480px; }
+.tile .solo { left: 270px; top: 70px; width: 360px; height: 360px; }
+.tile .say { position: absolute; right: 40px; bottom: 34px; padding: 10px 28px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 34px; }
+</style>
+<div id="stage"><section class="scene" id="bento"></section></div>
+<script>
+const bento = $("#bento");
+const OUT = 8900;
+const tile = (i, title) => {
+  const t = add(bento, `<div class="tile" style="left:${i % 2 ? 990 : 30}px;top:${i > 1 ? 570 : 30}px"><h2>${title}</h2></div>`);
+  pop(t, 150 + i * 260, { dur: 700, from: 0.7, z: 0.6 });
+  unpop(t, OUT + i * 50);
+  return t;
+};
+
+// Breed two.
+breedAct(tile(0, "they breed"), 500, { a: "rosa", b: "priya", w: 900, h: 480, cx: 450, py: 150, pd: 180, half: 150, kids: 3, ky: 372, kd: 150, kstep: 200, tags: false });
+
+// Fuse a team.
+{
+  const t = tile(1, "they fuse");
+  fuseAct(t, add(t, `<div class="melt"></div>`), 800, { team: ["zoe", "omar", "iris", "lena", "theo"], ring: 3.1, cells: 300, scale: 30, cy: -0.1, zoom: 1.45, to: OUT + 600 });
+}
+
+// Moods.
+{
+  const t = tile(2, "they have moods");
+  const h = hero(add(t, `<div class="pk solo"></div>`), HERO);
+  const label = add(t, `<div class="say"></div>`);
+  const moods = ["happy", "sleepy", "grumpy", "smug", "worried", "excited", "determined", "happy", "sleepy", "smug"].map((m, i) => [1700 + i * 720, m]);
+  moods.forEach(([at, m]) => h.mood(at, m));
+  on((time) => (label.textContent = latest([[-1e9, "neutral"], ...moods], time)[1]));
+}
+
+// Motion.
+{
+  const t = tile(3, "they're alive");
+  const h = hero(add(t, `<div class="pk solo"></div>`), "cleo", { breathe: 0.03 });
+  h.blink(1500, 3300, 3520, 5600, 7400).twitch(2100).twitch(4500, "r").twitch(6600, "l");
+  h.hop(2700, 36).hop(6000, 44).hop(6460, 30);
+  h.look(3800, -2.3, 0, 200).look(4300, 2.3, 0, 240).look(4900, 0, 0, 180);
+}
+
+scene(bento, 0, OUT + 500);
+cardEnd(act(OUT + 150, 1e9), OUT + 150);
+
+const DURATION = 12000;
+const POSTER = 6500;
+</script>

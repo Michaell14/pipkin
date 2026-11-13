@@ -1,0 +1,22 @@
+<!-- After the demo, in the pop cut's look: "and that's not all." then breed, fuse, moods, and the end card. -->
+<div id="stage"></div>
+<script>
+const CUTS = [0, 1700, 5100, 8700, 11000, 1e9];
+// The opener borrows the "hi" layout: a face with a line under it.
+{
+  const box = panel(CUTS[0], CUTS[1], { slide: false, bg: wash(HERO) });
+  box.classList.add("pp-hi");
+  const face = hero(add(box, `<div class="pk face"></div>`), HERO);
+  const line = add(box, `<h1 class="big"><span>and that's not all.</span></h1>`);
+  line.style.fontSize = "170px";
+  face.hop(150, 54).blink(560, 1250).twitch(900);
+  stamp(line, 120);
+}
+popBreed(panel(CUTS[1], CUTS[2]), CUTS[1]);
+popFuse(panel(CUTS[2], CUTS[3], { cls: "dark" }), CUTS[2], { until: CUTS[3] + 600 });
+popMood(panel(CUTS[3], CUTS[4]), CUTS[3]);
+popEnd(panel(CUTS[4], CUTS[5], { cls: "dark" }), CUTS[4]);
+
+const DURATION = 14000;
+const POSTER = 13200;
+</script>

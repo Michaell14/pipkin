@@ -1,0 +1,26 @@
+<!-- After the demo, in the tour's look: "They do more than sit there." then breed, fuse, moods, and the end card. -->
+<style>
+#open h1 { position: absolute; left: 0; right: 0; top: 590px; font-size: 124px; text-align: center; }
+#open .pk { left: 760px; top: 150px; width: 400px; height: 400px; }
+</style>
+<div id="stage"></div>
+<script>
+{
+  const box = act(0, 1900, "sc");
+  box.id = "open";
+  const host = add(box, `<div class="pk"></div>`);
+  const face = hero(host, HERO, { background: "squircle" });
+  add(box, `<h1>They do more than sit there.</h1>`);
+  const hw = words($("h1", box));
+  face.hop(200, 40).blink(620, 1300).twitch(950);
+  headlineOut(hw, 1560);
+  unpop(host, 1580);
+}
+breedScene(act(1780, 3850), 1780).out(5280);
+fuseScene(act(5540, 3900), 5540).out(9100);
+moodScene(act(9360, 2500), 9360).out(11490);
+cardEnd(act(11560, 1e9), 11560);
+
+const DURATION = 14500;
+const POSTER = 13600;
+</script>
